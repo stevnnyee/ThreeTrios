@@ -10,7 +10,7 @@ public class MainModelImpl implements MainModelInterface {
   private Player bluePlayer;
   private Player currentPlayer;
   private boolean gameStarted;
-  private boolean gameOver;
+  private final boolean gameOver;
 
   public MainModelImpl() {
     this.gameStarted = false;
@@ -134,9 +134,15 @@ public class MainModelImpl implements MainModelInterface {
   }
 
   private Direction getBattleDirection(Position from, Position to) {
-    if (from.row < to.row) return Direction.SOUTH;
-    if (from.row > to.row) return Direction.NORTH;
-    if (from.col < to.col) return Direction.EAST;
+    if (from.row < to.row) {
+      return Direction.SOUTH;
+    }
+    if (from.row > to.row) {
+      return Direction.NORTH;
+    }
+    if (from.col < to.col) {
+      return Direction.EAST;
+    }
     return Direction.WEST;
   }
 
@@ -165,8 +171,12 @@ public class MainModelImpl implements MainModelInterface {
     int redScore = countPlayerCards(redPlayer);
     int blueScore = countPlayerCards(bluePlayer);
 
-    if (redScore > blueScore) return redPlayer;
-    if (blueScore > redScore) return bluePlayer;
+    if (redScore > blueScore) {
+      return redPlayer;
+    }
+    if (blueScore > redScore) {
+      return bluePlayer;
+    }
     return null;
   }
 
