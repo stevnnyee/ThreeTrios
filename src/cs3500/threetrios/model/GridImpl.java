@@ -79,16 +79,6 @@ public class GridImpl implements Grid {
   }
 
   @Override
-  public List<Position> getAdjacentCardPositions(Position pos) {
-    return List.of();
-  }
-
-  @Override
-  public boolean isFull() {
-    return false;
-  }
-
-  @Override
   public int getCardCellCount() {
     return cardCellCount;
   }

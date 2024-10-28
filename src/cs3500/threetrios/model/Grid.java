@@ -11,8 +11,5 @@ public interface Grid {
   boolean isEmpty(int row, int col);
   Card getCard(int row, int col);
   void placeCard(int row, int col, Card card);
-  List<Position> getAdjacentCardPositions(Position pos);
-  boolean isFull();
-
   int getCardCellCount();
 }
