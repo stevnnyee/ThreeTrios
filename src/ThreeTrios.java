@@ -24,10 +24,32 @@ public class ThreeTrios {
         System.out.println("\n" + view.toString());
         Player currentPlayer = model.getCurrentPlayer();
         System.out.println(currentPlayer.getColor() + "'s turn");
-        System.out.print("Enter row (0-2): ");
-        int row = scanner.nextInt();
-        System.out.print("Enter column (0-2): ");
-        int col = scanner.nextInt();
+        int row = -1;
+        while (row < 0 || row > 2) {
+          System.out.print("Enter row (0-2): ");
+          if (scanner.hasNextInt()) {
+            row = scanner.nextInt();
+            if (row < 0 || row > 2) {
+              System.out.println("Invalid row. Number must be between 0 and 2.");
+            }
+          } else {
+            System.out.println("Invalid input.");
+            scanner.next();
+          }
+        }
+        int col = -1;
+        while (col < 0 || col > 2) {
+          System.out.print("Enter column (0-2): ");
+          if (scanner.hasNextInt()) {
+            col = scanner.nextInt();
+            if (col < 0 || col > 2) {
+              System.out.println("Invalid column. Number must be between 0 and 2.");
+            }
+          } else {
+            System.out.println("Invalid input.");
+            scanner.next();
+          }
+        }
         List<Card> hand = currentPlayer.getHand();
         System.out.println("\nYour cards:");
         for (int i = 0; i < hand.size(); i++) {
@@ -66,8 +88,8 @@ public class ThreeTrios {
   private static List<Card> createDeck() {
     List<Card> deck = new ArrayList<>();
 
-    String[] cardNames = {"Knight", "Dragon", "Wizard", "Warrior", "Archer",
-            "Mage", "Rogue", "Paladin", "Monk", "Ninja"};
+    String[] cardNames = {"BlackKnight", "BabyDragon", "IceWizard", "EliteBarbs", "Archer",
+            "Witch", "Goblin", "Princess", "Prince", "Valkyrie"};
 
     for (int i = 0; i < 10; i++) {
       int north = 1 + (int)(Math.random() * 10);
