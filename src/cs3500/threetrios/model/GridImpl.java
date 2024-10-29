@@ -66,9 +66,10 @@ public class GridImpl implements Grid {
     return cards[row][col];
   }
 
-  @Override
   public void placeCard(int row, int col, Card card) {
     validatePosition(row, col);
+    System.out.println("Attempting to place card at (" + row + ", " + col + ")");
+
     if (holes[row][col]) {
       throw new IllegalStateException("Cannot place card in a hole");
     }
@@ -76,6 +77,7 @@ public class GridImpl implements Grid {
       throw new IllegalStateException("Position already contains a card");
     }
     cards[row][col] = card;
+    System.out.println("Card placed successfully.");
   }
 
   @Override

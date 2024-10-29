@@ -14,6 +14,7 @@ public interface MainModelInterface {
 
   Player getCurrentPlayer();
 
+
   void executeBattlePhase(MainModelImpl.Position newCardPosition);
 
   boolean isGameOver();
@@ -21,8 +22,6 @@ public interface MainModelInterface {
   Player getWinner();
 
   boolean placeCard(int row, int col, Card card);
-
-  void executeBattlePhase(Position newCardPosition);
 
   Player determineWinner();
 

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.text.Position;
+
 public class MainModelImpl implements MainModelInterface {
   private Grid grid;
   private Player redPlayer;
@@ -64,7 +66,10 @@ public class MainModelImpl implements MainModelInterface {
   @Override
   public void makeMove(int row, int col, Card card) {
     validateMove(row, col, card);
-    placeCard(row, col, card);
+    if (grid.getCard(row, col) != null) {
+      throw new IllegalStateException("Cannot place a card on top of another card.");
+    }
+    grid.placeCard(row, col, card);
     executeBattlePhase(new Position(row, col));
     currentPlayer = (currentPlayer == redPlayer) ? bluePlayer : redPlayer;
   }
@@ -90,11 +95,6 @@ public class MainModelImpl implements MainModelInterface {
   }
 
   @Override
-  public void executeBattlePhase(javax.swing.text.Position newCardPosition) {
-
-  }
-
-  @Override
   public void executeBattlePhase(Position newCardPosition) {
     List<Position> adjacentPositions = getAdjacentPositions(newCardPosition);
     for (Position pos : adjacentPositions) {
@@ -112,15 +112,12 @@ public class MainModelImpl implements MainModelInterface {
     for (int[] dir : directions) {
       int newRow = position.row + dir[0];
       int newCol = position.col + dir[1];
-
       if (newRow >= 0 && newRow < grid.getRows() && newCol >= 0 && newCol < grid.getCols()) {
         positions.add(new Position(newRow, newCol));
       }
     }
-
     return positions;
   }
-
 
   private void checkAndFlipCard(Position attackerPos, Position defenderPos) {
     Card attacker = grid.getCard(attackerPos.row, attackerPos.col);
