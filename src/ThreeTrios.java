@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class ThreeTrios {
   public static void main(String[] args) {
-    MainModelInterface model = new MainModelImpl();
+    MainModelInterface model = new ThreeTriosGameModel();
     ThreeTriosView view = new ThreeTriosViewImpl(model);
     Scanner scanner = new Scanner(System.in);
 
@@ -97,7 +97,7 @@ public class ThreeTrios {
       int east = 1 + (int)(Math.random() * 10);
       int west = 1 + (int)(Math.random() * 10);
 
-      deck.add(new CardImpl(cardNames[i], north, south, east, west));
+      deck.add(new ThreeTriosCard(cardNames[i], north, south, east, west));
     }
 
     return deck;

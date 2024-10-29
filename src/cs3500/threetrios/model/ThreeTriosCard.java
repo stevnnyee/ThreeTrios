@@ -1,11 +1,14 @@
 package cs3500.threetrios.model;
 
-public class CardImpl implements Card {
+/**
+ * Class to represent a Card in the ThreeTrios Game,
+ */
+public class ThreeTriosCard implements Card {
   private final String name;
   private final int[] values; // [NORTH, SOUTH, EAST, WEST]
   private Player owner;
 
-  public CardImpl(String name, int north, int south, int east, int west) {
+  public ThreeTriosCard(String name, int north, int south, int east, int west) {
     this.name = name;
     this.values = new int[]{north, south, east, west};
     validateValues();

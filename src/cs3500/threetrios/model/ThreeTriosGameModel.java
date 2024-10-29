@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MainModelImpl implements MainModelInterface {
+public class ThreeTriosGameModel implements MainModelInterface {
   private Grid grid;
   private Player redPlayer;
   private Player bluePlayer;
@@ -12,7 +12,7 @@ public class MainModelImpl implements MainModelInterface {
   private boolean gameStarted;
   private final boolean gameOver;
 
-  public MainModelImpl() {
+  public ThreeTriosGameModel() {
     this.gameStarted = false;
     this.gameOver = false;
   }
@@ -39,8 +39,8 @@ public class MainModelImpl implements MainModelInterface {
 
   @Override
   public void initialize(Grid grid) {
-    this.redPlayer = new PlayerImpl("RED");
-    this.bluePlayer = new PlayerImpl("BLUE");
+    this.redPlayer = new ThreeTriosPlayer("RED");
+    this.bluePlayer = new ThreeTriosPlayer("BLUE");
   }
 
   @Override

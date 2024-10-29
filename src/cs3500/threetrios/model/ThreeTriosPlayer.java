@@ -3,11 +3,11 @@ package cs3500.threetrios.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayerImpl implements Player {
+public class ThreeTriosPlayer implements Player {
   private final String color;
   private final List<Card> hand;
 
-    public PlayerImpl(String color) {
+    public ThreeTriosPlayer(String color) {
     if (color == null || color.trim().isEmpty()) {
       throw new IllegalArgumentException("Color cannot be null or empty");
     }

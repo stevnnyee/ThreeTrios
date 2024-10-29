@@ -14,7 +14,7 @@ public interface MainModelInterface {
 
   Player getCurrentPlayer();
 
-  void executeBattlePhase(MainModelImpl.Position newCardPosition);
+  void executeBattlePhase(ThreeTriosGameModel.Position newCardPosition);
 
   boolean isGameOver();
 
