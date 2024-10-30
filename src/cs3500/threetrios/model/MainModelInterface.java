@@ -27,7 +27,7 @@ public interface MainModelInterface {
    * @param card   card to place
    * @throws IllegalArgumentException if the move is invalid
    */
-  void makeMove(Player player, int row, int col, Card card);
+  void placeCard(Player player, int row, int col, Card card);
 
   /**
    * Gets the current state of the grid.
@@ -37,12 +37,19 @@ public interface MainModelInterface {
   Grid getGrid();
 
   /**
-   * Gets the current player who turn it is to make a move.
+   * Gets the current player, either red or blue.
    *
    * @return the current Player
    */
   Player getCurrentPlayer();
 
+  /**
+   * Gets the hand of the specified player.
+   *
+   * @param player the player
+   * @return The list of cards in the player's hand
+   */
+  List<Card> getPlayerHand(Player player);
 
   void executeBattlePhase(ThreeTriosGameModel.Position newCardPosition);
 
@@ -69,8 +76,15 @@ public interface MainModelInterface {
    * @param card card
    * @return true if you can place card, false otherwise
    */
-  boolean placeCard(int row, int col, Card card);
+  boolean canPlaceCard(int row, int col, Card card);
 
+  /**
+   * Get score for specified player, the count of owned cards.
+   *
+   * @param player player
+   * @return number of cards owned by player
+   */
+  int getPlayerScore(Player player);
 
   Player determineWinner();
 

@@ -2,25 +2,30 @@ package cs3500.threetrios.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.text.Position;
 
 /**
  * Implementation of the ThreeTriosModel Interface.
+ * This handles the game state, card placement, battling, and turn mechanics.
  */
 public class ThreeTriosGameModel implements MainModelInterface {
   private Grid grid;
   private Player redPlayer;
   private Player bluePlayer;
   private Player currentPlayer;
+  private final Map<Player, List<Card>> playerHands;
   private boolean gameStarted;
-  private final boolean gameOver;
+  private boolean gameOver;
 
   /**
-   * Constructs a new ThreeTriosGameModel.
+   * Constructs a new ThreeTriosGameModel with an initial state.
    */
   public ThreeTriosGameModel() {
+    this.playerHands = new HashMap<>();
     this.gameStarted = false;
     this.gameOver = false;
   }
@@ -33,12 +38,25 @@ public class ThreeTriosGameModel implements MainModelInterface {
     dealCards(deck);
     this.currentPlayer = redPlayer;
     this.gameStarted = true;
+    this.gameOver = false;
   }
 
+  /**
+   * Method that helps validate the game setup parameters.
+   *
+   * @param grid the grid of the game
+   * @param deck deck of cards
+   */
   private void validateGameSetup(Grid grid, List<Card> deck) {
     if (grid == null || deck == null) {
       throw new IllegalArgumentException("Grid and deck cannot be null");
     }
+
+    int cardCells = grid.getCardCellCount();
+    if (cardCells % 2 == 0) {
+      throw new IllegalArgumentException("Grid must have odd number of card cells");
+    }
+
     int requiredCards = grid.getCardCellCount() + 1;
     if (deck.size() < requiredCards) {
       throw new IllegalArgumentException("Not enough cards for the game");
@@ -49,48 +67,72 @@ public class ThreeTriosGameModel implements MainModelInterface {
   public void initialize(Grid grid) {
     this.redPlayer = new ThreeTriosPlayer("RED");
     this.bluePlayer = new ThreeTriosPlayer("BLUE");
+    playerHands.clear(); // ensure hands are clear before drawing
+    playerHands.put(redPlayer, new ArrayList<>());
+    playerHands.put(bluePlayer, new ArrayList<>());
   }
 
   @Override
   public void dealCards(List<Card> deck) {
-    int cardsPerPlayer = (grid.getCardCellCount() + 1) / 2;
-
+    int handSize = (grid.getCardCellCount() + 1) / 2;
     List<Card> shuffledDeck = new ArrayList<>(deck);
     Collections.shuffle(shuffledDeck);
 
-    for (int i = 0; i < cardsPerPlayer; i++) {
-      Card redCard = shuffledDeck.get(i);
-      redCard.setOwner(redPlayer);
-      redPlayer.addCardToHand(redCard);
+    playerHands.get(redPlayer).clear();
+    playerHands.get(bluePlayer).clear();
 
-      Card blueCard = shuffledDeck.get(i + cardsPerPlayer);
+    for (int i = 0; i < handSize; i++) {
+      Card redCard = shuffledDeck.get(i);
+      Card blueCard = shuffledDeck.get(i + handSize);
+
+      redCard.setOwner(redPlayer);
       blueCard.setOwner(bluePlayer);
-      bluePlayer.addCardToHand(blueCard);
+
+      playerHands.get(redPlayer).add(redCard);
+      playerHands.get(bluePlayer).add(blueCard);
     }
   }
 
   @Override
-  public void makeMove(Player player, int row, int col, Card card) {
-    validateMove(row, col, card);
-    if (grid.getCard(row, col) != null) {
-      throw new IllegalStateException("Cannot place a card on top of another card.");
-    }
+  public void placeCard(Player player, int row, int col, Card card) {
+    validateMove(player, row, col, card);
     grid.placeCard(row, col, card);
+    playerHands.get(player).remove(card);
     executeBattlePhase(new Position(row, col));
     currentPlayer = (currentPlayer == redPlayer) ? bluePlayer : redPlayer;
+    gameOver = isGridFull();
   }
 
-  private void validateMove(int row, int col, Card card) {
+  /**
+   * Validates a move before it performs its action.
+   *
+   * @param player player
+   * @param row row
+   * @param col column
+   * @param card card
+   * @throws IllegalArgumentException if the move is invalid
+   * @throws IllegalStateException if the game state doesn't allow the move
+   */
+  private void validateMove(Player player, int row, int col, Card card) {
     if (!gameStarted || gameOver) {
       throw new IllegalStateException("Game not in progress");
+    }
+    if (player != currentPlayer) {
+      throw new IllegalArgumentException("Not your turn");
     }
     if (!currentPlayer.getHand().contains(card)) {
       throw new IllegalArgumentException("Card not in current player's hand");
     }
+    if (grid.getCard(row, col) != null) {
+      throw new IllegalStateException("Cannot place a card on top of another card.");
+    }
+    if (grid.isHole(row, col)) {
+      throw new IllegalArgumentException("Cannot place card in a hole");
+    }
   }
 
   @Override
-  public boolean placeCard(int row, int col, Card card) {
+  public boolean canPlaceCard(int row, int col, Card card) {
     try {
       grid.placeCard(row, col, card);
       currentPlayer.removeCardFromHand(card);
@@ -98,6 +140,16 @@ public class ThreeTriosGameModel implements MainModelInterface {
     } catch (IllegalStateException | IllegalArgumentException e) {
       return false;
     }
+  }
+
+  @Override
+  public int getPlayerScore(Player player) {
+    return 0; //NEED TO COMPLETE
+  }
+
+  @Override
+  public List<Card> getPlayerHand(Player player) {
+    return List.of();
   }
 
   @Override
