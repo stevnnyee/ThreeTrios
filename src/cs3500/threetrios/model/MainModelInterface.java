@@ -2,8 +2,6 @@ package cs3500.threetrios.model;
 
 import java.util.List;
 
-import javax.swing.text.Position;
-
 /**
  * Interface for the model of the ThreeTrios game, defining the actions that
  * can be performed on the game.

@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * The ThreeTrios class, the main class to run the game.
+ */
 public class ThreeTrios {
   public static void main(String[] args) {
     String configPath = "src/cs3500/threetrios/model/configs/";

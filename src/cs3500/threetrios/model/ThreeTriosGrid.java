@@ -72,6 +72,7 @@ public class ThreeTriosGrid implements Grid {
     return cards[row][col];
   }
 
+  @Override
   public void placeCard(int row, int col, Card card) {
     validatePosition(row, col);
     System.out.println("Attempting to place card at (" + row + ", " + col + ")");

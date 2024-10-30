@@ -16,7 +16,6 @@ Invariants:
      where N is the number of card cells on the grid.
 
 Grid: Represents the layout of the game board, supporting various sizes and hole configurations.
-  -
 
 Card: Represents individual cards with attack values for each direction (North, South, East, West).
   - Has a color, essential to turn management and logic.

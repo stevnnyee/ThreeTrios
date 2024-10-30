@@ -6,11 +6,15 @@ import cs3500.threetrios.model.Grid;
 import cs3500.threetrios.model.MainModelInterface;
 import cs3500.threetrios.model.Player;
 
+/**
+ * The implementation of ThreeTriosView, creating a new view of the game.
+ */
 public class ThreeTriosViewImpl implements ThreeTriosView {
   private final MainModelInterface model;
 
   /**
    * Constructs a textual view with the given model.
+   *
    * @param model the game model to visualize
    * @throws IllegalArgumentException if model is null
    */
@@ -68,6 +72,7 @@ public class ThreeTriosViewImpl implements ThreeTriosView {
 
   /**
    * Formats attack values, converting 10 to 'A' as per game specifications.
+   *
    * @param value the attack value to format
    * @return formatted string representation
    */
