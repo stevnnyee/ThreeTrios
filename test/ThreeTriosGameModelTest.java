@@ -1,10 +1,8 @@
-import cs3500.threetrios.model.*;
+
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.After;
-
-import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,22 +13,31 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import cs3500.threetrios.model.Card;
+import cs3500.threetrios.model.Grid;
+import cs3500.threetrios.model.Player;
+import cs3500.threetrios.model.ThreeTriosGameModel;
+import cs3500.threetrios.model.ThreeTriosGrid;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+
 /**
  * Test class for ThreeTrios game functionality.
  */
 public class ThreeTriosGameModelTest {
   private Path tempDir;
   private ThreeTriosGameModel game;
-  private String boardPath;
-  private String cardPath;
 
   @Before
   public void setup() throws IOException {
-    // Create a temporary directory for test files
     tempDir = Files.createTempDirectory("threetrios-test");
     game = new ThreeTriosGameModel();
 
-    // Create the board files
     createTestFile("board2-CellsReachWithHoles",
             "// 5x3 board with holes and cells connected to each other.\n" +
                     "5 3\n" +
@@ -40,7 +47,6 @@ public class ThreeTriosGameModelTest {
                     "CXC\n" +
                     "CCC");
 
-    // Create the cards file with at least 12 cards (11 cells + 1)
     createTestFile("card2-EnoughCards",
             "// Cards for testing\n" +
                     "BlackKnight 8 6 9 7\n" +
@@ -68,7 +74,7 @@ public class ThreeTriosGameModelTest {
   }
 
   /**
-   * Recursively deletes a directory and its contents
+   * Recursively deletes a directory and its contents.
    */
   private void deleteDirectory(File directory) {
     File[] files = directory.listFiles();
@@ -107,7 +113,6 @@ public class ThreeTriosGameModelTest {
     Player currentPlayer = game.getCurrentPlayer();
     Card card = game.getPlayerHand(currentPlayer).get(0);
 
-    // Attempt to place a card in a hole position, which should throw an exception
     game.placeCard(currentPlayer, 1, 1, card);
   }
 
@@ -121,7 +126,6 @@ public class ThreeTriosGameModelTest {
     Card card = game.getPlayerHand(firstPlayer).get(0);
     game.placeCard(firstPlayer, 0, 0, card);
 
-    // Attempt to place another card in the same position
     game.placeCard(firstPlayer, 0, 0, game.getPlayerHand(firstPlayer).get(1));
   }
 
@@ -129,8 +133,6 @@ public class ThreeTriosGameModelTest {
   public void testStartGameWithInvalidBoardPath() throws IOException {
     String invalidBoardPath = tempDir.resolve("nonexistent-board").toString();
     String cardPath = tempDir.resolve("card2-EnoughCards").toString();
-
-    // Attempt to start the game with an invalid board path
     game.startGameFromConfig(invalidBoardPath, cardPath);
   }
 
@@ -138,8 +140,6 @@ public class ThreeTriosGameModelTest {
   public void testStartGameWithInvalidCardPath() throws IOException {
     String boardPath = tempDir.resolve("board2-CellsReachWithHoles").toString();
     String invalidCardPath = tempDir.resolve("nonexistent-cards").toString();
-
-    // Attempt to start the game with an invalid card path
     game.startGameFromConfig(boardPath, invalidCardPath);
   }
 
@@ -151,14 +151,11 @@ public class ThreeTriosGameModelTest {
     game.startGameFromConfig(boardPath, cardPath);
     Player currentPlayer = game.getCurrentPlayer();
     Card card = game.getPlayerHand(currentPlayer).get(0);
-
-    // Attempt to place a card out of grid bounds
-    game.placeCard(currentPlayer, 5, 3, card); // Out of bounds for a 5x3 grid
+    game.placeCard(currentPlayer, 5, 3, card);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testInvalidGridDimensions() {
-    // Attempt to create a grid with invalid dimensions (0 rows and negative columns)
     new ThreeTriosGrid(0, -3, new boolean[][]{});
   }
 
@@ -174,12 +171,10 @@ public class ThreeTriosGameModelTest {
     assertNotNull(game.getCurrentPlayer());
     assertEquals(13, game.getGrid().getCardCellCount());
 
-    // Verify grid dimensions
     Grid grid = game.getGrid();
     assertEquals(5, grid.getRows());
     assertEquals(3, grid.getCols());
 
-    // Verify holes are in correct positions
     assertTrue(grid.isHole(1, 1));
     assertTrue(grid.isHole(3, 1));
     assertFalse(grid.isHole(0, 0));
@@ -192,7 +187,6 @@ public class ThreeTriosGameModelTest {
 
     game.startGameFromConfig(boardPath, cardPath);
 
-    // Since we have 11 card cells, each player should get (11+1)/2 = 6 cards
     Player currentPlayer = game.getCurrentPlayer();
     assertEquals(7, game.getPlayerHand(currentPlayer).size());
   }
@@ -204,10 +198,9 @@ public class ThreeTriosGameModelTest {
 
     game.startGameFromConfig(boardPath, cardPath);
 
-    // Try to place a card in a hole position
     Player currentPlayer = game.getCurrentPlayer();
     Card card = game.getPlayerHand(currentPlayer).get(0);
-    game.placeCard(currentPlayer, 1, 1, card); // This should throw an exception as (1,1) is a hole
+    game.placeCard(currentPlayer, 1, 1, card);
   }
 
   @Test
@@ -221,11 +214,9 @@ public class ThreeTriosGameModelTest {
     Card card = game.getPlayerHand(firstPlayer).get(0);
     game.placeCard(firstPlayer, 0, 0, card);
 
-    // Verify card was placed
     assertNotNull(game.getGrid().getCard(0, 0));
     assertEquals(card, game.getGrid().getCard(0, 0));
 
-    // Verify turn changed
     assertNotEquals(firstPlayer, game.getCurrentPlayer());
   }
 
@@ -248,7 +239,6 @@ public class ThreeTriosGameModelTest {
     Player redPlayer = game.getCurrentPlayer();
     List<Card> redHand = game.getPlayerHand(redPlayer);
 
-    // For an 11-cell board, each player should get 6 cards ((11+1)/2)
     assertEquals(7, redHand.size());
   }
 
@@ -287,11 +277,11 @@ public class ThreeTriosGameModelTest {
     for (int rowIndex = 0; rowIndex < grid.getRows(); rowIndex++) {
       for (int columnIndex = 0; columnIndex < grid.getCols(); columnIndex++) {
         if (!grid.isHole(rowIndex, columnIndex)) {
-          game.placeCard(game.getCurrentPlayer(), rowIndex, columnIndex, game.getPlayerHand(game.getCurrentPlayer()).get(0));
+          game.placeCard(game.getCurrentPlayer(),
+                  rowIndex, columnIndex, game.getPlayerHand(game.getCurrentPlayer()).get(0));
         }
       }
     }
-
     assertTrue(grid.isFull());
     assertEquals(0, grid.getEmptyCells().size());
   }
@@ -305,7 +295,6 @@ public class ThreeTriosGameModelTest {
   public void testStartGameWithNullDeck() {
     game.startGame(new ThreeTriosGrid(3, 3, new boolean[][]{}), null);
   }
-
 
   @Test(expected = IllegalArgumentException.class)
   public void testGetPlayerScoreNullPlayer() {

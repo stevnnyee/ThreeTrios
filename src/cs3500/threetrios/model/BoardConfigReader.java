@@ -10,6 +10,7 @@ import java.io.IOException;
 public class BoardConfigReader {
   /**
    * Reads a board configuration file and creates a Grid.
+   *
    * @param filePath path to the board configuration file
    * @return Grid configured according to the file
    * @throws IllegalArgumentException if file format is invalid

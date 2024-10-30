@@ -3,7 +3,7 @@ package cs3500.threetrios.model;
 import java.util.EnumMap;
 
 /**
- * Class to represent a Card in the ThreeTrios Game,
+ * Class to represent a Card in the ThreeTrios Game.
  */
 public class ThreeTriosCard implements Card {
   private final String name;

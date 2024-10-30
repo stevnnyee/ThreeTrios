@@ -2,7 +2,6 @@ package cs3500.threetrios.model;
 
 import java.util.List;
 
-import javax.swing.text.Position;
 
 /**
  * Interface that represents a Grid in the ThreeTrios game.

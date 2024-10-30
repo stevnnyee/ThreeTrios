@@ -12,6 +12,7 @@ import java.util.List;
 public class CardConfigReader {
   /**
    * Reads a card configuration file and creates a list of Cards.
+   *
    * @param filePath path to the card configuration file
    * @return List of Cards configured according to the file
    * @throws IllegalArgumentException if file format is invalid
@@ -48,6 +49,7 @@ public class CardConfigReader {
 
   /**
    * Parses an attack value, converting 'A' to 10.
+   *
    * @param value string value to parse
    * @return integer attack value
    * @throws IllegalArgumentException if value is invalid

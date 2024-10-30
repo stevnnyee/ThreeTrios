@@ -87,12 +87,10 @@ public class ThreeTriosGameModel implements MainModelInterface {
 
   @Override
   public void dealCards(List<Card> deck) {
-    // Calculate real playable cells (excluding holes)
     int cardCells = grid.getCardCellCount();
-    // Each player gets (cardCells + 1) / 2 cards
+    // (cardCells + 1) / 2
     int handSize = (cardCells + 1) / 2;
 
-    // Validate deck size against required cards
     if (deck.size() < cardCells + 1) {
       throw new IllegalArgumentException(
               String.format("Not enough cards. Need %d, got %d",
@@ -101,18 +99,14 @@ public class ThreeTriosGameModel implements MainModelInterface {
 
     List<Card> shuffledDeck = new ArrayList<>(deck);
     Collections.shuffle(shuffledDeck);
-
     playerHands.get(redPlayer).clear();
     playerHands.get(bluePlayer).clear();
 
-    // Deal cards to both players
     for (int i = 0; i < handSize; i++) {
       Card redCard = shuffledDeck.get(i);
       Card blueCard = shuffledDeck.get(i + handSize);
-
       redCard.setOwner(redPlayer);
       blueCard.setOwner(bluePlayer);
-
       playerHands.get(redPlayer).add(redCard);
       playerHands.get(bluePlayer).add(blueCard);
     }
@@ -192,7 +186,6 @@ public class ThreeTriosGameModel implements MainModelInterface {
     List<Position> toFlip = new ArrayList<>();
     List<Position> adjacent = getAdjacentPositions(newCardPosition);
 
-    // First round of battle
     for (Position pos : adjacent) {
       Card adjacentCard = grid.getCard(pos.row, pos.col);
       if (adjacentCard != null && adjacentCard.getOwner() != currentPlayer) {
@@ -202,11 +195,11 @@ public class ThreeTriosGameModel implements MainModelInterface {
       }
     }
 
-    // Flip cards and trigger combo chains
+    // Combo
     for (Position pos : toFlip) {
       Card card = grid.getCard(pos.row, pos.col);
       card.setOwner(currentPlayer);
-      executeBattlePhase(pos); // Recursive call for combo chains
+      executeBattlePhase(pos);
     }
   }
 
@@ -222,8 +215,8 @@ public class ThreeTriosGameModel implements MainModelInterface {
     Card defender = grid.getCard(defenderPos.row, defenderPos.col);
 
     Direction battleDirection = getBattleDirection(attackerPos, defenderPos);
-    return attacker.getAttackPower(battleDirection) >
-            defender.getAttackPower(battleDirection.getOpposite());
+    return attacker.getAttackPower(battleDirection)
+            > defender.getAttackPower(battleDirection.getOpposite());
   }
 
   /**
@@ -254,9 +247,9 @@ public class ThreeTriosGameModel implements MainModelInterface {
    * @return true if position is valid, false otherwise
    */
   private boolean isValidPosition(int row, int col) {
-    return row >= 0 && row < grid.getRows() &&
-            col >= 0 && col < grid.getCols() &&
-            !grid.isHole(row, col);
+    return row >= 0 && row < grid.getRows()
+            && col >= 0 && col < grid.getCols()
+            && !grid.isHole(row, col);
   }
 
   /**
@@ -267,9 +260,15 @@ public class ThreeTriosGameModel implements MainModelInterface {
    * @return direction
    */
   private Direction getBattleDirection(Position from, Position to) {
-    if (from.row < to.row) return Direction.SOUTH;
-    if (from.row > to.row) return Direction.NORTH;
-    if (from.col < to.col) return Direction.EAST;
+    if (from.row < to.row) {
+      return Direction.SOUTH;
+    }
+    if (from.row > to.row) {
+      return Direction.NORTH;
+    }
+    if (from.col < to.col) {
+      return Direction.EAST;
+    }
     return Direction.WEST;
   }
 
@@ -303,16 +302,20 @@ public class ThreeTriosGameModel implements MainModelInterface {
     int redScore = countPlayerCards(redPlayer);
     int blueScore = countPlayerCards(bluePlayer);
 
-    if (redScore > blueScore) return redPlayer;
-    if (blueScore > redScore) return bluePlayer;
-    return null; // Tie game
+    if (redScore > blueScore) {
+      return redPlayer;
+    }
+    if (blueScore > redScore) {
+      return bluePlayer;
+    }
+    return null;
   }
 
   /**
    * Counts and returns the number of cards a player has.
    *
    * @param player player
-   * @return
+   * @return returns count
    */
   private int countPlayerCards(Player player) {
     int count = playerHands.get(player).size();
