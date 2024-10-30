@@ -8,12 +8,12 @@ import java.util.Scanner;
 
 public class ThreeTrios {
   public static void main(String[] args) {
-    MainModelInterface model = new MainModelImpl();
+    MainModelInterface model = new ThreeTriosGameModel();
     ThreeTriosView view = new ThreeTriosViewImpl(model);
     Scanner scanner = new Scanner(System.in);
 
     boolean[][] holes = new boolean[3][3];
-    Grid grid = new GridImpl(3, 3, holes);
+    Grid grid = new ThreeTriosGrid(3, 3, holes);
 
     List<Card> deck = createDeck();
 
@@ -65,7 +65,7 @@ public class ThreeTrios {
         System.out.print("Choose card (0-" + (hand.size() - 1) + "): ");
         int cardIndex = scanner.nextInt();
         try {
-          model.makeMove(row, col, hand.get(cardIndex));
+          model.placeCard(currentPlayer, row, col, hand.get(cardIndex));
         } catch (IllegalArgumentException | IllegalStateException e) {
           System.out.println("Invalid move: " + e.getMessage());
         }
@@ -97,7 +97,7 @@ public class ThreeTrios {
       int east = 1 + (int)(Math.random() * 10);
       int west = 1 + (int)(Math.random() * 10);
 
-      deck.add(new CardImpl(cardNames[i], north, south, east, west));
+      deck.add(new ThreeTriosCard(cardNames[i], north, south, east, west));
     }
 
     return deck;
