@@ -96,6 +96,9 @@ public class ThreeTriosGameModel implements MainModelInterface {
   @Override
   public void placeCard(Player player, int row, int col, Card card) {
     validateMove(player, row, col, card);
+    if (!canPlaceCard(row, col, card)) {
+      throw new IllegalArgumentException("Invalid card placement");
+    }
     grid.placeCard(row, col, card);
     playerHands.get(player).remove(card);
     executeBattlePhase(new Position(row, col));
@@ -133,23 +136,23 @@ public class ThreeTriosGameModel implements MainModelInterface {
 
   @Override
   public boolean canPlaceCard(int row, int col, Card card) {
-    try {
-      grid.placeCard(row, col, card);
-      currentPlayer.removeCardFromHand(card);
-      return true;
-    } catch (IllegalStateException | IllegalArgumentException e) {
+    if (!gameStarted || gameOver) {
       return false;
     }
+    if (!currentPlayer.getHand().contains(card)) {
+      return false;
+    }
+    return grid.getCard(row, col) == null && !grid.isHole(row, col);
   }
 
   @Override
   public int getPlayerScore(Player player) {
-    return 0; //NEED TO COMPLETE
+    return countPlayerCards(player);
   }
 
   @Override
   public List<Card> getPlayerHand(Player player) {
-    return List.of();
+    return new ArrayList<>(playerHands.get(player));
   }
 
   @Override
@@ -177,7 +180,7 @@ public class ThreeTriosGameModel implements MainModelInterface {
     return positions;
   }
 
-  private void checkAndFlipCard(Position attackerPos, Position defenderPos) {
+  private boolean checkAndFlipCard(Position attackerPos, Position defenderPos) {
     Card attacker = grid.getCard(attackerPos.row, attackerPos.col);
     Card defender = grid.getCard(defenderPos.row, defenderPos.col);
 
@@ -185,7 +188,9 @@ public class ThreeTriosGameModel implements MainModelInterface {
     if (attacker.getAttackPower(battleDirection) >
             defender.getAttackPower(battleDirection.getOpposite())) {
       defender.setOwner(currentPlayer);
+      return true;
     }
+    return false;
   }
 
   private Direction getBattleDirection(Position from, Position to) {
@@ -270,6 +275,37 @@ public class ThreeTriosGameModel implements MainModelInterface {
     Position(int row, int col) {
       this.row = row;
       this.col = col;
+    }
+  }
+
+  /**
+   * Checks if game is started.
+   *
+   * @return true if game is started, false otherwise
+   */
+  public boolean isGameStarted() {
+    return gameStarted;
+  }
+
+  private Player getOpponent(Player player) {
+    return player == redPlayer ? bluePlayer : redPlayer;
+  }
+
+  private void executeComboBattlePhase(List<Position> newlyFlippedPositions) {
+    List<Position> comboFlippedPositions = new ArrayList<>();
+    for (Position pos : newlyFlippedPositions) {
+      List<Position> adjacentPositions = getAdjacentPositions(pos);
+      for (Position adjPos : adjacentPositions) {
+        Card adjacentCard = grid.getCard(adjPos.row, adjPos.col);
+        if (adjacentCard != null && adjacentCard.getOwner() == getOpponent(currentPlayer)) {
+          if (checkAndFlipCard(pos, adjPos)) {
+            comboFlippedPositions.add(adjPos);
+          }
+        }
+      }
+    }
+    if (!comboFlippedPositions.isEmpty()) {
+      executeComboBattlePhase(comboFlippedPositions);
     }
   }
 }
