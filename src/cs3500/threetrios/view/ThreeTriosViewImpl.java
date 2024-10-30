@@ -24,42 +24,36 @@ public class ThreeTriosViewImpl implements ThreeTriosView {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-
-    // Add current player info
     Player currentPlayer = model.getCurrentPlayer();
     output.append("Player: ").append(currentPlayer.getColor()).append("\n");
-
-    // Render grid
     Grid grid = model.getGrid();
     for (int i = 0; i < grid.getRows(); i++) {
       for (int j = 0; j < grid.getCols(); j++) {
+        if (j > 0) {
+          output.append(" ");
+        }
         if (grid.isHole(i, j)) {
-          output.append(' ');
+          output.append(" ");
         } else {
           Card card = grid.getCard(i, j);
           if (card == null) {
-            output.append('_');
+            output.append("_");
           } else {
             output.append(card.getOwner().getColor().charAt(0));
           }
         }
-        if (j < grid.getCols() - 1) {
-          output.append(' ');
-        }
       }
-      output.append('\n');
+      output.append("\n");
     }
     output.append("Hand:\n");
     for (Card card : currentPlayer.getHand()) {
-      output.append(card.getName()).append(" ");
-
-      output.append(card.getAttackPower(Direction.NORTH)).append(" ");
-      output.append(card.getAttackPower(Direction.SOUTH)).append(" ");
-      output.append(card.getAttackPower(Direction.EAST)).append(" ");
-      output.append(card.getAttackPower(Direction.WEST));
-      output.append('\n');
+      output.append(card.getName()).append(" ")
+              .append(card.getAttackPower(Direction.NORTH)).append(" ")
+              .append(card.getAttackPower(Direction.SOUTH)).append(" ")
+              .append(card.getAttackPower(Direction.EAST)).append(" ")
+              .append(card.getAttackPower(Direction.WEST))
+              .append("\n");
     }
-
     return output.toString();
   }
 }
