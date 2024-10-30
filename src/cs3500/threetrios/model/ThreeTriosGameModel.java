@@ -80,13 +80,25 @@ public class ThreeTriosGameModel implements MainModelInterface {
 
   @Override
   public void dealCards(List<Card> deck) {
-    int handSize = (grid.getCardCellCount() + 1) / 2;
+    // Calculate real playable cells (excluding holes)
+    int cardCells = grid.getCardCellCount();
+    // Each player gets (cardCells + 1) / 2 cards
+    int handSize = (cardCells + 1) / 2;
+
+    // Validate deck size against required cards
+    if (deck.size() < cardCells + 1) {
+      throw new IllegalArgumentException(
+              String.format("Not enough cards. Need %d, got %d",
+                      cardCells + 1, deck.size()));
+    }
+
     List<Card> shuffledDeck = new ArrayList<>(deck);
     Collections.shuffle(shuffledDeck);
 
     playerHands.get(redPlayer).clear();
     playerHands.get(bluePlayer).clear();
 
+    // Deal cards to both players
     for (int i = 0; i < handSize; i++) {
       Card redCard = shuffledDeck.get(i);
       Card blueCard = shuffledDeck.get(i + handSize);
