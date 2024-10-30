@@ -89,7 +89,9 @@ public class ThreeTrios {
     List<Card> deck = new ArrayList<>();
 
     String[] cardNames = {"BlackKnight", "BabyDragon", "IceWizard", "EliteBarbs", "Archer",
-            "Witch", "Goblin", "Princess", "Prince", "Valkyrie"};
+            "Witch", "Goblin", "Princess", "Prince", "Valkyrie", "Pekka", "Warden", "King",
+            "Queen", "Yeti", "HogRider", "Skeleton", "Balloon", "Dragon", "Minion", "Snowman",
+            "Golem", "Healer", "Miner", "ElectroWizard", "Mammoth"};
 
     for (int i = 0; i < 10; i++) {
       int north = 1 + (int)(Math.random() * 10);
