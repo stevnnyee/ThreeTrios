@@ -1,0 +1,7 @@
+// 5x5 board with holes and cells connected to each other.
+5 5
+CCCCC
+CXCXC
+CCCCC
+CXCXC
+CCCCC
