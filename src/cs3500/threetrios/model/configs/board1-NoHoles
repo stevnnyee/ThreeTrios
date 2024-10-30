@@ -1,7 +1,5 @@
 // 5x5 board with no holes.
-5 5
-CCCCC
-CCCCC
+3 5
 CCCCC
 CCCCC
 CCCCC
