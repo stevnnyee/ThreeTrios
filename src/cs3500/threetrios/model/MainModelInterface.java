@@ -71,8 +71,8 @@ public interface MainModelInterface {
   /**
    * Checks if you can place the card onto the specified cell.
    *
-   * @param row row
-   * @param col column
+   * @param row  row
+   * @param col  column
    * @param card card
    * @return true if you can place card, false otherwise
    */

@@ -1,0 +1,4 @@
+DESIGN DOCUMENT: Player Implementation for Three Trios
+To support both human and AI players in the future,
+the Player interface should be designed to abstract the decision-making process for moves.
+

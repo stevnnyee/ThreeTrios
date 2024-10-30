@@ -1,7 +1,9 @@
 import cs3500.threetrios.model.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.After;
+
 import static org.junit.Assert.*;
 
 import java.io.File;
@@ -10,15 +12,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Test class for ThreeTrios game functionality.
  */
-public class ThreeTriosExamples {
+public class ThreeTriosGameModelTest {
   private Path tempDir;
   private ThreeTriosGameModel game;
+  private String boardPath;
+  private String cardPath;
 
   @Before
   public void setup() throws IOException {
@@ -261,7 +265,6 @@ public class ThreeTriosExamples {
     assertTrue(game.isGameOver());
   }
 
-
   @Test
   public void testEmptyCellsAndFullStatus() throws IOException {
     String boardPath = tempDir.resolve("board2-CellsReachWithHoles").toString();
@@ -284,5 +287,26 @@ public class ThreeTriosExamples {
 
     assertTrue(grid.isFull());
     assertEquals(0, grid.getEmptyCells().size());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testStartGameWithNullGrid() {
+    game.startGame(null, new ArrayList<>());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testStartGameWithNullDeck() {
+    game.startGame(new ThreeTriosGrid(3, 3, new boolean[][]{}), null);
+  }
+
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testGetPlayerScoreNullPlayer() {
+    game.getPlayerScore(null);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testGetPlayerHandNullPlayer() {
+    game.getPlayerHand(null);
   }
 }
