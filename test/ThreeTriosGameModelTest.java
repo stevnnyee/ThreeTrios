@@ -32,8 +32,6 @@ import static org.junit.Assert.assertTrue;
 public class ThreeTriosGameModelTest {
   private Path tempDir;
   private ThreeTriosGameModel game;
-  private String boardPath;
-  private String cardPath;
 
   @Before
   public void setup() throws IOException {
@@ -284,7 +282,6 @@ public class ThreeTriosGameModelTest {
         }
       }
     }
-
     assertTrue(grid.isFull());
     assertEquals(0, grid.getEmptyCells().size());
   }
@@ -298,7 +295,6 @@ public class ThreeTriosGameModelTest {
   public void testStartGameWithNullDeck() {
     game.startGame(new ThreeTriosGrid(3, 3, new boolean[][]{}), null);
   }
-
 
   @Test(expected = IllegalArgumentException.class)
   public void testGetPlayerScoreNullPlayer() {

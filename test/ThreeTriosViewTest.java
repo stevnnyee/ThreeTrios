@@ -53,7 +53,7 @@ public class ThreeTriosViewTest {
   }
 
   @After
-  public void cleanup() throws IOException {
+  public void cleanup() {
     deleteDirectory(tempDir.toFile());
   }
 
@@ -87,8 +87,8 @@ public class ThreeTriosViewTest {
     view = new ThreeTriosViewImpl(game);
 
     String visualization = view.toString();
-    assertTrue("Should show current player", visualization.startsWith("Player: RED"));
-    assertTrue("Should contain hand section", visualization.contains("Hand:"));
+    assertTrue(visualization.startsWith("Player: RED"));
+    assertTrue(visualization.contains("Hand:"));
 
     String[] lines = visualization.split("\n");
 
@@ -96,8 +96,7 @@ public class ThreeTriosViewTest {
 
     // Check first grid row
     String firstRow = lines[1].trim();
-    assertEquals("First row should have correct format",
-            "_   _", firstRow);
+    assertEquals("_   _", firstRow);
   }
 
   @Test
@@ -116,14 +115,11 @@ public class ThreeTriosViewTest {
 
     String afterPlacementView = view.toString();
 
-    assertNotEquals("View should change after card placement",
-            initialView, afterPlacementView);
+    assertNotEquals(initialView, afterPlacementView);
 
     String[] lines = afterPlacementView.split("\n");
-    assertTrue("First cell should show Red's card",
-            lines[1].trim().startsWith("R"));
-    assertTrue("Should now be Blue's turn",
-            lines[0].contains("BLUE"));
+    assertTrue(lines[1].trim().startsWith("R"));
+    assertTrue(lines[0].contains("BLUE"));
   }
 
 
@@ -137,21 +133,19 @@ public class ThreeTriosViewTest {
 
     String visualization = view.toString();
     String[] sections = visualization.split("Hand:\n");
-    assertEquals("Should have grid and hand sections", 2, sections.length);
+    assertEquals(2, sections.length);
 
     String handSection = sections[1];
     String[] handLines = handSection.trim().split("\n");
 
-    assertEquals("Should have correct number of cards in hand", 3, handLines.length);
+    assertEquals(3, handLines.length);
 
     for (String cardLine : handLines) {
       String[] cardParts = cardLine.trim().split(" ");
-      assertEquals("Each card should have name and 4 attack values",
-              5, cardParts.length);
+      assertEquals(5, cardParts.length);
 
       for (int i = 1; i < cardParts.length; i++) {
-        assertTrue("Attack values should be 1-9 or A",
-                cardParts[i].matches("[1-9A]"));
+        assertTrue(cardParts[i].matches("[1-9A]"));
       }
     }
   }
@@ -174,10 +168,8 @@ public class ThreeTriosViewTest {
     String visualization = view.toString();
     String[] lines = visualization.split("\n");
 
-    assertTrue("Should show Red's card in top-left",
-            lines[1].trim().startsWith("R"));
-    assertTrue("Should show Blue's card in bottom-left",
-            lines[3].trim().startsWith("B"));
+    assertTrue(lines[1].trim().startsWith("R"));
+    assertTrue(lines[3].trim().startsWith("B"));
   }
 
   @Test
@@ -194,9 +186,9 @@ public class ThreeTriosViewTest {
     String secondRow = lines[2];
     String thirdRow = lines[3].trim();
 
-    assertEquals("First row should have correct format", "_   _", firstRow);
-    assertEquals("Second row should have correct format", "  _  ", secondRow);
-    assertEquals("Third row should have correct format", "_   _", thirdRow);
+    assertEquals("_   _", firstRow);
+    assertEquals("  _  ", secondRow);
+    assertEquals("_   _", thirdRow);
   }
 
 
@@ -229,8 +221,7 @@ public class ThreeTriosViewTest {
     }
 
     String finalVisualization = view.toString();
-    assertTrue("Final view should contain both R and B",
-            finalVisualization.contains("R") && finalVisualization.contains("B"));
+    assertTrue(finalVisualization.contains("R") && finalVisualization.contains("B"));
   }
 
   @Test(expected = IllegalArgumentException.class)
