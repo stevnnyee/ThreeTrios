@@ -10,7 +10,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -142,12 +141,11 @@ public class ThreeTriosExamples {
     Card card = game.getPlayerHand(currentPlayer).get(0);
 
     // Attempt to place a card out of grid bounds
-    game.placeCard(currentPlayer, 5, 3, card); // Out of bounds for a 5x3 grid
+    game.placeCard(currentPlayer, 5, 3, card);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testInvalidGridDimensions() {
-    // Attempt to create a grid with invalid dimensions (0 rows and negative columns)
     new ThreeTriosGrid(0, -3, new boolean[][]{});
   }
 
@@ -163,12 +161,10 @@ public class ThreeTriosExamples {
     assertNotNull(game.getCurrentPlayer());
     assertEquals(13, game.getGrid().getCardCellCount());
 
-    // Verify grid dimensions
     Grid grid = game.getGrid();
     assertEquals(5, grid.getRows());
     assertEquals(3, grid.getCols());
 
-    // Verify holes are in correct positions
     assertTrue(grid.isHole(1, 1));
     assertTrue(grid.isHole(3, 1));
     assertFalse(grid.isHole(0, 0));
@@ -181,7 +177,6 @@ public class ThreeTriosExamples {
 
     game.startGameFromConfig(boardPath, cardPath);
 
-    // Since we have 11 card cells, each player should get (11+1)/2 = 6 cards
     Player currentPlayer = game.getCurrentPlayer();
     assertEquals(7, game.getPlayerHand(currentPlayer).size());
   }
@@ -192,11 +187,9 @@ public class ThreeTriosExamples {
     String cardPath = tempDir.resolve("card2-EnoughCards").toString();
 
     game.startGameFromConfig(boardPath, cardPath);
-
-    // Try to place a card in a hole position
     Player currentPlayer = game.getCurrentPlayer();
     Card card = game.getPlayerHand(currentPlayer).get(0);
-    game.placeCard(currentPlayer, 1, 1, card); // This should throw an exception as (1,1) is a hole
+    game.placeCard(currentPlayer, 1, 1, card);
   }
 
   @Test
@@ -209,12 +202,9 @@ public class ThreeTriosExamples {
     Player firstPlayer = game.getCurrentPlayer();
     Card card = game.getPlayerHand(firstPlayer).get(0);
     game.placeCard(firstPlayer, 0, 0, card);
-
-    // Verify card was placed
     assertNotNull(game.getGrid().getCard(0, 0));
     assertEquals(card, game.getGrid().getCard(0, 0));
 
-    // Verify turn changed
     assertNotEquals(firstPlayer, game.getCurrentPlayer());
   }
 
@@ -237,7 +227,6 @@ public class ThreeTriosExamples {
     Player redPlayer = game.getCurrentPlayer();
     List<Card> redHand = game.getPlayerHand(redPlayer);
 
-    // For an 11-cell board, each player should get 6 cards ((11+1)/2)
     assertEquals(7, redHand.size());
   }
 
@@ -281,7 +270,6 @@ public class ThreeTriosExamples {
         }
       }
     }
-
     assertTrue(grid.isFull());
     assertEquals(0, grid.getEmptyCells().size());
   }

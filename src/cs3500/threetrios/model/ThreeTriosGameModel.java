@@ -80,12 +80,9 @@ public class ThreeTriosGameModel implements MainModelInterface {
 
   @Override
   public void dealCards(List<Card> deck) {
-    // Calculate real playable cells (excluding holes)
     int cardCells = grid.getCardCellCount();
-    // Each player gets (cardCells + 1) / 2 cards
     int handSize = (cardCells + 1) / 2;
 
-    // Validate deck size against required cards
     if (deck.size() < cardCells + 1) {
       throw new IllegalArgumentException(
               String.format("Not enough cards. Need %d, got %d",

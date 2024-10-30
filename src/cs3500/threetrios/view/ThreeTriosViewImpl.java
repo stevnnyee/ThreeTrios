@@ -26,25 +26,21 @@ public class ThreeTriosViewImpl implements ThreeTriosView {
     StringBuilder output = new StringBuilder();
     Player currentPlayer = model.getCurrentPlayer();
 
-    // Add current player info
     output.append("Player: ").append(currentPlayer.getColor()).append("\n");
 
-    // Render grid
     Grid grid = model.getGrid();
     for (int i = 0; i < grid.getRows(); i++) {
       for (int j = 0; j < grid.getCols(); j++) {
         if (j > 0) {
           output.append(" ");
         }
-
         if (grid.isHole(i, j)) {
-          output.append(" "); // Space for holes
+          output.append(" ");
         } else {
           Card card = grid.getCard(i, j);
           if (card == null) {
-            output.append("_"); // Underscore for empty cells
+            output.append("_");
           } else {
-            // R for Red player's cards, B for Blue player's cards
             output.append(card.getOwner().getColor().charAt(0));
           }
         }
@@ -52,7 +48,6 @@ public class ThreeTriosViewImpl implements ThreeTriosView {
       output.append("\n");
     }
 
-    // Render current player's hand
     output.append("Hand:\n");
     for (Card card : model.getPlayerHand(currentPlayer)) {
       output.append(card.getName()).append(" ")
