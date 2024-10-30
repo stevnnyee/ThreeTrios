@@ -51,7 +51,15 @@ public interface MainModelInterface {
    */
   List<Card> getPlayerHand(Player player);
 
-  void executeBattlePhase(ThreeTriosGameModel.Position newCardPosition);
+  /**
+   * Checks if you can place the card onto the specified cell.
+   *
+   * @param row row
+   * @param col column
+   * @param card card
+   * @return true if you can place card, false otherwise
+   */
+  boolean canPlaceCard(int row, int col, Card card);
 
   /**
    * Checks if the game is over.
@@ -69,16 +77,6 @@ public interface MainModelInterface {
   Player getWinner();
 
   /**
-   * Checks if you can place the card onto the specified cell.
-   *
-   * @param row row
-   * @param col column
-   * @param card card
-   * @return true if you can place card, false otherwise
-   */
-  boolean canPlaceCard(int row, int col, Card card);
-
-  /**
    * Get score for specified player, the count of owned cards.
    *
    * @param player player
@@ -86,8 +84,11 @@ public interface MainModelInterface {
    */
   int getPlayerScore(Player player);
 
+
+
   Player determineWinner();
 
+  void executeBattlePhase(ThreeTriosGameModel.Position newCardPosition);
 
   void dealCards(List<Card> deck);
 
