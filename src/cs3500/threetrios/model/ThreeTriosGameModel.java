@@ -1,12 +1,11 @@
 package cs3500.threetrios.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.swing.text.Position;
 
 /**
  * Implementation of the ThreeTriosModel Interface.
@@ -42,11 +41,18 @@ public class ThreeTriosGameModel implements MainModelInterface {
   }
 
   /**
-   * Method that helps validate the game setup parameters.
-   *
-   * @param grid the grid of the game
-   * @param deck deck of cards
+   * Creates a new game from configuration files.
+   * @param boardFile path to board configuration file
+   * @param cardFile path to card configuration file
+   * @throws IOException if files cannot be read
+   * @throws IllegalArgumentException if configurations are invalid
    */
+  public void startGameFromConfig(String boardFile, String cardFile) throws IOException {
+    Grid grid = BoardConfigReader.readBoardConfig(boardFile);
+    List<Card> deck = CardConfigReader.readCardConfig(cardFile);
+    startGame(grid, deck);
+  }
+
   private void validateGameSetup(Grid grid, List<Card> deck) {
     if (grid == null || deck == null) {
       throw new IllegalArgumentException("Grid and deck cannot be null");
@@ -57,7 +63,7 @@ public class ThreeTriosGameModel implements MainModelInterface {
       throw new IllegalArgumentException("Grid must have odd number of card cells");
     }
 
-    int requiredCards = grid.getCardCellCount() + 1;
+    int requiredCards = cardCells + 1;
     if (deck.size() < requiredCards) {
       throw new IllegalArgumentException("Not enough cards for the game");
     }
@@ -67,7 +73,7 @@ public class ThreeTriosGameModel implements MainModelInterface {
   public void initialize(Grid grid) {
     this.redPlayer = new ThreeTriosPlayer("RED");
     this.bluePlayer = new ThreeTriosPlayer("BLUE");
-    playerHands.clear(); // ensure hands are clear before drawing
+    playerHands.clear();
     playerHands.put(redPlayer, new ArrayList<>());
     playerHands.put(bluePlayer, new ArrayList<>());
   }
@@ -103,16 +109,6 @@ public class ThreeTriosGameModel implements MainModelInterface {
     gameOver = isGridFull();
   }
 
-  /**
-   * Validates a move before it performs its action.
-   *
-   * @param player player
-   * @param row row
-   * @param col column
-   * @param card card
-   * @throws IllegalArgumentException if the move is invalid
-   * @throws IllegalStateException if the game state doesn't allow the move
-   */
   private void validateMove(Player player, int row, int col, Card card) {
     if (!gameStarted || gameOver) {
       throw new IllegalStateException("Game not in progress");
@@ -120,7 +116,7 @@ public class ThreeTriosGameModel implements MainModelInterface {
     if (player != currentPlayer) {
       throw new IllegalArgumentException("Not your turn");
     }
-    if (!currentPlayer.getHand().contains(card)) {
+    if (!playerHands.get(currentPlayer).contains(card)) {
       throw new IllegalArgumentException("Card not in current player's hand");
     }
     if (grid.getCard(row, col) != null) {
@@ -133,34 +129,67 @@ public class ThreeTriosGameModel implements MainModelInterface {
 
   @Override
   public boolean canPlaceCard(int row, int col, Card card) {
-    try {
-      grid.placeCard(row, col, card);
-      currentPlayer.removeCardFromHand(card);
-      return true;
-    } catch (IllegalStateException | IllegalArgumentException e) {
+    if (!gameStarted || gameOver) {
       return false;
     }
+    if (!playerHands.get(currentPlayer).contains(card)) {
+      return false;
+    }
+    if (row < 0 || row >= grid.getRows() || col < 0 || col >= grid.getCols()) {
+      return false;
+    }
+    if (grid.isHole(row, col)) {
+      return false;
+    }
+    return grid.getCard(row, col) == null;
   }
 
   @Override
   public int getPlayerScore(Player player) {
-    return 0; //NEED TO COMPLETE
+    if (player == null) {
+      throw new IllegalArgumentException("Player cannot be null");
+    }
+    return countPlayerCards(player);
   }
 
   @Override
   public List<Card> getPlayerHand(Player player) {
-    return List.of();
+    if (player == null) {
+      throw new IllegalArgumentException("Player cannot be null");
+    }
+    return new ArrayList<>(playerHands.get(player));
   }
 
   @Override
   public void executeBattlePhase(Position newCardPosition) {
-    List<Position> adjacentPositions = getAdjacentPositions(newCardPosition);
-    for (Position pos : adjacentPositions) {
+    List<Position> toFlip = new ArrayList<>();
+    List<Position> adjacent = getAdjacentPositions(newCardPosition);
+
+    // First round of battle
+    for (Position pos : adjacent) {
       Card adjacentCard = grid.getCard(pos.row, pos.col);
       if (adjacentCard != null && adjacentCard.getOwner() != currentPlayer) {
-        checkAndFlipCard(newCardPosition, pos);
+        if (checkCardWinsBattle(newCardPosition, pos)) {
+          toFlip.add(pos);
+        }
       }
     }
+
+    // Flip cards and trigger combo chains
+    for (Position pos : toFlip) {
+      Card card = grid.getCard(pos.row, pos.col);
+      card.setOwner(currentPlayer);
+      executeBattlePhase(pos); // Recursive call for combo chains
+    }
+  }
+
+  private boolean checkCardWinsBattle(Position attackerPos, Position defenderPos) {
+    Card attacker = grid.getCard(attackerPos.row, attackerPos.col);
+    Card defender = grid.getCard(defenderPos.row, defenderPos.col);
+
+    Direction battleDirection = getBattleDirection(attackerPos, defenderPos);
+    return attacker.getAttackPower(battleDirection) >
+            defender.getAttackPower(battleDirection.getOpposite());
   }
 
   private List<Position> getAdjacentPositions(Position position) {
@@ -170,34 +199,23 @@ public class ThreeTriosGameModel implements MainModelInterface {
     for (int[] dir : directions) {
       int newRow = position.row + dir[0];
       int newCol = position.col + dir[1];
-      if (newRow >= 0 && newRow < grid.getRows() && newCol >= 0 && newCol < grid.getCols()) {
+      if (isValidPosition(newRow, newCol)) {
         positions.add(new Position(newRow, newCol));
       }
     }
     return positions;
   }
 
-  private void checkAndFlipCard(Position attackerPos, Position defenderPos) {
-    Card attacker = grid.getCard(attackerPos.row, attackerPos.col);
-    Card defender = grid.getCard(defenderPos.row, defenderPos.col);
-
-    Direction battleDirection = getBattleDirection(attackerPos, defenderPos);
-    if (attacker.getAttackPower(battleDirection) >
-            defender.getAttackPower(battleDirection.getOpposite())) {
-      defender.setOwner(currentPlayer);
-    }
+  private boolean isValidPosition(int row, int col) {
+    return row >= 0 && row < grid.getRows() &&
+            col >= 0 && col < grid.getCols() &&
+            !grid.isHole(row, col);
   }
 
   private Direction getBattleDirection(Position from, Position to) {
-    if (from.row < to.row) {
-      return Direction.SOUTH;
-    }
-    if (from.row > to.row) {
-      return Direction.NORTH;
-    }
-    if (from.col < to.col) {
-      return Direction.EAST;
-    }
+    if (from.row < to.row) return Direction.SOUTH;
+    if (from.row > to.row) return Direction.NORTH;
+    if (from.col < to.col) return Direction.EAST;
     return Direction.WEST;
   }
 
@@ -226,17 +244,13 @@ public class ThreeTriosGameModel implements MainModelInterface {
     int redScore = countPlayerCards(redPlayer);
     int blueScore = countPlayerCards(bluePlayer);
 
-    if (redScore > blueScore) {
-      return redPlayer;
-    }
-    if (blueScore > redScore) {
-      return bluePlayer;
-    }
-    return null;
+    if (redScore > blueScore) return redPlayer;
+    if (blueScore > redScore) return bluePlayer;
+    return null; // Tie game
   }
 
   private int countPlayerCards(Player player) {
-    int count = player.getHand().size();
+    int count = playerHands.get(player).size();
     for (int i = 0; i < grid.getRows(); i++) {
       for (int j = 0; j < grid.getCols(); j++) {
         Card card = grid.getCard(i, j);
@@ -263,6 +277,9 @@ public class ThreeTriosGameModel implements MainModelInterface {
     return determineWinner();
   }
 
+  /**
+   * Represents a position on the game grid.
+   */
   static class Position {
     final int row;
     final int col;
@@ -273,4 +290,3 @@ public class ThreeTriosGameModel implements MainModelInterface {
     }
   }
 }
-

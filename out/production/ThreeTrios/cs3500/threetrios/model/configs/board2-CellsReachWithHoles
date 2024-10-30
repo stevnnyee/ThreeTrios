@@ -1,3 +1,4 @@
+// 5x3 board with holes and cells connected to each other.
 5 3
 CCC
 CXC
