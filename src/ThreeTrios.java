@@ -13,7 +13,7 @@ public class ThreeTrios {
     Scanner scanner = new Scanner(System.in);
 
     boolean[][] holes = new boolean[3][3];
-    Grid grid = new GridImpl(3, 3, holes);
+    Grid grid = new ThreeTriosGrid(3, 3, holes);
 
     List<Card> deck = createDeck();
 
