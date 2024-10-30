@@ -84,6 +84,13 @@ public class ThreeTriosGameModelTest {
     directory.delete();
   }
 
+  /**
+   * Creates a test file given a file name and its content.
+   *
+   * @param filename file name
+   * @param content content of the file
+   * @throws IOException if the file cannot run
+   */
   private void createTestFile(String filename, String content) throws IOException {
     Path filePath = tempDir.resolve(filename);
     FileWriter writer = new FileWriter(filePath.toFile());
