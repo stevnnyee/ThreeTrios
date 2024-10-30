@@ -2,106 +2,38 @@ import cs3500.threetrios.model.*;
 import cs3500.threetrios.view.ThreeTriosView;
 import cs3500.threetrios.view.ThreeTriosViewImpl;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class ThreeTrios {
   public static void main(String[] args) {
-    MainModelInterface model = new ThreeTriosGameModel();
-    ThreeTriosView view = new ThreeTriosViewImpl(model);
-    Scanner scanner = new Scanner(System.in);
-
-    boolean[][] holes = new boolean[3][3];
-    Grid grid = new ThreeTriosGrid(3, 3, holes);
-
-    List<Card> deck = createDeck();
+    String configPath = "src/cs3500/threetrios/model/configs/";
 
     try {
-      model.startGame(grid, deck);
+      ThreeTriosGameModel model = new ThreeTriosGameModel();
+      ThreeTriosViewImpl view = new ThreeTriosViewImpl(model);
 
-      while (!model.isGameOver()) {
-        System.out.println("\n" + view.toString());
-        Player currentPlayer = model.getCurrentPlayer();
-        System.out.println(currentPlayer.getColor() + "'s turn");
-        int row = -1;
-        while (row < 0 || row > 2) {
-          System.out.print("Enter row (0-2): ");
-          if (scanner.hasNextInt()) {
-            row = scanner.nextInt();
-            if (row < 0 || row > 2) {
-              System.out.println("Invalid row. Number must be between 0 and 2.");
-            }
-          } else {
-            System.out.println("Invalid input.");
-            scanner.next();
-          }
-        }
-        int col = -1;
-        while (col < 0 || col > 2) {
-          System.out.print("Enter column (0-2): ");
-          if (scanner.hasNextInt()) {
-            col = scanner.nextInt();
-            if (col < 0 || col > 2) {
-              System.out.println("Invalid column. Number must be between 0 and 2.");
-            }
-          } else {
-            System.out.println("Invalid input.");
-            scanner.next();
-          }
-        }
-        List<Card> hand = currentPlayer.getHand();
-        System.out.println("\nYour cards:");
-        for (int i = 0; i < hand.size(); i++) {
-          Card card = hand.get(i);
-          System.out.printf("%d: %s (N:%d S:%d E:%d W:%d)\n",
-                  i, card.getName(),
-                  card.getAttackPower(Direction.NORTH),
-                  card.getAttackPower(Direction.SOUTH),
-                  card.getAttackPower(Direction.EAST),
-                  card.getAttackPower(Direction.WEST));
-        }
+      // Test first configuration
+      System.out.println("Testing board with no holes (board1) with enough cards (card2):");
+      model.startGameFromConfig(
+              configPath + "board1-NoHoles",
+              configPath + "card2-EnoughCards");
+      System.out.println(view.toString());
 
-        System.out.print("Choose card (0-" + (hand.size() - 1) + "): ");
-        int cardIndex = scanner.nextInt();
-        try {
-          model.placeCard(currentPlayer, row, col, hand.get(cardIndex));
-        } catch (IllegalArgumentException | IllegalStateException e) {
-          System.out.println("Invalid move: " + e.getMessage());
-        }
-      }
-      System.out.println("\nGame Over!");
-      Player winner = model.getWinner();
-      if (winner != null) {
-        System.out.println("Winner: " + winner.getColor());
-      } else {
-        System.out.println("It's a tie!");
-      }
+      // Debug: Print hand size
+      System.out.println("DEBUG - Current player hand size: " +
+              model.getPlayerHand(model.getCurrentPlayer()).size());
+      System.out.println("\n----------------------------------------\n");
+
+      // Continue with other tests...
 
     } catch (Exception e) {
-      System.out.println("Error: " + e.getMessage());
-    } finally {
-      scanner.close();
+      System.err.println("Error: " + e.getMessage());
+      e.printStackTrace();
     }
-  }
-
-  private static List<Card> createDeck() {
-    List<Card> deck = new ArrayList<>();
-
-    String[] cardNames = {"BlackKnight", "BabyDragon", "IceWizard", "EliteBarbs", "Archer",
-            "Witch", "Goblin", "Princess", "Prince", "Valkyrie", "Pekka", "Warden", "King",
-            "Queen", "Yeti", "HogRider", "Skeleton", "Balloon", "Dragon", "Minion", "Snowman",
-            "Golem", "Healer", "Miner", "ElectroWizard", "Mammoth"};
-
-    for (int i = 0; i < 10; i++) {
-      int north = 1 + (int)(Math.random() * 10);
-      int south = 1 + (int)(Math.random() * 10);
-      int east = 1 + (int)(Math.random() * 10);
-      int west = 1 + (int)(Math.random() * 10);
-
-      deck.add(new ThreeTriosCard(cardNames[i], north, south, east, west));
-    }
-
-    return deck;
   }
 }
