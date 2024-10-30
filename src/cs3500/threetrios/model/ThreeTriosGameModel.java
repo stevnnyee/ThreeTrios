@@ -6,6 +6,9 @@ import java.util.List;
 
 import javax.swing.text.Position;
 
+/**
+ * Implementation of the ThreeTriosModel Interface.
+ */
 public class ThreeTriosGameModel implements MainModelInterface {
   private Grid grid;
   private Player redPlayer;
@@ -14,6 +17,9 @@ public class ThreeTriosGameModel implements MainModelInterface {
   private boolean gameStarted;
   private final boolean gameOver;
 
+  /**
+   * Constructs a new ThreeTriosGameModel.
+   */
   public ThreeTriosGameModel() {
     this.gameStarted = false;
     this.gameOver = false;
@@ -64,7 +70,7 @@ public class ThreeTriosGameModel implements MainModelInterface {
   }
 
   @Override
-  public void makeMove(int row, int col, Card card) {
+  public void makeMove(Player player, int row, int col, Card card) {
     validateMove(row, col, card);
     if (grid.getCard(row, col) != null) {
       throw new IllegalStateException("Cannot place a card on top of another card.");

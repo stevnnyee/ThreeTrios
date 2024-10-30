@@ -65,7 +65,7 @@ public class ThreeTrios {
         System.out.print("Choose card (0-" + (hand.size() - 1) + "): ");
         int cardIndex = scanner.nextInt();
         try {
-          model.makeMove(row, col, hand.get(cardIndex));
+          model.makeMove(currentPlayer, row, col, hand.get(cardIndex));
         } catch (IllegalArgumentException | IllegalStateException e) {
           System.out.println("Invalid move: " + e.getMessage());
         }

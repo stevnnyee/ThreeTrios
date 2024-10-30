@@ -3,11 +3,19 @@ package cs3500.threetrios.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation of the Player interface for the Three Trios game.
+ */
 public class ThreeTriosPlayer implements Player {
   private final String color;
   private final List<Card> hand;
 
-    public ThreeTriosPlayer(String color) {
+  /**
+   * Constructs a new Player with a specified color.
+   *
+   * @param color color of the player
+   */
+  public ThreeTriosPlayer(String color) {
     if (color == null || color.trim().isEmpty()) {
       throw new IllegalArgumentException("Color cannot be null or empty");
     }
@@ -41,6 +49,7 @@ public class ThreeTriosPlayer implements Player {
     if (!hand.remove(card)) {
       throw new IllegalStateException("Card not found in hand");
     }
+    hand.remove(card);
   }
 
   @Override
@@ -54,7 +63,6 @@ public class ThreeTriosPlayer implements Player {
         }
       }
     }
-
     return count;
   }
 }
