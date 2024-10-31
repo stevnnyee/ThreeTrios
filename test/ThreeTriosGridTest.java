@@ -1,19 +1,25 @@
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import java.util.List;
 
 import cs3500.threetrios.model.Card;
 import cs3500.threetrios.model.ThreeTriosCard;
 import cs3500.threetrios.model.ThreeTriosGrid;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Class containing tests regarding the methods in the grid class.
+ */
 public class ThreeTriosGridTest {
   private ThreeTriosGrid grid;
-  private boolean[][] standardHoles;
 
   @Before
   public void setup() {
-    standardHoles = new boolean[][]{
+    boolean[][] standardHoles = new boolean[][]{
             {false, true, false},
             {true, false, true},
             {false, true, false}
@@ -166,11 +172,21 @@ public class ThreeTriosGridTest {
     boolean foundCell22 = false;
 
     for (int[] cell : emptyCells) {
-      if (cell[0] == 0 && cell[1] == 0) foundCell00 = true;
-      if (cell[0] == 0 && cell[1] == 2) foundCell02 = true;
-      if (cell[0] == 1 && cell[1] == 1) foundCell11 = true;
-      if (cell[0] == 2 && cell[1] == 0) foundCell20 = true;
-      if (cell[0] == 2 && cell[1] == 2) foundCell22 = true;
+      if (cell[0] == 0 && cell[1] == 0) {
+        foundCell00 = true;
+      }
+      if (cell[0] == 0 && cell[1] == 2) {
+        foundCell02 = true;
+      }
+      if (cell[0] == 1 && cell[1] == 1) {
+        foundCell11 = true;
+      }
+      if (cell[0] == 2 && cell[1] == 0) {
+        foundCell20 = true;
+      }
+      if (cell[0] == 2 && cell[1] == 2) {
+        foundCell22 = true;
+      }
     }
 
     assertTrue(foundCell00 && foundCell02 && foundCell11 && foundCell20 && foundCell22);
