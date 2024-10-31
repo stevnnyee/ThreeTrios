@@ -88,7 +88,6 @@ public class ThreeTriosGameModel implements MainModelInterface {
   @Override
   public void dealCards(List<Card> deck) {
     int cardCells = grid.getCardCellCount();
-    // (cardCells + 1) / 2
     int handSize = (cardCells + 1) / 2;
 
     if (deck.size() < cardCells + 1) {
@@ -141,10 +140,10 @@ public class ThreeTriosGameModel implements MainModelInterface {
       throw new IllegalArgumentException("Card not in current player's hand");
     }
     if (grid.getCard(row, col) != null) {
-      throw new IllegalStateException("Cannot place a card on top of another card.");
+      throw new IllegalStateException("Can't place a card on top of another card.");
     }
     if (grid.isHole(row, col)) {
-      throw new IllegalArgumentException("Cannot place card in a hole");
+      throw new IllegalArgumentException("Can't place card in a hole");
     }
   }
 
@@ -194,8 +193,6 @@ public class ThreeTriosGameModel implements MainModelInterface {
         }
       }
     }
-
-    // Combo
     for (Position pos : toFlip) {
       Card card = grid.getCard(pos.row, pos.col);
       card.setOwner(currentPlayer);

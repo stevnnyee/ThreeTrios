@@ -24,7 +24,6 @@ public class CardConfigReader {
     try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
       String line = reader.readLine();
 
-      // Skip comment lines
       while (line != null) {
         if (!line.trim().startsWith("//")) {
           String[] parts = line.trim().split(" ");
@@ -43,7 +42,6 @@ public class CardConfigReader {
         line = reader.readLine();
       }
     }
-
     return cards;
   }
 

@@ -78,7 +78,6 @@ public class ThreeTriosGrid implements Grid {
       throw new IllegalStateException("Can't place null card");
     }
     validatePosition(row, col);
-    System.out.println("Attempting to place card at (" + row + ", " + col + ")");
 
     if (holes[row][col]) {
       throw new IllegalStateException("Can't place card in a hole");
@@ -87,7 +86,6 @@ public class ThreeTriosGrid implements Grid {
       throw new IllegalStateException("Position already contains a card");
     }
     cards[row][col] = card;
-    System.out.println("Card placed successfully.");
   }
 
   @Override
