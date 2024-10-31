@@ -27,7 +27,6 @@ public class ThreeTriosGridTest {
     grid = new ThreeTriosGrid(3, 3, standardHoles);
   }
 
-  // Constructor Tests
   @Test(expected = IllegalArgumentException.class)
   public void testConstructorNegativeRows() {
     new ThreeTriosGrid(-1, 3, new boolean[1][1]);
@@ -52,7 +51,6 @@ public class ThreeTriosGridTest {
     new ThreeTriosGrid(2, 2, evenHoles);
   }
 
-  // getRows and getCols Tests
   @Test
   public void testGetRows() {
     assertEquals(3, grid.getRows());
@@ -63,7 +61,6 @@ public class ThreeTriosGridTest {
     assertEquals(3, grid.getCols());
   }
 
-  // isHole Tests
   @Test
   public void testIsHole() {
     assertTrue(grid.isHole(0, 1));
@@ -75,14 +72,12 @@ public class ThreeTriosGridTest {
     grid.isHole(3, 3);
   }
 
-  // isEmpty Tests
   @Test
   public void testIsEmpty() {
     assertFalse(grid.isEmpty(0, 0));
     assertFalse(grid.isEmpty(1, 1));
   }
 
-  // getCard Tests
   @Test
   public void testGetCardEmptyCell() {
     assertNull(grid.getCard(0, 0));
@@ -100,7 +95,6 @@ public class ThreeTriosGridTest {
     grid.getCard(3, 3);
   }
 
-  // placeCard Tests
   @Test
   public void testPlaceCardValidPosition() {
     Card testCard = new ThreeTriosCard("TestCard", 5, 6, 7, 8);
@@ -128,13 +122,11 @@ public class ThreeTriosGridTest {
     grid.placeCard(3, 3, testCard);
   }
 
-  // getCardCellCount Tests
   @Test
   public void testGetCardCellCount() {
     assertEquals(5, grid.getCardCellCount());
   }
 
-  // isFull Tests
   @Test
   public void testIsFullEmptyGrid() {
     assertFalse(grid.isFull());
@@ -150,7 +142,6 @@ public class ThreeTriosGridTest {
   @Test
   public void testIsFullCompletedGrid() {
     Card testCard = new ThreeTriosCard("TestCard", 5, 6, 7, 8);
-    // Fill all available cells
     grid.placeCard(0, 0, testCard);
     grid.placeCard(0, 2, testCard);
     grid.placeCard(1, 1, testCard);
@@ -159,7 +150,6 @@ public class ThreeTriosGridTest {
     assertTrue(grid.isFull());
   }
 
-  // getEmptyCells Tests
   @Test
   public void testGetEmptyCellsInitialGrid() {
     List<int[]> emptyCells = grid.getEmptyCells();
