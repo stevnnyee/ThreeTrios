@@ -1,11 +1,16 @@
 import org.junit.Test;
-import static org.junit.Assert.*;
+
 
 import java.util.List;
 
 import cs3500.threetrios.model.Card;
 import cs3500.threetrios.model.ThreeTriosCard;
 import cs3500.threetrios.model.ThreeTriosGrid;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Class containing all the tests regarding the card methods.
