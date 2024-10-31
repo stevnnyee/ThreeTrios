@@ -228,4 +228,78 @@ public class ThreeTriosViewTest {
   public void testViewConstructorWithNullModel() {
     new ThreeTriosViewImpl(null);
   }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testViewWithInvalidBoardConfig() throws IOException {
+    createTestFile("invalid-board",
+            "// Invalid 3x3 board with wrong dimensions\n" +
+                    "3 3\n" +
+                    "_X_\n" +
+                    "X_\n" +
+                    "_X_");
+
+    game.startGameFromConfig(
+            tempDir.resolve("invalid-board").toString(),
+            tempDir.resolve("test-cards").toString()
+    );
+    view = new ThreeTriosViewImpl(game);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testViewWithInvalidCardConfig() throws IOException {
+    createTestFile("invalid-cards",
+            "// Cards with invalid value counts\n" +
+                    "Knight A 5 6\n" +
+                    "Dragon 9 8 7 6\n" +
+                    "Wizard 5 A 7 8\n");
+
+    game.startGameFromConfig(
+            tempDir.resolve("test-board").toString(),
+            tempDir.resolve("invalid-cards").toString()
+    );
+    view = new ThreeTriosViewImpl(game);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testViewWithInvalidCardValues() throws IOException {
+    createTestFile("invalid-card-values",
+            "// Cards with invalid values\n" +
+                    "Knight X 5 6 7\n" +
+                    "Dragon 9 8 7 6\n" +
+                    "Wizard 5 A 7 8\n");
+
+    game.startGameFromConfig(
+            tempDir.resolve("test-board").toString(),
+            tempDir.resolve("invalid-card-values").toString()
+    );
+    view = new ThreeTriosViewImpl(game);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testViewWithEmptyConfigFiles() throws IOException {
+    createTestFile("empty-board", "");
+    createTestFile("empty-cards", "");
+
+    game.startGameFromConfig(
+            tempDir.resolve("empty-board").toString(),
+            tempDir.resolve("empty-cards").toString()
+    );
+    view = new ThreeTriosViewImpl(game);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testViewWithMalformedBoardDimensions() throws IOException {
+    createTestFile("malformed-board",
+            "// Malformed board dimensions\n" +
+                    "3x3\n" +
+                    "_X_\n" +
+                    "X_X\n" +
+                    "_X_");
+
+    game.startGameFromConfig(
+            tempDir.resolve("malformed-board").toString(),
+            tempDir.resolve("test-cards").toString()
+    );
+    view = new ThreeTriosViewImpl(game);
+  }
 }

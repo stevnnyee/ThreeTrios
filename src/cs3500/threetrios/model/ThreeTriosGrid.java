@@ -74,11 +74,14 @@ public class ThreeTriosGrid implements Grid {
 
   @Override
   public void placeCard(int row, int col, Card card) {
+    if (card == null) {
+      throw new IllegalStateException("Can't place null card");
+    }
     validatePosition(row, col);
     System.out.println("Attempting to place card at (" + row + ", " + col + ")");
 
     if (holes[row][col]) {
-      throw new IllegalStateException("Cannot place card in a hole");
+      throw new IllegalStateException("Can't place card in a hole");
     }
     if (cards[row][col] != null) {
       throw new IllegalStateException("Position already contains a card");
