@@ -76,7 +76,6 @@ public class ThreeTriosGameModel implements MainModelInterface {
     }
   }
 
-  @Override
   public void initialize(Grid grid) {
     this.redPlayer = new ThreeTriosPlayer("RED");
     this.bluePlayer = new ThreeTriosPlayer("BLUE");
@@ -85,7 +84,6 @@ public class ThreeTriosGameModel implements MainModelInterface {
     playerHands.put(bluePlayer, new ArrayList<>());
   }
 
-  @Override
   public void dealCards(List<Card> deck) {
     int cardCells = grid.getCardCellCount();
     int handSize = (cardCells + 1) / 2;
@@ -112,10 +110,10 @@ public class ThreeTriosGameModel implements MainModelInterface {
   }
 
   @Override
-  public void placeCard(Player player, int row, int col, Card card) {
-    validateMove(player, row, col, card);
+  public void placeCard(int row, int col, Card card) {
+    validateMove(currentPlayer, row, col, card);
     grid.placeCard(row, col, card);
-    playerHands.get(player).remove(card);
+    playerHands.get(currentPlayer).remove(card);
     executeBattlePhase(new Position(row, col));
     currentPlayer = (currentPlayer == redPlayer) ? bluePlayer : redPlayer;
     gameOver = isGridFull();
@@ -144,6 +142,9 @@ public class ThreeTriosGameModel implements MainModelInterface {
     }
     if (grid.isHole(row, col)) {
       throw new IllegalArgumentException("Can't place card in a hole");
+    }
+    if (row < 0 || row >= grid.getRows() || col < 0 || col >= grid.getCols()) {
+      throw new IllegalArgumentException("Position out of bounds");
     }
   }
 
@@ -180,7 +181,6 @@ public class ThreeTriosGameModel implements MainModelInterface {
     return new ArrayList<>(playerHands.get(player));
   }
 
-  @Override
   public void executeBattlePhase(Position newCardPosition) {
     List<Position> toFlip = new ArrayList<>();
     List<Position> adjacent = getAdjacentPositions(newCardPosition);
@@ -290,7 +290,6 @@ public class ThreeTriosGameModel implements MainModelInterface {
     return true;
   }
 
-  @Override
   public Player determineWinner() {
     if (!isGameOver()) {
       return null;
@@ -329,7 +328,17 @@ public class ThreeTriosGameModel implements MainModelInterface {
 
   @Override
   public Grid getGrid() {
-    return grid;
+    return new ThreeTriosGrid(grid.getRows(), grid.getCols(), getHoles());
+  }
+
+  private boolean[][] getHoles() {
+    boolean[][] holes = new boolean[grid.getRows()][grid.getCols()];
+    for (int i = 0; i < grid.getRows(); i++) {
+      for (int j = 0; j < grid.getCols(); j++) {
+        holes[i][j] = grid.isHole(i, j);
+      }
+    }
+    return holes;
   }
 
   @Override
@@ -341,6 +350,67 @@ public class ThreeTriosGameModel implements MainModelInterface {
   public Player getWinner() {
     return determineWinner();
   }
+
+  @Override
+  public int getFlippableCards(int row, int col, Card card) {
+    if (!canPlaceCard(row, col, card)) {
+      return 0;
+    }
+    int flippableCount = 0;
+    List<Position> adjacent = getAdjacentPositions(new Position(row, col));
+    for (Position pos : adjacent) {
+      Card adjacentCard = grid.getCard(pos.row, pos.col);
+      if (adjacentCard != null && adjacentCard.getOwner() != currentPlayer) {
+        if (checkCardWinsBattle(new Position(row, col), pos)) {
+          flippableCount++;
+        }
+      }
+    }
+    return flippableCount;
+  }
+
+  @Override
+  public int[] getGridDimensions() {
+    if (grid == null) {
+      throw new IllegalStateException("Game has not been started");
+    }
+    return new int[]{grid.getRows(), grid.getCols()};
+  }
+
+  @Override
+  public Card getCardAt(int row, int col) {
+    if (grid == null) {
+      throw new IllegalStateException("Game has not been started");
+    }
+    if (row < 0 || row >= grid.getRows() || col < 0 || col >= grid.getCols()) {
+      throw new IllegalArgumentException("Invalid grid coordinates");
+    }
+    return grid.getCard(row, col);
+  }
+
+  @Override
+  public Player getCardOwnerAt(int row, int col) {
+    if (grid == null) {
+      throw new IllegalStateException("Game has not been started");
+    }
+    if (row < 0 || row >= grid.getRows() || col < 0 || col >= grid.getCols()) {
+      throw new IllegalArgumentException("Invalid grid coordinates");
+    }
+    Card card = grid.getCard(row, col);
+    return card != null ? card.getOwner() : null;
+  }
+
+  @Override
+  public boolean isHole(int row, int col) {
+    if (grid == null) {
+      throw new IllegalStateException("Game has not been started");
+    }
+    if (row < 0 || row >= grid.getRows() || col < 0 || col >= grid.getCols()) {
+      throw new IllegalArgumentException("Invalid grid coordinates");
+    }
+    return grid.isHole(row, col);
+  }
+
 
   /**
    * Represents a position on the game grid.
