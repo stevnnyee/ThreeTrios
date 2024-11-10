@@ -49,7 +49,6 @@ public class ThreeTriosPlayer implements Player {
     if (!hand.remove(card)) {
       throw new IllegalStateException("Card not found in hand");
     }
-    hand.remove(card);
   }
 
   @Override

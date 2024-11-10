@@ -109,4 +109,8 @@ public interface ReadOnlyThreeTriosModel {
    * @throws IllegalArgumentException if coordinates are invalid
    */
   boolean isHole(int row, int col);
+
+  List<Player> getPlayers();
+
+  void placeCard(int row, int col, Card card);
 }

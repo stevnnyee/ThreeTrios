@@ -37,4 +37,6 @@ public interface MainModelInterface extends ReadOnlyThreeTriosModel {
    * @throws IllegalStateException if the game is not in progress
    */
   void placeCard(int row, int col, Card card);
+
+  List<Player> getPlayers();
 }

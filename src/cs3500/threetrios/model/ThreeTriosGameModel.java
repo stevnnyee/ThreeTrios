@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementation of the ThreeTriosModel Interface.
@@ -19,6 +21,7 @@ public class ThreeTriosGameModel implements MainModelInterface {
   private final Map<Player, List<Card>> playerHands;
   private boolean gameStarted;
   private boolean gameOver;
+  private boolean isScoring = false;
 
   /**
    * Constructs a new ThreeTriosGameModel with an initial state.
@@ -35,7 +38,9 @@ public class ThreeTriosGameModel implements MainModelInterface {
     this.grid = grid;
     initialize(grid);
     dealCards(deck);
-    this.currentPlayer = redPlayer;
+
+    this.currentPlayer = Math.random() < 0.5 ? redPlayer : bluePlayer;
+
     this.gameStarted = true;
     this.gameOver = false;
   }
@@ -85,13 +90,12 @@ public class ThreeTriosGameModel implements MainModelInterface {
   }
 
   public void dealCards(List<Card> deck) {
-    int cardCells = grid.getCardCellCount();
-    int handSize = (cardCells + 1) / 2;
+    final int handSize = 8;
 
-    if (deck.size() < cardCells + 1) {
+    if (deck.size() < handSize * 2) {
       throw new IllegalArgumentException(
               String.format("Not enough cards. Need %d, got %d",
-                      cardCells + 1, deck.size()));
+                      handSize * 2, deck.size()));
     }
 
     List<Card> shuffledDeck = new ArrayList<>(deck);
@@ -99,6 +103,7 @@ public class ThreeTriosGameModel implements MainModelInterface {
     playerHands.get(redPlayer).clear();
     playerHands.get(bluePlayer).clear();
 
+    // Deal exactly 8 cards to each player
     for (int i = 0; i < handSize; i++) {
       Card redCard = shuffledDeck.get(i);
       Card blueCard = shuffledDeck.get(i + handSize);
@@ -180,25 +185,44 @@ public class ThreeTriosGameModel implements MainModelInterface {
     }
     return new ArrayList<>(playerHands.get(player));
   }
-
   public void executeBattlePhase(Position newCardPosition) {
     List<Position> toFlip = new ArrayList<>();
-    List<Position> adjacent = getAdjacentPositions(newCardPosition);
+    boolean[][] visited = new boolean[grid.getRows()][grid.getCols()];
 
+    List<Position> adjacent = getAdjacentPositions(newCardPosition);
     for (Position pos : adjacent) {
       Card adjacentCard = grid.getCard(pos.row, pos.col);
-      if (adjacentCard != null && adjacentCard.getOwner() != currentPlayer) {
-        if (checkCardWinsBattle(newCardPosition, pos)) {
-          toFlip.add(pos);
-        }
+      if (adjacentCard != null &&
+              adjacentCard.getOwner() != currentPlayer &&
+              checkCardWinsBattle(newCardPosition, pos)) {
+        toFlip.add(pos);
+        visited[pos.row][pos.col] = true;
       }
     }
+
+    int startIndex = 0;
+    while (startIndex < toFlip.size()) {
+      Position current = toFlip.get(startIndex);
+      Card currentCard = grid.getCard(current.row, current.col);
+
+      for (Position adj : getAdjacentPositions(current)) {
+        if (!visited[adj.row][adj.col]) {
+          Card adjCard = grid.getCard(adj.row, adj.col);
+          if (adjCard != null && adjCard.getOwner() == currentCard.getOwner()) {
+            toFlip.add(adj);
+            visited[adj.row][adj.col] = true;
+          }
+        }
+      }
+      startIndex++;
+    }
+
     for (Position pos : toFlip) {
       Card card = grid.getCard(pos.row, pos.col);
       card.setOwner(currentPlayer);
-      executeBattlePhase(pos);
     }
   }
+
 
   /**
    * Checks if a card wins the battle in comparison to another card.
@@ -271,7 +295,13 @@ public class ThreeTriosGameModel implements MainModelInterface {
 
   @Override
   public boolean isGameOver() {
-    return gameOver || isGridFull();
+    if (gameOver || isGridFull()) {
+      System.out.println("\nFINAL SCORING DEBUG:");
+      System.out.println("Red total cards: " + countPlayerCards(redPlayer));
+      System.out.println("Blue total cards: " + countPlayerCards(bluePlayer));
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -280,6 +310,13 @@ public class ThreeTriosGameModel implements MainModelInterface {
    * @return true if grid is full, false otherwise
    */
   private boolean isGridFull() {
+    int redCardsLeft = playerHands.get(redPlayer).size();
+    int blueCardsLeft = playerHands.get(bluePlayer).size();
+    if ((redCardsLeft == 1 && blueCardsLeft == 0) ||
+            (blueCardsLeft == 1 && redCardsLeft == 0)) {
+      return true;
+    }
+
     for (int i = 0; i < grid.getRows(); i++) {
       for (int j = 0; j < grid.getCols(); j++) {
         if (!grid.isHole(i, j) && grid.getCard(i, j) == null) {
@@ -313,8 +350,22 @@ public class ThreeTriosGameModel implements MainModelInterface {
    * @param player player
    * @return returns count
    */
+
   private int countPlayerCards(Player player) {
-    int count = playerHands.get(player).size();
+    // Prevent recursive scoring
+    if (isScoring) {
+      return 0;
+    }
+
+    isScoring = true;
+    int count = 0;
+
+    // Only count hand cards if game is NOT over
+    if (!isGameOver()) {
+      count += playerHands.get(player).size();
+    }
+
+    // Count cards on the board
     for (int i = 0; i < grid.getRows(); i++) {
       for (int j = 0; j < grid.getCols(); j++) {
         Card card = grid.getCard(i, j);
@@ -323,6 +374,8 @@ public class ThreeTriosGameModel implements MainModelInterface {
         }
       }
     }
+
+    isScoring = false;
     return count;
   }
 
@@ -411,6 +464,21 @@ public class ThreeTriosGameModel implements MainModelInterface {
     return grid.isHole(row, col);
   }
 
+  @Override
+  public List<Player> getPlayers() {
+    if (!gameStarted) {
+      return Collections.emptyList();
+    }
+    return List.of(redPlayer, bluePlayer);
+  }
+
+  public void setCurrentPlayer(String color) {
+    if (color.equals("RED")) {
+      this.currentPlayer = redPlayer;
+    } else {
+      this.currentPlayer = bluePlayer;
+    }
+  }
 
   /**
    * Represents a position on the game grid.
