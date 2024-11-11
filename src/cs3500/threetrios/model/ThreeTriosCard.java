@@ -68,15 +68,4 @@ public class ThreeTriosCard implements Card {
     }
     this.owner = newOwner;
   }
-
-  /**
-   * Method that compares two cards to see if the card at hand can flip the other card.
-   *
-   * @param otherCard other card
-   * @param direction direction
-   * @return boolean if card can be flipped.
-   */
-  private boolean canFlip(Card otherCard, Direction direction) {
-    return this.getAttackPower(direction) > otherCard.getAttackPower(direction.getOpposite());
-  }
 }

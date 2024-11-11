@@ -1,5 +1,5 @@
 import org.junit.Test;
-import static org.junit.Assert.*;
+
 
 import java.util.List;
 
@@ -7,6 +7,14 @@ import cs3500.threetrios.model.Card;
 import cs3500.threetrios.model.ThreeTriosCard;
 import cs3500.threetrios.model.ThreeTriosGrid;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Class containing all the tests regarding the card methods.
+ */
 public class ThreeTriosCardTest {
 
   @Test(expected = IllegalArgumentException.class)
@@ -33,11 +41,12 @@ public class ThreeTriosCardTest {
   public void testIsHole() {
     boolean[][] holes = {
             {false, false, false},
-            {false, true, false},
+            {false, true, true},
             {false, false, false}
     };
     ThreeTriosGrid grid = new ThreeTriosGrid(3, 3, holes);
     assertTrue(grid.isHole(1, 1));
+    assertTrue(grid.isHole(1, 2));
     assertFalse(grid.isHole(0, 0));
   }
 
@@ -64,7 +73,7 @@ public class ThreeTriosCardTest {
     assertEquals(card, grid.getCard(0, 0));
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testPlaceCardInHole() {
     boolean[][] holes = {{true}};
     ThreeTriosGrid grid = new ThreeTriosGrid(1, 1, holes);

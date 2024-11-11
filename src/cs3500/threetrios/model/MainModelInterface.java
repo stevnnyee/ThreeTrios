@@ -1,94 +1,42 @@
 package cs3500.threetrios.model;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
- * Interface for the model of the ThreeTrios game, defining the actions that
- * can be performed on the game.
+ * Interface for the model of the ThreeTrios game, extending the read-only interface
+ * to add methods that modify game state.
  */
-public interface MainModelInterface {
-
+public interface MainModelInterface extends ReadOnlyThreeTriosModel {
   /**
-   * Starts a new game with the given grid and cards.
+   * Starts a new game with the given grid and deck of cards.
    *
-   * @param grid grid
-   * @param deck cards
+   * @param grid the game grid
+   * @param deck the deck of cards
+   * @throws IllegalArgumentException if grid or deck is invalid
    */
   void startGame(Grid grid, List<Card> deck);
 
   /**
-   * Places a card on the grid for a given player.
+   * Starts a new game using configuration files.
    *
-   * @param player player
-   * @param row    row to place card
-   * @param col    column to place card
-   * @param card   card to place
+   * @param boardFile path to the board configuration file
+   * @param cardFile path to the card configuration file
+   * @throws IOException if files cannot be read
+   * @throws IllegalArgumentException if configurations are invalid
+   */
+  void startGameFromConfig(String boardFile, String cardFile) throws IOException;
+
+  /**
+   * Places a card on the grid for the current player.
+   *
+   * @param row row coordinate
+   * @param col column coordinate
+   * @param card the card to place
    * @throws IllegalArgumentException if the move is invalid
+   * @throws IllegalStateException if the game is not in progress
    */
-  void placeCard(Player player, int row, int col, Card card);
+  void placeCard(int row, int col, Card card);
 
-  /**
-   * Gets the current state of the grid.
-   *
-   * @return the current Grid
-   */
-  Grid getGrid();
-
-  /**
-   * Gets the current player, either red or blue.
-   *
-   * @return the current Player
-   */
-  Player getCurrentPlayer();
-
-  /**
-   * Gets the hand of the specified player.
-   *
-   * @param player the player
-   * @return The list of cards in the player's hand
-   */
-  List<Card> getPlayerHand(Player player);
-
-  void executeBattlePhase(ThreeTriosGameModel.Position newCardPosition);
-
-  /**
-   * Checks if the game is over.
-   *
-   * @return true if the game is over, false otherwise
-   */
-  boolean isGameOver();
-
-  /**
-   * Gets the winner of the game.
-   *
-   * @return the winning Player, or null if the game is a tie or not over
-   * @throws IllegalStateException if the game is not over
-   */
-  Player getWinner();
-
-  /**
-   * Checks if you can place the card onto the specified cell.
-   *
-   * @param row  row
-   * @param col  column
-   * @param card card
-   * @return true if you can place card, false otherwise
-   */
-  boolean canPlaceCard(int row, int col, Card card);
-
-  /**
-   * Get score for specified player, the count of owned cards.
-   *
-   * @param player player
-   * @return number of cards owned by player
-   */
-  int getPlayerScore(Player player);
-
-  Player determineWinner();
-
-
-  void dealCards(List<Card> deck);
-
-
-  void initialize(Grid grid);
+  List<Player> getPlayers();
 }

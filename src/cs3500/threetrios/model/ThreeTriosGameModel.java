@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementation of the ThreeTriosModel Interface.
@@ -19,6 +21,7 @@ public class ThreeTriosGameModel implements MainModelInterface {
   private final Map<Player, List<Card>> playerHands;
   private boolean gameStarted;
   private boolean gameOver;
+  private boolean isScoring = false;
 
   /**
    * Constructs a new ThreeTriosGameModel with an initial state.
@@ -35,7 +38,9 @@ public class ThreeTriosGameModel implements MainModelInterface {
     this.grid = grid;
     initialize(grid);
     dealCards(deck);
-    this.currentPlayer = redPlayer;
+
+    this.currentPlayer = Math.random() < 0.5 ? redPlayer : bluePlayer;
+
     this.gameStarted = true;
     this.gameOver = false;
   }
@@ -76,7 +81,6 @@ public class ThreeTriosGameModel implements MainModelInterface {
     }
   }
 
-  @Override
   public void initialize(Grid grid) {
     this.redPlayer = new ThreeTriosPlayer("RED");
     this.bluePlayer = new ThreeTriosPlayer("BLUE");
@@ -85,16 +89,13 @@ public class ThreeTriosGameModel implements MainModelInterface {
     playerHands.put(bluePlayer, new ArrayList<>());
   }
 
-  @Override
   public void dealCards(List<Card> deck) {
-    int cardCells = grid.getCardCellCount();
-    // (cardCells + 1) / 2
-    int handSize = (cardCells + 1) / 2;
+    final int handSize = 8;
 
-    if (deck.size() < cardCells + 1) {
+    if (deck.size() < handSize * 2) {
       throw new IllegalArgumentException(
               String.format("Not enough cards. Need %d, got %d",
-                      cardCells + 1, deck.size()));
+                      handSize * 2, deck.size()));
     }
 
     List<Card> shuffledDeck = new ArrayList<>(deck);
@@ -102,6 +103,7 @@ public class ThreeTriosGameModel implements MainModelInterface {
     playerHands.get(redPlayer).clear();
     playerHands.get(bluePlayer).clear();
 
+    // Deal exactly 8 cards to each player
     for (int i = 0; i < handSize; i++) {
       Card redCard = shuffledDeck.get(i);
       Card blueCard = shuffledDeck.get(i + handSize);
@@ -113,10 +115,10 @@ public class ThreeTriosGameModel implements MainModelInterface {
   }
 
   @Override
-  public void placeCard(Player player, int row, int col, Card card) {
-    validateMove(player, row, col, card);
+  public void placeCard(int row, int col, Card card) {
+    validateMove(currentPlayer, row, col, card);
     grid.placeCard(row, col, card);
-    playerHands.get(player).remove(card);
+    playerHands.get(currentPlayer).remove(card);
     executeBattlePhase(new Position(row, col));
     currentPlayer = (currentPlayer == redPlayer) ? bluePlayer : redPlayer;
     gameOver = isGridFull();
@@ -141,10 +143,13 @@ public class ThreeTriosGameModel implements MainModelInterface {
       throw new IllegalArgumentException("Card not in current player's hand");
     }
     if (grid.getCard(row, col) != null) {
-      throw new IllegalStateException("Cannot place a card on top of another card.");
+      throw new IllegalStateException("Can't place a card on top of another card.");
     }
     if (grid.isHole(row, col)) {
-      throw new IllegalArgumentException("Cannot place card in a hole");
+      throw new IllegalArgumentException("Can't place card in a hole");
+    }
+    if (row < 0 || row >= grid.getRows() || col < 0 || col >= grid.getCols()) {
+      throw new IllegalArgumentException("Position out of bounds");
     }
   }
 
@@ -180,28 +185,44 @@ public class ThreeTriosGameModel implements MainModelInterface {
     }
     return new ArrayList<>(playerHands.get(player));
   }
-
-  @Override
   public void executeBattlePhase(Position newCardPosition) {
     List<Position> toFlip = new ArrayList<>();
-    List<Position> adjacent = getAdjacentPositions(newCardPosition);
+    boolean[][] visited = new boolean[grid.getRows()][grid.getCols()];
 
+    List<Position> adjacent = getAdjacentPositions(newCardPosition);
     for (Position pos : adjacent) {
       Card adjacentCard = grid.getCard(pos.row, pos.col);
-      if (adjacentCard != null && adjacentCard.getOwner() != currentPlayer) {
-        if (checkCardWinsBattle(newCardPosition, pos)) {
-          toFlip.add(pos);
-        }
+      if (adjacentCard != null &&
+              adjacentCard.getOwner() != currentPlayer &&
+              checkCardWinsBattle(newCardPosition, pos)) {
+        toFlip.add(pos);
+        visited[pos.row][pos.col] = true;
       }
     }
 
-    // Combo
+    int startIndex = 0;
+    while (startIndex < toFlip.size()) {
+      Position current = toFlip.get(startIndex);
+      Card currentCard = grid.getCard(current.row, current.col);
+
+      for (Position adj : getAdjacentPositions(current)) {
+        if (!visited[adj.row][adj.col]) {
+          Card adjCard = grid.getCard(adj.row, adj.col);
+          if (adjCard != null && adjCard.getOwner() == currentCard.getOwner()) {
+            toFlip.add(adj);
+            visited[adj.row][adj.col] = true;
+          }
+        }
+      }
+      startIndex++;
+    }
+
     for (Position pos : toFlip) {
       Card card = grid.getCard(pos.row, pos.col);
       card.setOwner(currentPlayer);
-      executeBattlePhase(pos);
     }
   }
+
 
   /**
    * Checks if a card wins the battle in comparison to another card.
@@ -274,7 +295,13 @@ public class ThreeTriosGameModel implements MainModelInterface {
 
   @Override
   public boolean isGameOver() {
-    return gameOver || isGridFull();
+    if (gameOver || isGridFull()) {
+      System.out.println("\nFINAL SCORING DEBUG:");
+      System.out.println("Red total cards: " + countPlayerCards(redPlayer));
+      System.out.println("Blue total cards: " + countPlayerCards(bluePlayer));
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -283,6 +310,13 @@ public class ThreeTriosGameModel implements MainModelInterface {
    * @return true if grid is full, false otherwise
    */
   private boolean isGridFull() {
+    int redCardsLeft = playerHands.get(redPlayer).size();
+    int blueCardsLeft = playerHands.get(bluePlayer).size();
+    if ((redCardsLeft == 1 && blueCardsLeft == 0) ||
+            (blueCardsLeft == 1 && redCardsLeft == 0)) {
+      return true;
+    }
+
     for (int i = 0; i < grid.getRows(); i++) {
       for (int j = 0; j < grid.getCols(); j++) {
         if (!grid.isHole(i, j) && grid.getCard(i, j) == null) {
@@ -293,7 +327,6 @@ public class ThreeTriosGameModel implements MainModelInterface {
     return true;
   }
 
-  @Override
   public Player determineWinner() {
     if (!isGameOver()) {
       return null;
@@ -317,8 +350,22 @@ public class ThreeTriosGameModel implements MainModelInterface {
    * @param player player
    * @return returns count
    */
+
   private int countPlayerCards(Player player) {
-    int count = playerHands.get(player).size();
+    // Prevent recursive scoring
+    if (isScoring) {
+      return 0;
+    }
+
+    isScoring = true;
+    int count = 0;
+
+    // Only count hand cards if game is NOT over
+    if (!isGameOver()) {
+      count += playerHands.get(player).size();
+    }
+
+    // Count cards on the board
     for (int i = 0; i < grid.getRows(); i++) {
       for (int j = 0; j < grid.getCols(); j++) {
         Card card = grid.getCard(i, j);
@@ -327,12 +374,24 @@ public class ThreeTriosGameModel implements MainModelInterface {
         }
       }
     }
+
+    isScoring = false;
     return count;
   }
 
   @Override
   public Grid getGrid() {
-    return grid;
+    return new ThreeTriosGrid(grid.getRows(), grid.getCols(), getHoles());
+  }
+
+  private boolean[][] getHoles() {
+    boolean[][] holes = new boolean[grid.getRows()][grid.getCols()];
+    for (int i = 0; i < grid.getRows(); i++) {
+      for (int j = 0; j < grid.getCols(); j++) {
+        holes[i][j] = grid.isHole(i, j);
+      }
+    }
+    return holes;
   }
 
   @Override
@@ -343,6 +402,82 @@ public class ThreeTriosGameModel implements MainModelInterface {
   @Override
   public Player getWinner() {
     return determineWinner();
+  }
+
+  @Override
+  public int getFlippableCards(int row, int col, Card card) {
+    if (!canPlaceCard(row, col, card)) {
+      return 0;
+    }
+    int flippableCount = 0;
+    List<Position> adjacent = getAdjacentPositions(new Position(row, col));
+    for (Position pos : adjacent) {
+      Card adjacentCard = grid.getCard(pos.row, pos.col);
+      if (adjacentCard != null && adjacentCard.getOwner() != currentPlayer) {
+        if (checkCardWinsBattle(new Position(row, col), pos)) {
+          flippableCount++;
+        }
+      }
+    }
+    return flippableCount;
+  }
+
+  @Override
+  public int[] getGridDimensions() {
+    if (grid == null) {
+      throw new IllegalStateException("Game has not been started");
+    }
+    return new int[]{grid.getRows(), grid.getCols()};
+  }
+
+  @Override
+  public Card getCardAt(int row, int col) {
+    if (grid == null) {
+      throw new IllegalStateException("Game has not been started");
+    }
+    if (row < 0 || row >= grid.getRows() || col < 0 || col >= grid.getCols()) {
+      throw new IllegalArgumentException("Invalid grid coordinates");
+    }
+    return grid.getCard(row, col);
+  }
+
+  @Override
+  public Player getCardOwnerAt(int row, int col) {
+    if (grid == null) {
+      throw new IllegalStateException("Game has not been started");
+    }
+    if (row < 0 || row >= grid.getRows() || col < 0 || col >= grid.getCols()) {
+      throw new IllegalArgumentException("Invalid grid coordinates");
+    }
+    Card card = grid.getCard(row, col);
+    return card != null ? card.getOwner() : null;
+  }
+
+  @Override
+  public boolean isHole(int row, int col) {
+    if (grid == null) {
+      throw new IllegalStateException("Game has not been started");
+    }
+    if (row < 0 || row >= grid.getRows() || col < 0 || col >= grid.getCols()) {
+      throw new IllegalArgumentException("Invalid grid coordinates");
+    }
+    return grid.isHole(row, col);
+  }
+
+  @Override
+  public List<Player> getPlayers() {
+    if (!gameStarted) {
+      return Collections.emptyList();
+    }
+    return List.of(redPlayer, bluePlayer);
+  }
+
+  public void setCurrentPlayer(String color) {
+    if (color.equals("RED")) {
+      this.currentPlayer = redPlayer;
+    } else {
+      this.currentPlayer = bluePlayer;
+    }
   }
 
   /**

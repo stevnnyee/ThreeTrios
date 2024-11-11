@@ -1,5 +1,3 @@
-
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.After;
@@ -323,16 +321,16 @@ public class ThreeTriosGameModelTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testStartGameWithInvalidGrid() {
-    Grid invalidGrid = new ThreeTriosGrid(3, 3, new boolean[][]{{false, false, false},
-            {false, false, false}, {false, false, false}});
+    Grid invalidGrid = new ThreeTriosGrid(3, 3,
+            new boolean[][]{{false, false, false}, {false, false, false}, {false, false, false}});
     List<Card> deck = new ArrayList<>();
     game.startGame(invalidGrid, deck);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testStartGameWithInsufficientCards() {
-    Grid validGrid = new ThreeTriosGrid(3, 3, new boolean[][]{{false, false, false},
-            {false, true, false}, {false, false, false}});
+    Grid validGrid = new ThreeTriosGrid(3, 3,
+            new boolean[][]{{false, false, false}, {false, true, false}, {false, false, false}});
     List<Card> insufficientDeck = new ArrayList<>();
     game.startGame(validGrid, insufficientDeck);
   }

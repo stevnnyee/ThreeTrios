@@ -17,7 +17,7 @@ public class ThreeTriosPlayer implements Player {
    */
   public ThreeTriosPlayer(String color) {
     if (color == null || color.trim().isEmpty()) {
-      throw new IllegalArgumentException("Color cannot be null or empty");
+      throw new IllegalArgumentException("Color can't be null or empty");
     }
     this.color = color;
     this.hand = new ArrayList<>();
@@ -36,7 +36,7 @@ public class ThreeTriosPlayer implements Player {
   @Override
   public void addCardToHand(Card card) {
     if (card == null) {
-      throw new IllegalArgumentException("Card cannot be null");
+      throw new IllegalArgumentException("Card can't be null");
     }
     hand.add(card);
   }
@@ -44,12 +44,11 @@ public class ThreeTriosPlayer implements Player {
   @Override
   public void removeCardFromHand(Card card) {
     if (card == null) {
-      throw new IllegalArgumentException("Card cannot be null");
+      throw new IllegalArgumentException("Card can't be null");
     }
     if (!hand.remove(card)) {
       throw new IllegalStateException("Card not found in hand");
     }
-    hand.remove(card);
   }
 
   @Override
