@@ -5,6 +5,7 @@ import java.util.List;
 
 /**
  * Implementation of the Grid interface for the ThreeTrios game.
+ * Origin of (0,0) with positive dimensions and an odd number of card cells.
  */
 public class ThreeTriosGrid implements Grid {
   private final int rows;

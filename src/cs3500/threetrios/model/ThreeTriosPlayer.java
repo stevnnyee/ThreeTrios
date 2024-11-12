@@ -8,6 +8,7 @@ import cs3500.threetrios.strategy.AIStrategy;
 
 /**
  * Implementation of the Player interface for the Three Trios game.
+ * Sets strategy for a player as well as counts the cards in a player's hand.
  */
 public class ThreeTriosPlayer implements Player {
   private final String color;

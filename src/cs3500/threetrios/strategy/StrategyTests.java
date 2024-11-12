@@ -11,6 +11,9 @@ import static org.junit.Assert.*;
 import cs3500.threetrios.model.Card;
 import cs3500.threetrios.model.Player;
 
+/**
+ * Class testing the strategies in the program.
+ */
 public class StrategyTests {
   private StringBuilder log;
   private MockThreeTriosModel model;
