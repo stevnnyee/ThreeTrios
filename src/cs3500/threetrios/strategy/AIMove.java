@@ -21,6 +21,12 @@ public class AIMove {
    * @param score    the evaluated score of the move
    */
   public AIMove(Card card, Position position, int score) {
+    if (position == null) {
+      throw new IllegalArgumentException("Position cannot be null");
+    }
+    if (score < 0) {
+      throw new IllegalArgumentException("Score cannot be negative");
+    }
     this.card = card;
     this.position = position;
     this.score = score;
