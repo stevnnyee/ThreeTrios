@@ -14,7 +14,6 @@ public class DefensiveStrat implements AIStrategy {
     List<Card> hand = model.getPlayerHand(player);
     List<AIMove> possibleMoves = new ArrayList<>();
 
-    // Try all possible positions and cards
     for (int row = 0; row < model.getGridDimensions()[0]; row++) {
       for (int col = 0; col < model.getGridDimensions()[1]; col++) {
         if (model.isHole(row, col) || model.getCardAt(row, col) != null) {
@@ -40,7 +39,6 @@ public class DefensiveStrat implements AIStrategy {
 
   private int calculateDefensibility(MainModelInterface model, Position pos, Card card, Player player) {
     int score = 0;
-    // Get opponent
     Player opponent = null;
     for (Player p : model.getPlayers()) {
       if (!p.getColor().equals(player.getColor())) {
@@ -55,7 +53,6 @@ public class DefensiveStrat implements AIStrategy {
 
     List<Card> opponentHand = model.getPlayerHand(opponent);
 
-    // Check each direction for potential flips by opponent cards
     Direction[] directions = {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
     for (Direction dir : directions) {
       Position adjPos = getAdjacentPosition(pos, dir);
@@ -66,10 +63,8 @@ public class DefensiveStrat implements AIStrategy {
             vulnerableToFlips++;
           }
         }
-        // Subtract from score - more vulnerable positions/cards get lower scores
         score -= vulnerableToFlips * 100;
       } else {
-        // Bonus for edges where we can't be attacked from
         score += 50;
       }
     }

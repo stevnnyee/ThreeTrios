@@ -379,4 +379,5 @@ public class ThreeTriosViewTest {
     String[] cardLines = handSection.trim().split("\n");
     assertEquals(3, cardLines.length); // Assuming 3 cards in hand
   }
+
 }

@@ -3,7 +3,7 @@ package cs3500.threetrios.view;
 import java.awt.*;
 
 /**
- * Interface for the player hand panel.
+ * Interface for the player hand panel for the game.
  */
 public interface PlayerHandPanel {
   /**
