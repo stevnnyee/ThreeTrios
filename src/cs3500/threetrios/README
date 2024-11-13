@@ -117,31 +117,43 @@ Changes for part 2
   of the 3x3 board with no holes.
   - Created a JAR file that can run the ThreeTrios game.
 
-
 EXTRA CREDIT STRATEGIES IMPLEMENTATION:
 
 Defensive Strategy:
-- Predicts and chooses cards with the lowest risk of being flipped by the opponent.
-- Checks each card's position and direction and calculates how many of the opponents
-cards can flip them.
+  - Predicts and chooses cards with the lowest risk of being flipped by the opponent.
+  - Checks each card's position and direction and calculates how many of the opponents
+  cards can flip them.
 
 Implementation:
-- This strategy can be located in DefensiveStrat.java.
+  - This strategy can be located in strategy/DefensiveStrat.java.
 
 Test Coverage:
-- The tests checking if this strategy works properly are located in XXX.
-- The mock inside of the strategy package assists with the testing.
+  - The tests checking if this strategy works properly are located in test/StrategyTests.java.
+  - The mock inside of the strategy package assists with the testing.
 
 
 Minimax Strategy:
-- Predicts the opponent's moves and chooses a move that minimizes the maximum advantage the
-opponent can gain.
-- Simulates potential cases against the opponent's strategy in order to
-decide which case is best.
+  - Predicts the opponent's moves and chooses a move that minimizes the maximum advantage the
+  opponent can gain.
+  - Simulates potential cases against the opponent's strategy in order to
+  decide which case is best.
 
 Implementation:
-- This strategy can be located in MinimaxStrat.java.
+  - This strategy can be located in strategy/MinimaxStrat.java.
 
 Test Coverage:
-- The tests checking if this strategy works properly are located in XXX.
-- The mock inside of the strategy package assists with the testing.
+  - The tests checking if this strategy works properly are located in test/StrategyTests.java.
+  - The mock inside of the strategy package assists with the testing.
+
+
+Composite Strategy:
+  - CompositeStrategy implements a weighted combination approach, allowing multiple strategies
+  to be combined with different importance weights to create a more sophisticated decision-making
+  process that considers multiple factors when choosing a move.
+
+Implementation:
+  - This strategy can be located in strategy/CompositeStrategy.java.
+
+Test Coverage:
+  - The tests checking if this strategy works properly are located in test/StrategyTests.java.
+  - The mock inside of the strategy package assists with the testing.
