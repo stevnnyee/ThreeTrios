@@ -40,8 +40,8 @@ public class ThreeTriosCard implements Card {
     for (Direction direction : Direction.values()) {
       int value = values.get(direction);
       if (value < 1 || value > 10) {
-        throw new IllegalArgumentException("Card value for " + direction + " " +
-                "must be between 1 and 10, but was " + value);
+        throw new IllegalArgumentException("Card value for " + direction + " "
+                + "must be between 1 and 10, but was " + value);
       }
     }
   }

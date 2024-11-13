@@ -81,6 +81,11 @@ public class ThreeTriosGameModel implements MainModelInterface {
     }
   }
 
+  /**
+   * Initializes the grid for a ThreeTrios game.
+   *
+   * @param grid the grid of the game
+   */
   public void initialize(Grid grid) {
     this.redPlayer = new ThreeTriosPlayer("RED");
     this.bluePlayer = new ThreeTriosPlayer("BLUE");
@@ -89,6 +94,11 @@ public class ThreeTriosGameModel implements MainModelInterface {
     playerHands.put(bluePlayer, new ArrayList<>());
   }
 
+  /**
+   * Deals cards from a deck to a hand, setting up the hand.
+   *
+   * @param deck the deck to draw from
+   */
   public void dealCards(List<Card> deck) {
     // Calculate required hand size based on grid
     int totalRequiredCards = grid.getCardCellCount() + 1;
@@ -196,11 +206,16 @@ public class ThreeTriosGameModel implements MainModelInterface {
     }
     return new ArrayList<>(playerHands.get(player));
   }
+
+  /**
+   * Executes the battle phase of the game after a card has been placed.
+   * This method implements a search algorithm to process card battles.
+   *
+   * @param newCardPosition the new card position
+   */
   public void executeBattlePhase(Position newCardPosition) {
     Set<Position> toProcess = new HashSet<>();
     Set<Position> processed = new HashSet<>();
-
-    // Start with the newly placed card
     toProcess.add(newCardPosition);
 
     while (!toProcess.isEmpty()) {
@@ -209,25 +224,26 @@ public class ThreeTriosGameModel implements MainModelInterface {
       processed.add(currentPos);
 
       Card currentCard = grid.getCard(currentPos.row, currentPos.col);
-      if (currentCard == null) continue;
+      if (currentCard == null) {
+        continue;
+      }
 
-      // Get all adjacent positions
       List<Position> adjacentPositions = getAdjacentPositions(currentPos);
 
       for (Position adjPos : adjacentPositions) {
-        // Skip if position was already processed or has no card
-        if (processed.contains(adjPos)) continue;
+        if (processed.contains(adjPos)) {
+          continue;
+        }
 
         Card adjacentCard = grid.getCard(adjPos.row, adjPos.col);
-        if (adjacentCard == null) continue;
+        if (adjacentCard == null) {
+          continue;
+        }
 
         // Only battle against opponent's cards
         if (adjacentCard.getOwner() != currentCard.getOwner()) {
           if (checkCardWinsBattle(currentPos, adjPos)) {
-            // Flip the card immediately
             adjacentCard.setOwner(currentCard.getOwner());
-
-            // Add the newly flipped card to be processed for combo battles
             toProcess.add(adjPos);
           }
         }
@@ -313,10 +329,7 @@ public class ThreeTriosGameModel implements MainModelInterface {
 
   @Override
   public boolean isGameOver() {
-    if (gameOver || isGridFull()) {
-      return true;
-    }
-    return false;
+    return (gameOver || isGridFull());
   }
 
   /**
@@ -335,6 +348,12 @@ public class ThreeTriosGameModel implements MainModelInterface {
     return true;
   }
 
+  /**
+   * Determines a winner within a ThreeTrios game, returning null if the game is not over.
+   * The winner is determined by the player with the most cards at the end of the game.
+   *
+   * @return the winner of the ThreeTrios game, null if game is not over
+   */
   public Player determineWinner() {
     if (!isGameOver()) {
       return null;
@@ -491,6 +510,11 @@ public class ThreeTriosGameModel implements MainModelInterface {
     return List.of(redPlayer, bluePlayer);
   }
 
+  /**
+   * Sets the current player given a color.
+   *
+   * @param color the color to set the player
+   */
   public void setCurrentPlayer(String color) {
     if (color.equals("RED")) {
       this.currentPlayer = redPlayer;

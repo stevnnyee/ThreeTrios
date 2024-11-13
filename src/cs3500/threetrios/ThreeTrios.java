@@ -6,11 +6,28 @@ import cs3500.threetrios.model.Card;
 import cs3500.threetrios.model.ThreeTriosGrid;
 import cs3500.threetrios.model.ThreeTriosCard;
 import cs3500.threetrios.view.ThreeTriosSwingView;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Main class for the ThreeTrios game. This class initializes and starts the game with
+ * a predefined board layout and randomly generated cards.
+ * The board is a 5x7 grid with specific holes pattern, and the deck contains 35 cards
+ * with random attack values, including 6 special cards with maximum attack values.
+ */
 public final class ThreeTrios {
+  /**
+   * Main method that initializes and starts the ThreeTrios game.
+   * Creates a game board with a specific hole pattern, generates a deck of cards with
+   * random attack values and initializes the game model and view,
+   * and randomly selects the starting player.
+   *
+   * @param args command line arguments.
+   * @throws IllegalArgumentException if there's an error starting the game or if the thread
+   * is interrupted while waiting for the first move
+   */
   public static void main(String[] args) {
     ThreeTriosGameModel model = new ThreeTriosGameModel();
     int rows = 5;
@@ -46,10 +63,20 @@ public final class ThreeTrios {
 
       if (i <= 6) {
         switch (i % 4) {
-          case 0: north = 10; break;
-          case 1: south = 10; break;
-          case 2: east = 10; break;
-          case 3: west = 10; break;
+          case 0:
+            north = 10;
+            break;
+          case 1:
+            south = 10;
+            break;
+          case 2:
+            east = 10;
+            break;
+          case 3:
+            west = 10;
+            break;
+          default:
+            break;
         }
       }
 

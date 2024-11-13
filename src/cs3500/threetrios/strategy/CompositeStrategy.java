@@ -1,9 +1,11 @@
 package cs3500.threetrios.strategy;
 
-import cs3500.threetrios.model.*;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import cs3500.threetrios.model.Card;
+import cs3500.threetrios.model.MainModelInterface;
+import cs3500.threetrios.model.Player;
 
 /**
  * A composite strategy that combines multiple strategies with weights.

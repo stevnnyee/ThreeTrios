@@ -1,9 +1,12 @@
 package cs3500.threetrios.strategy;
 
-import cs3500.threetrios.model.*;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import cs3500.threetrios.model.Card;
+import cs3500.threetrios.model.Direction;
+import cs3500.threetrios.model.MainModelInterface;
+import cs3500.threetrios.model.Player;
 
 /**
  * Strategy that chooses positions and cards that are least likely to be flipped by opponents.
