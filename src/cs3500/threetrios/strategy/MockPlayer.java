@@ -8,10 +8,20 @@ import cs3500.threetrios.model.Grid;
 import cs3500.threetrios.model.MainModelInterface;
 import cs3500.threetrios.model.Player;
 
+/**
+ * A mock implementation of the Player interface used for testing game logic and strategies.
+ * This class provides a simplified player representation with basic hand management
+ * and no strategic decision-making capabilities.
+ */
 public class MockPlayer implements Player {
   private final String color;
   private final List<Card> hand;
 
+  /**
+   * Constructs a new MockPlayer with a color as its user.
+   *
+   * @param color the color of the player
+   */
   public MockPlayer(String color) {
     this.color = color;
     this.hand = new ArrayList<>();

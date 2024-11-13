@@ -1,16 +1,24 @@
 package cs3500.threetrios.strategy;
 
 import cs3500.threetrios.model.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * A composite strategy that combines multiple strategies with weights.
  * This allows for creating complex strategies by combining simpler ones.
+ * In combining multiple strategies this helps determine the best move in a game.
  */
 public class CompositeStrategy implements AIStrategy {
   private final List<WeightedStrategy> strategies;
 
+  /**
+   * Constructs a new CompositeStrategy by combining strategies with their respective weights.
+   *
+   * @param strategies List of strategies to be combined
+   * @param weights    List of weights corresponding to each strategy
+   */
   public CompositeStrategy(List<AIStrategy> strategies, List<Integer> weights) {
     if (strategies.size() != weights.size()) {
       throw new IllegalArgumentException("Must provide same number of strategies and weights");
@@ -53,10 +61,21 @@ public class CompositeStrategy implements AIStrategy {
     return allMoves.get(0);
   }
 
+  /**
+   * Private inner class representing a strategy and its associated weight.
+   * This class helps represent the relationship between a strategy and
+   * its influence on the composite decision.
+   */
   private static class WeightedStrategy {
     final AIStrategy strategy;
     final int weight;
 
+    /**
+     * Constructs a new WeightedStrategy that takes in a strategy and its weight.
+     *
+     * @param strategy the AI strategy
+     * @param weight   the strategy's weight
+     */
     WeightedStrategy(AIStrategy strategy, int weight) {
       this.strategy = strategy;
       this.weight = weight;

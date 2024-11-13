@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class MinimaxStrat implements AIStrategy {
   private final AIStrategy opponentStrategy;
-  private static final int MAX_DEPTH = 2;  // Limit search depth for performance
+  private static final int MAX_DEPTH = 2;
 
   public MinimaxStrat(AIStrategy opponentStrategy) {
     this.opponentStrategy = opponentStrategy;
@@ -21,7 +21,6 @@ public class MinimaxStrat implements AIStrategy {
     List<Card> hand = model.getPlayerHand(player);
     List<AIMove> possibleMoves = new ArrayList<>();
 
-    // Generate all possible moves
     for (int row = 0; row < model.getGridDimensions()[0]; row++) {
       for (int col = 0; col < model.getGridDimensions()[1]; col++) {
         if (model.isHole(row, col) || model.getCardAt(row, col) != null) {
@@ -46,6 +45,16 @@ public class MinimaxStrat implements AIStrategy {
     return possibleMoves.get(0);
   }
 
+  /**
+   * Evaluates a move by calculating the immediate value of a move, considering the possible
+   * moves of an opposing player.
+   *
+   * @param model model
+   * @param pos position
+   * @param card card
+   * @param currentPlayer current player
+   * @return the combined score of the move's value
+   */
   private int evaluateMove(MainModelInterface model, Position pos, Card card, Player currentPlayer) {
     int immediateScore = calculateImmediateScore(model, pos, card, currentPlayer);
 
@@ -70,6 +79,15 @@ public class MinimaxStrat implements AIStrategy {
     return immediateScore - opponentScore;
   }
 
+  /**
+   * Calculates the immediate value of a move without considering the opponents possible moves.
+   *
+   * @param model model
+   * @param pos position
+   * @param card card
+   * @param player player
+   * @return the immediate value of a move without considering the opponents possible moves
+   */
   private int calculateImmediateScore(MainModelInterface model, Position pos, Card card, Player player) {
     int score = 0;
 

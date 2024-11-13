@@ -9,7 +9,12 @@ import cs3500.threetrios.model.Player;
 
 import static cs3500.threetrios.strategy.StrategyUtil.getDefaultMove;
 
+/**
+ * An AI strategy that checks for moves that flips the most amount of opponent cards in a single
+ * turn.
+ */
 public class MaxFlipsStrat implements AIStrategy {
+
   @Override
   public AIMove findBestMove(MainModelInterface model, Player player) {
     List<Card> hand = model.getPlayerHand(player);
