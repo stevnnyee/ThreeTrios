@@ -90,7 +90,9 @@ public class ThreeTriosGameModel implements MainModelInterface {
   }
 
   public void dealCards(List<Card> deck) {
-    final int handSize = 8;
+    // Calculate required hand size based on grid
+    int totalRequiredCards = grid.getCardCellCount() + 1;
+    int handSize = (totalRequiredCards + 1) / 2;  // Round up to next even number divided by 2
 
     if (deck.size() < handSize * 2) {
       throw new IllegalArgumentException(
@@ -103,7 +105,7 @@ public class ThreeTriosGameModel implements MainModelInterface {
     playerHands.get(redPlayer).clear();
     playerHands.get(bluePlayer).clear();
 
-    // Deal exactly 8 cards to each player
+    // Deal cards to each player
     for (int i = 0; i < handSize; i++) {
       Card redCard = shuffledDeck.get(i);
       Card blueCard = shuffledDeck.get(i + handSize);
@@ -115,13 +117,19 @@ public class ThreeTriosGameModel implements MainModelInterface {
   }
 
   @Override
-  public void placeCard(int row, int col, Card card) {
-    validateMove(currentPlayer, row, col, card);
+  public void placeCard(Player player, int row, int col, Card card) {
+    validateMove(player, row, col, card);
     grid.placeCard(row, col, card);
-    playerHands.get(currentPlayer).remove(card);
+    playerHands.get(player).remove(card);
     executeBattlePhase(new Position(row, col));
     currentPlayer = (currentPlayer == redPlayer) ? bluePlayer : redPlayer;
     gameOver = isGridFull();
+  }
+
+  // Keep the old method for backward compatibility if needed, internally calling the new one
+  @Override
+  public void placeCard(int row, int col, Card card) {
+    placeCard(currentPlayer, row, col, card);
   }
 
   /**
@@ -142,14 +150,17 @@ public class ThreeTriosGameModel implements MainModelInterface {
     if (!playerHands.get(currentPlayer).contains(card)) {
       throw new IllegalArgumentException("Card not in current player's hand");
     }
-    if (grid.getCard(row, col) != null) {
-      throw new IllegalStateException("Can't place a card on top of another card.");
+    if (grid == null) {
+      throw new IllegalStateException("Game has not been started");
+    }
+    if (row < 0 || row >= grid.getRows() || col < 0 || col >= grid.getCols()) {
+      throw new IllegalArgumentException("Position out of bounds");
     }
     if (grid.isHole(row, col)) {
       throw new IllegalArgumentException("Can't place card in a hole");
     }
-    if (row < 0 || row >= grid.getRows() || col < 0 || col >= grid.getCols()) {
-      throw new IllegalArgumentException("Position out of bounds");
+    if (grid.getCard(row, col) != null) {
+      throw new IllegalStateException("Position already contains a card");
     }
   }
 
@@ -186,40 +197,41 @@ public class ThreeTriosGameModel implements MainModelInterface {
     return new ArrayList<>(playerHands.get(player));
   }
   public void executeBattlePhase(Position newCardPosition) {
-    List<Position> toFlip = new ArrayList<>();
-    boolean[][] visited = new boolean[grid.getRows()][grid.getCols()];
+    Set<Position> toProcess = new HashSet<>();
+    Set<Position> processed = new HashSet<>();
 
-    List<Position> adjacent = getAdjacentPositions(newCardPosition);
-    for (Position pos : adjacent) {
-      Card adjacentCard = grid.getCard(pos.row, pos.col);
-      if (adjacentCard != null &&
-              adjacentCard.getOwner() != currentPlayer &&
-              checkCardWinsBattle(newCardPosition, pos)) {
-        toFlip.add(pos);
-        visited[pos.row][pos.col] = true;
-      }
-    }
+    // Start with the newly placed card
+    toProcess.add(newCardPosition);
 
-    int startIndex = 0;
-    while (startIndex < toFlip.size()) {
-      Position current = toFlip.get(startIndex);
-      Card currentCard = grid.getCard(current.row, current.col);
+    while (!toProcess.isEmpty()) {
+      Position currentPos = toProcess.iterator().next();
+      toProcess.remove(currentPos);
+      processed.add(currentPos);
 
-      for (Position adj : getAdjacentPositions(current)) {
-        if (!visited[adj.row][adj.col]) {
-          Card adjCard = grid.getCard(adj.row, adj.col);
-          if (adjCard != null && adjCard.getOwner() == currentCard.getOwner()) {
-            toFlip.add(adj);
-            visited[adj.row][adj.col] = true;
+      Card currentCard = grid.getCard(currentPos.row, currentPos.col);
+      if (currentCard == null) continue;
+
+      // Get all adjacent positions
+      List<Position> adjacentPositions = getAdjacentPositions(currentPos);
+
+      for (Position adjPos : adjacentPositions) {
+        // Skip if position was already processed or has no card
+        if (processed.contains(adjPos)) continue;
+
+        Card adjacentCard = grid.getCard(adjPos.row, adjPos.col);
+        if (adjacentCard == null) continue;
+
+        // Only battle against opponent's cards
+        if (adjacentCard.getOwner() != currentCard.getOwner()) {
+          if (checkCardWinsBattle(currentPos, adjPos)) {
+            // Flip the card immediately
+            adjacentCard.setOwner(currentCard.getOwner());
+
+            // Add the newly flipped card to be processed for combo battles
+            toProcess.add(adjPos);
           }
         }
       }
-      startIndex++;
-    }
-
-    for (Position pos : toFlip) {
-      Card card = grid.getCard(pos.row, pos.col);
-      card.setOwner(currentPlayer);
     }
   }
 
@@ -235,9 +247,15 @@ public class ThreeTriosGameModel implements MainModelInterface {
     Card attacker = grid.getCard(attackerPos.row, attackerPos.col);
     Card defender = grid.getCard(defenderPos.row, defenderPos.col);
 
-    Direction battleDirection = getBattleDirection(attackerPos, defenderPos);
-    return attacker.getAttackPower(battleDirection)
-            > defender.getAttackPower(battleDirection.getOpposite());
+    if (attacker == null || defender == null) {
+      return false;
+    }
+
+    Direction battleDir = getBattleDirection(attackerPos, defenderPos);
+    int attackValue = attacker.getAttackPower(battleDir);
+    int defenseValue = defender.getAttackPower(battleDir.getOpposite());
+
+    return attackValue > defenseValue;
   }
 
   /**
@@ -296,9 +314,6 @@ public class ThreeTriosGameModel implements MainModelInterface {
   @Override
   public boolean isGameOver() {
     if (gameOver || isGridFull()) {
-      System.out.println("\nFINAL SCORING DEBUG:");
-      System.out.println("Red total cards: " + countPlayerCards(redPlayer));
-      System.out.println("Blue total cards: " + countPlayerCards(bluePlayer));
       return true;
     }
     return false;
@@ -310,13 +325,6 @@ public class ThreeTriosGameModel implements MainModelInterface {
    * @return true if grid is full, false otherwise
    */
   private boolean isGridFull() {
-    int redCardsLeft = playerHands.get(redPlayer).size();
-    int blueCardsLeft = playerHands.get(bluePlayer).size();
-    if ((redCardsLeft == 1 && blueCardsLeft == 0) ||
-            (blueCardsLeft == 1 && redCardsLeft == 0)) {
-      return true;
-    }
-
     for (int i = 0; i < grid.getRows(); i++) {
       for (int j = 0; j < grid.getCols(); j++) {
         if (!grid.isHole(i, j) && grid.getCard(i, j) == null) {
@@ -381,7 +389,18 @@ public class ThreeTriosGameModel implements MainModelInterface {
 
   @Override
   public Grid getGrid() {
-    return new ThreeTriosGrid(grid.getRows(), grid.getCols(), getHoles());
+    // Return a deep copy of the grid to prevent modification
+    ThreeTriosGrid newGrid = new ThreeTriosGrid(grid.getRows(), grid.getCols(), getHoles());
+    // Copy all cards to the new grid
+    for (int i = 0; i < grid.getRows(); i++) {
+      for (int j = 0; j < grid.getCols(); j++) {
+        Card card = grid.getCard(i, j);
+        if (card != null) {
+          newGrid.placeCard(i, j, card);
+        }
+      }
+    }
+    return newGrid;
   }
 
   private boolean[][] getHoles() {
