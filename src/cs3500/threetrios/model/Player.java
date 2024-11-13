@@ -2,6 +2,9 @@ package cs3500.threetrios.model;
 
 import java.util.List;
 
+import cs3500.threetrios.strategy.AIMove;
+import cs3500.threetrios.strategy.AIStrategy;
+
 /**
  * Interface that represents a player in the ThreeTrios game,
  * which has a color and a hand of cards.
@@ -43,4 +46,8 @@ public interface Player {
    * @return count of owned cards
    */
   int countOwnedCards(Grid grid);
+
+  void setStrategy(AIStrategy strategy);
+
+  AIMove getNextMove(MainModelInterface model);
 }
