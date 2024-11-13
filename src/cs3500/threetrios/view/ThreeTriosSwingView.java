@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.swing.*;
 
+
 /**
  * A Swing-based graphical user interface for the Three Trios game.
  * This view implements a window with three main panels:
