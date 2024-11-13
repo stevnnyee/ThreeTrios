@@ -1,12 +1,15 @@
 package cs3500.threetrios.strategy;
 
-import cs3500.threetrios.model.*;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import cs3500.threetrios.model.Card;
+import cs3500.threetrios.model.Grid;
+import cs3500.threetrios.model.MainModelInterface;
+import cs3500.threetrios.model.Player;
 
 /**
  * A mock implementation of MainModelInterface used for testing game strategies and components.

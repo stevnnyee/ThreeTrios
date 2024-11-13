@@ -1,6 +1,6 @@
 package cs3500.threetrios.view;
 
-import java.awt.*;
+import java.awt.Dimension;
 
 /**
  * Interface for the player hand panel for the game.

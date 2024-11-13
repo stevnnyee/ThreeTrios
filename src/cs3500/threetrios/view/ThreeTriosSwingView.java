@@ -5,12 +5,13 @@ import cs3500.threetrios.model.Player;
 import cs3500.threetrios.model.ReadOnlyThreeTriosModel;
 import cs3500.threetrios.model.Card;
 
-import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+
+import javax.swing.*;
 
 /**
  * A Swing-based graphical user interface for the Three Trios game.
@@ -195,10 +196,14 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
      */
     private void handleCardClick(Point p) {
       Player player = getPlayer();
-      if (player == null || player != model.getCurrentPlayer()) return;
+      if (player == null || player != model.getCurrentPlayer()) {
+        return;
+      }
 
       List<Card> hand = model.getPlayerHand(player);
-      if (hand == null || hand.isEmpty()) return;
+      if (hand == null || hand.isEmpty()) {
+        return;
+      }
 
       int cardSpacing = getHeight() / hand.size();
 
@@ -226,10 +231,14 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
     @Override
     public Dimension getCardSize() {
       Player player = getPlayer();
-      if (player == null) return new Dimension(getWidth() - 20, 50);
+      if (player == null) {
+        return new Dimension(getWidth() - 20, 50);
+      }
 
       List<Card> hand = model.getPlayerHand(player);
-      if (hand == null || hand.isEmpty()) return new Dimension(getWidth() - 20, 50);
+      if (hand == null || hand.isEmpty()) {
+        return new Dimension(getWidth() - 20, 50);
+      }
 
       return new Dimension(getWidth() - 20, getHeight() / hand.size() - 10);
     }
@@ -277,14 +286,16 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
      * @param p the point where the mouse is clicked
      */
     private void handleGridClick(Point p) {
-      if (selectedCard == null) return;
+      if (selectedCard == null) {
+        return;
+      }
 
       Dimension cellSize = getCellSize();
       int row = p.y / cellSize.height;
       int col = p.x / cellSize.width;
 
-      if (row >= 0 && row < model.getGridDimensions()[0] &&
-              col >= 0 && col < model.getGridDimensions()[1]) {
+      if (row >= 0 && row < model.getGridDimensions()[0]
+              && col >= 0 && col < model.getGridDimensions()[1]) {
 
         try {
           if (!model.isHole(row, col) && model.canPlaceCard(row, col, selectedCard)) {

@@ -16,6 +16,7 @@ import cs3500.threetrios.model.Player;
 public class MockPlayer implements Player {
   private final String color;
   private final List<Card> hand;
+  private AIStrategy strategy;
 
   /**
    * Constructs a new MockPlayer with a color as its user.
@@ -54,6 +55,7 @@ public class MockPlayer implements Player {
 
   @Override
   public void setStrategy(AIStrategy strategy) {
+    this.strategy = strategy;
   }
 
   @Override
