@@ -20,8 +20,22 @@ public class CompositeStrategy implements AIStrategy {
    * @param weights    List of weights corresponding to each strategy
    */
   public CompositeStrategy(List<AIStrategy> strategies, List<Integer> weights) {
+    if (strategies == null || weights == null) {
+      throw new IllegalArgumentException("Strategies and weights cannot be null");
+    }
+    if (strategies.isEmpty() || weights.isEmpty()) {
+      throw new IllegalArgumentException("Strategies and weights cannot be empty");
+    }
     if (strategies.size() != weights.size()) {
       throw new IllegalArgumentException("Must provide same number of strategies and weights");
+    }
+    if (strategies.contains(null)) {
+      throw new IllegalArgumentException("Strategy list cannot contain null");
+    }
+    for (Integer weight : weights) {
+      if (weight < 0) {
+        throw new IllegalArgumentException("Weights cannot be negative");
+      }
     }
     this.strategies = new ArrayList<>();
     for (int i = 0; i < strategies.size(); i++) {
@@ -81,4 +95,5 @@ public class CompositeStrategy implements AIStrategy {
       this.weight = weight;
     }
   }
+
 }

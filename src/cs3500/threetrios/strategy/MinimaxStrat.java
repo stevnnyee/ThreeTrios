@@ -13,12 +13,28 @@ public class MinimaxStrat implements AIStrategy {
   private static final int MAX_DEPTH = 2;
 
   public MinimaxStrat(AIStrategy opponentStrategy) {
+    if (opponentStrategy == null) {
+      throw new IllegalArgumentException("Opponent strategy cannot be null");
+    }
     this.opponentStrategy = opponentStrategy;
   }
 
   @Override
   public AIMove findBestMove(MainModelInterface model, Player player) {
+    if (model == null) {
+      throw new IllegalArgumentException("Model cannot be null");
+    }
+    if (player == null) {
+      throw new IllegalArgumentException("Player cannot be null");
+    }
+    int[] dimensions = model.getGridDimensions();
+    if (dimensions[0] <= 0 || dimensions[1] <= 0) {
+      throw new IllegalStateException("Invalid grid dimensions");
+    }
     List<Card> hand = model.getPlayerHand(player);
+    if (hand == null) {
+      throw new IllegalStateException("Player hand cannot be null");
+    }
     List<AIMove> possibleMoves = new ArrayList<>();
 
     for (int row = 0; row < model.getGridDimensions()[0]; row++) {

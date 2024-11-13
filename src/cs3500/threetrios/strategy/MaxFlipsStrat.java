@@ -17,7 +17,25 @@ public class MaxFlipsStrat implements AIStrategy {
 
   @Override
   public AIMove findBestMove(MainModelInterface model, Player player) {
+    if (model == null) {
+      throw new IllegalArgumentException("Model cannot be null");
+    }
+    if (player == null) {
+      throw new IllegalArgumentException("Player cannot be null");
+    }
     List<Card> hand = model.getPlayerHand(player);
+    if (hand == null) {
+      throw new IllegalStateException("Player hand cannot be null");
+    }
+    int[] dimensions = model.getGridDimensions();
+    if (dimensions[0] <= 0 || dimensions[1] <= 0) {
+      throw new IllegalStateException("Invalid grid dimensions");
+    }
+    for (Card card : hand) {
+      if (card == null) {
+        throw new IllegalStateException("Hand contains null card");
+      }
+    }
     List<AIMove> possibleMoves = new ArrayList<>();
 
     for (int row = 0; row < model.getGridDimensions()[0]; row++) {

@@ -19,7 +19,20 @@ public class CornerStrat implements AIStrategy {
 
   @Override
   public AIMove findBestMove(MainModelInterface model, Player player) {
+    if (model == null) {
+      throw new IllegalArgumentException("Model cannot be null");
+    }
+    if (player == null) {
+      throw new IllegalArgumentException("Player cannot be null");
+    }
     List<Card> hand = model.getPlayerHand(player);
+    if (hand == null) {
+      throw new IllegalStateException("Player hand cannot be null");
+    }
+    int[] dimensions = model.getGridDimensions();
+    if (dimensions[0] <= 0 || dimensions[1] <= 0) {
+      throw new IllegalStateException("Invalid grid dimensions");
+    }
     List<AIMove> possibleMoves = new ArrayList<>();
 
     Position[] corners = new Position[4];
@@ -80,6 +93,12 @@ public class CornerStrat implements AIStrategy {
    */
   private int calculateDefensibility(MainModelInterface model,
                                      Position pos, Card card, Player player) {
+    if (pos == null) {
+      throw new IllegalArgumentException("Position cannot be null");
+    }
+    if (card == null) {
+      throw new IllegalArgumentException("Card cannot be null");
+    }
     int score = 0;
     if ((pos.row == 0 || pos.row == model.getGridDimensions()[0] - 1)
             && (pos.col == 0 || pos.col == model.getGridDimensions()[1] - 1)) {
