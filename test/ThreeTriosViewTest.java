@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+
 import javax.swing.*;
 
 import static org.junit.Assert.assertEquals;
@@ -39,22 +40,22 @@ public class ThreeTriosViewTest {
     game = new ThreeTriosGameModel();
 
     createTestFile("test-board",
-            "// 3x3 test board with 5 playable cells\n" +
-                    "3 3\n" +
-                    "_X_\n" +
-                    "X_X\n" +
-                    "_X_");
+            "// 3x3 test board with 5 playable cells\n"
+                    + "3 3\n"
+                    + "_X_\n"
+                    + "X_X\n"
+                    + "_X_");
 
     createTestFile("test-cards",
-            "// Cards with specific values for testing\n" +
-                    "Knight A 5 6 7\n" +
-                    "Dragon 9 8 7 6\n" +
-                    "Wizard 5 A 7 8\n" +
-                    "Archer 6 7 8 9\n" +
-                    "Witch 7 6 5 4\n" +
-                    "Pekka 8 7 6 5\n" +
-                    "Giant 6 5 4 3\n" +
-                    "Golem 9 9 8 7\n");
+            "// Cards with specific values for testing\n"
+                    + "Knight A 5 6 7\n"
+                    + "Dragon 9 8 7 6\n"
+                    + "Wizard 5 A 7 8\n"
+                    + "Archer 6 7 8 9\n"
+                    + "Witch 7 6 5 4\n"
+                    + "Pekka 8 7 6 5\n"
+                    + "Giant 6 5 4 3\n"
+                    + "Golem 9 9 8 7\n");
   }
 
   @After
@@ -203,8 +204,8 @@ public class ThreeTriosViewTest {
 
       for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
-          if (!game.getGrid().isHole(i, j) &&
-                  game.getGrid().getCard(i, j) == null) {
+          if (!game.getGrid().isHole(i, j)
+                  && game.getGrid().getCard(i, j) == null) {
             try {
               game.placeCard(currentPlayer, i, j, card);
               break;
@@ -228,11 +229,11 @@ public class ThreeTriosViewTest {
   @Test(expected = IllegalArgumentException.class)
   public void testViewWithInvalidBoardConfig() throws IOException {
     createTestFile("invalid-board",
-            "// Invalid 3x3 board with wrong dimensions\n" +
-                    "3 3\n" +
-                    "_X_\n" +
-                    "X_\n" +
-                    "_X_");
+            "// Invalid 3x3 board with wrong dimensions\n"
+                    + "3 3\n"
+                    + "_X_\n"
+                    + "X_\n"
+                    + "_X_");
 
     game.startGameFromConfig(
             tempDir.resolve("invalid-board").toString(),
@@ -243,10 +244,10 @@ public class ThreeTriosViewTest {
   @Test(expected = IllegalArgumentException.class)
   public void testViewWithInvalidCardConfig() throws IOException {
     createTestFile("invalid-cards",
-            "// Cards with invalid value counts\n" +
-                    "Knight A 5 6\n" +
-                    "Dragon 9 8 7 6\n" +
-                    "Wizard 5 A 7 8\n");
+            "// Cards with invalid value counts\n"
+                    + "Knight A 5 6\n"
+                    + "Dragon 9 8 7 6\n"
+                    + "Wizard 5 A 7 8\n");
 
     game.startGameFromConfig(
             tempDir.resolve("test-board").toString(),
@@ -257,10 +258,10 @@ public class ThreeTriosViewTest {
   @Test(expected = IllegalArgumentException.class)
   public void testViewWithInvalidCardValues() throws IOException {
     createTestFile("invalid-card-values",
-            "// Cards with invalid values\n" +
-                    "Knight X 5 6 7\n" +
-                    "Dragon 9 8 7 6\n" +
-                    "Wizard 5 A 7 8\n");
+            "// Cards with invalid values\n"
+                    + "Knight X 5 6 7\n"
+                    + "Dragon 9 8 7 6\n"
+                    + "Wizard 5 A 7 8\n");
 
     game.startGameFromConfig(
             tempDir.resolve("test-board").toString(),
@@ -282,11 +283,11 @@ public class ThreeTriosViewTest {
   @Test(expected = IllegalArgumentException.class)
   public void testViewWithMalformedBoardDimensions() throws IOException {
     createTestFile("malformed-board",
-            "// Malformed board dimensions\n" +
-                    "3x3\n" +
-                    "_X_\n" +
-                    "X_X\n" +
-                    "_X_");
+            "// Malformed board dimensions\n"
+                    + "3x3\n"
+                    + "_X_\n"
+                    + "X_X\n"
+                    + "_X_");
 
     game.startGameFromConfig(
             tempDir.resolve("malformed-board").toString(),
@@ -328,7 +329,8 @@ public class ThreeTriosViewTest {
     ThreeTriosSwingView swingView = new ThreeTriosSwingView(game);
 
     String initialTitle = swingView.getTitle();
-    game.placeCard(game.getCurrentPlayer(), 0, 0, game.getPlayerHand(game.getCurrentPlayer()).get(0));
+    game.placeCard(game.getCurrentPlayer(), 0, 0,
+            game.getPlayerHand(game.getCurrentPlayer()).get(0));
     swingView.refresh();
 
     assertNotEquals(initialTitle, swingView.getTitle());
@@ -362,8 +364,8 @@ public class ThreeTriosViewTest {
 
     String viewString = textView.toString();
     String[] lines = viewString.split("\n");
-    assertTrue(lines.length >= 5); // At least 5 lines (player info, 3 grid rows, and hand)
-    assertTrue(lines[1].contains("_") || lines[1].contains(" ")); // Check for empty cells or holes
+    assertTrue(lines.length >= 5);
+    assertTrue(lines[1].contains("_") || lines[1].contains(" "));
   }
 
   @Test

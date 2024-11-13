@@ -1,6 +1,9 @@
 package cs3500.threetrios.strategy;
 
-import cs3500.threetrios.model.*;
+import cs3500.threetrios.model.Card;
+import cs3500.threetrios.model.MainModelInterface;
+import cs3500.threetrios.model.Player;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +15,10 @@ public class MinimaxStrat implements AIStrategy {
   private final AIStrategy opponentStrategy;
   private static final int MAX_DEPTH = 2;
 
+  /**
+   * Constructor for the minimax strategy by using the opponent's strategy.
+   * @param opponentStrategy the strategy the opponent is using.
+   */
   public MinimaxStrat(AIStrategy opponentStrategy) {
     if (opponentStrategy == null) {
       throw new IllegalArgumentException("Opponent strategy cannot be null");
@@ -71,10 +78,9 @@ public class MinimaxStrat implements AIStrategy {
    * @param currentPlayer current player
    * @return the combined score of the move's value
    */
-  private int evaluateMove(MainModelInterface model, Position pos, Card card, Player currentPlayer) {
+  private int evaluateMove(MainModelInterface model,
+                           Position pos, Card card, Player currentPlayer) {
     int immediateScore = calculateImmediateScore(model, pos, card, currentPlayer);
-
-    // Get opponent
     Player opponent = null;
     for (Player p : model.getPlayers()) {
       if (!p.getColor().equals(currentPlayer.getColor())) {
@@ -82,16 +88,13 @@ public class MinimaxStrat implements AIStrategy {
         break;
       }
     }
-
     if (opponent == null) {
       return immediateScore;
     }
 
-    // Simulate opponent's best response
     AIMove opponentMove = opponentStrategy.findBestMove(model, opponent);
     int opponentScore = opponentMove.getScore();
 
-    // Our final score is our immediate gain minus the opponent's best response
     return immediateScore - opponentScore;
   }
 
@@ -104,19 +107,16 @@ public class MinimaxStrat implements AIStrategy {
    * @param player player
    * @return the immediate value of a move without considering the opponents possible moves
    */
-  private int calculateImmediateScore(MainModelInterface model, Position pos, Card card, Player player) {
+  private int calculateImmediateScore(MainModelInterface model,
+                                      Position pos, Card card, Player player) {
     int score = 0;
-
-    // Consider immediate flips
     score += model.getFlippableCards(pos.row, pos.col, card) * 100;
 
-    // Consider defensive value using DefensiveStrat
     DefensiveStrat defensiveStrat = new DefensiveStrat();
-    score += defensiveStrat.findBestMove(model, player).getScore() * 0.5; // Weight defensive consideration
+    score += defensiveStrat.findBestMove(model, player).getScore() * 0.5;
 
-    // Consider corner value (from CornerStrat)
-    if ((pos.row == 0 || pos.row == model.getGridDimensions()[0] - 1) &&
-            (pos.col == 0 || pos.col == model.getGridDimensions()[1] - 1)) {
+    if ((pos.row == 0 || pos.row == model.getGridDimensions()[0] - 1)
+            && (pos.col == 0 || pos.col == model.getGridDimensions()[1] - 1)) {
       score += 50;
     }
 

@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.*;
 
 import cs3500.threetrios.model.Card;
 import cs3500.threetrios.model.Player;
@@ -24,6 +23,11 @@ import cs3500.threetrios.strategy.MockPlayer;
 import cs3500.threetrios.strategy.MockThreeTriosModel;
 import cs3500.threetrios.strategy.Position;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Class testing the strategies in the program.
  */
@@ -31,7 +35,6 @@ public class StrategyTests {
   private StringBuilder log;
   private MockThreeTriosModel model;
   private Player redPlayer;
-  private Player bluePlayer;
   private CornerStrat cornerStrategy;
   private MaxFlipsStrat maxFlipsStrategy;
   private Card strongCard;
@@ -73,10 +76,18 @@ public class StrategyTests {
         boolean bottomRight = false;
 
         for (Position pos : checkedPositions) {
-          if (pos.row == 0 && pos.col == 0) topLeft = true;
-          if (pos.row == 0 && pos.col == cols - 1) topRight = true;
-          if (pos.row == rows - 1 && pos.col == 0) bottomLeft = true;
-          if (pos.row == rows - 1 && pos.col == cols - 1) bottomRight = true;
+          if (pos.row == 0 && pos.col == 0) {
+            topLeft = true;
+          }
+          if (pos.row == 0 && pos.col == cols - 1) {
+            topRight = true;
+          }
+          if (pos.row == rows - 1 && pos.col == 0) {
+            bottomLeft = true;
+          }
+          if (pos.row == rows - 1 && pos.col == cols - 1) {
+            bottomRight = true;
+          }
         }
 
         return topLeft && topRight && bottomLeft && bottomRight;
@@ -89,7 +100,7 @@ public class StrategyTests {
     };
 
     redPlayer = new MockPlayer("RED");
-    bluePlayer = new MockPlayer("BLUE");
+    Player bluePlayer = new MockPlayer("BLUE");
     cornerStrategy = new CornerStrat();
     maxFlipsStrategy = new MaxFlipsStrat();
     defensiveStrategy = new DefensiveStrat();
@@ -108,10 +119,10 @@ public class StrategyTests {
     AIMove move = cornerStrategy.findBestMove(model, redPlayer);
 
     assertTrue(model.verifiedAllCorners());
-    boolean isCorner = (move.getPosition().row == 0 && move.getPosition().col == 0) ||
-            (move.getPosition().row == 0 && move.getPosition().col == 6) ||
-            (move.getPosition().row == 4 && move.getPosition().col == 0) ||
-            (move.getPosition().row == 4 && move.getPosition().col == 6);
+    boolean isCorner = (move.getPosition().row == 0 && move.getPosition().col == 0)
+            || (move.getPosition().row == 0 && move.getPosition().col == 6)
+            || (move.getPosition().row == 4 && move.getPosition().col == 0)
+            || (move.getPosition().row == 4 && move.getPosition().col == 6);
 
     assertTrue(isCorner);
     assertEquals(strongCard, move.getCard());
@@ -252,8 +263,8 @@ public class StrategyTests {
     AIMove move = compositeStrategy.findBestMove(model, redPlayer);
     assertNotNull(move);
     assertNotNull(move.getCard());
-    assertTrue(move.getPosition().row < model.getGridDimensions()[0] &&
-            move.getPosition().col < model.getGridDimensions()[1]);
+    assertTrue(move.getPosition().row < model.getGridDimensions()[0]
+            && move.getPosition().col < model.getGridDimensions()[1]);
   }
 
   @Test
@@ -282,7 +293,8 @@ public class StrategyTests {
     assertTrue(move1.comparePosition(move3) < 0);
     assertTrue(move3.comparePosition(move1) > 0);
 
-    assertEquals(0, move1.comparePosition(new AIMove(card, new Position(1, 1), 5)));
+    assertEquals(0,
+            move1.comparePosition(new AIMove(card, new Position(1, 1), 5)));
   }
 
   @Test
@@ -394,7 +406,9 @@ public class StrategyTests {
     MockThreeTriosModel model = new MockThreeTriosModel(log) {
       @Override
       public int getFlippableCards(int row, int col, Card card) {
-        if (row == 1 && col == 1) return 2;
+        if (row == 1 && col == 1) {
+          return 2;
+        }
         return 1;
       }
 

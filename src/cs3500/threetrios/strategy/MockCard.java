@@ -11,17 +11,20 @@ import cs3500.threetrios.model.Player;
  */
 public class MockCard implements Card {
   private final String name;
-  private final int north, south, east, west;
+  private final int north;
+  private final int south;
+  private final int east;
+  private final int west;
   private Player owner;
 
   /**
    * Constructs a new MockCard with a specified name and a power for each direction.
    *
-   * @param name
-   * @param north
-   * @param south
-   * @param east
-   * @param west
+   * @param name of the card
+   * @param north north direction
+   * @param south south direction
+   * @param east east direction
+   * @param west west direction
    */
   public MockCard(String name, int north, int south, int east, int west) {
     this.name = name;
