@@ -78,13 +78,12 @@ public class ThreeTriosGrid implements Grid {
 
   @Override
   public void placeCard(int row, int col, Card card) {
-    if (card == null) {
-      throw new IllegalStateException("Can't place null card");
-    }
     validatePosition(row, col);
-
+    if (card == null) {
+      throw new IllegalArgumentException("Cannot place null card");
+    }
     if (holes[row][col]) {
-      throw new IllegalStateException("Can't place card in a hole");
+      throw new IllegalStateException("Cannot place card in a hole");
     }
     if (cards[row][col] != null) {
       throw new IllegalStateException("Position already contains a card");
@@ -99,7 +98,14 @@ public class ThreeTriosGrid implements Grid {
 
   @Override
   public boolean isFull() {
-    return getEmptyCells().isEmpty();
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        if (!holes[i][j] && cards[i][j] == null) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   @Override
@@ -107,7 +113,7 @@ public class ThreeTriosGrid implements Grid {
     List<int[]> emptyCells = new ArrayList<>();
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
-        if (!isHole(i, j) && cards[i][j] == null) {
+        if (!holes[i][j] && cards[i][j] == null) {
           emptyCells.add(new int[]{i, j});
         }
       }
@@ -144,4 +150,3 @@ public class ThreeTriosGrid implements Grid {
     return count;
   }
 }
-
