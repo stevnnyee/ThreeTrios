@@ -169,7 +169,6 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
             selectedCard = null;
             selectedCardPlayer = null;
           }
-          System.out.println("Clicked card " + i + " in " + playerColor + " hand");
           refresh();
           break;
         }
@@ -217,7 +216,6 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
 
       if (row >= 0 && row < model.getGridDimensions()[0] &&
               col >= 0 && col < model.getGridDimensions()[1]) {
-        System.out.println("Clicked grid position: (" + row + ", " + col + ")");
 
         try {
           if (!model.isHole(row, col) && model.canPlaceCard(row, col, selectedCard)) {
@@ -231,7 +229,7 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
             ThreeTriosSwingView.this.refresh();
           }
         } catch (IllegalArgumentException | IllegalStateException e) {
-          System.out.println("Invalid move: " + e.getMessage());
+          throw new IllegalArgumentException("Illegal move");
         }
       }
     }

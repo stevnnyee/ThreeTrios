@@ -3,12 +3,17 @@ package cs3500.threetrios.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import cs3500.threetrios.strategy.AIMove;
+import cs3500.threetrios.strategy.AIStrategy;
+
 /**
  * Implementation of the Player interface for the Three Trios game.
+ * Sets strategy for a player as well as counts the cards in a player's hand.
  */
 public class ThreeTriosPlayer implements Player {
   private final String color;
   private final List<Card> hand;
+  private AIStrategy strategy;
 
   /**
    * Constructs a new Player with a specified color.
@@ -21,6 +26,19 @@ public class ThreeTriosPlayer implements Player {
     }
     this.color = color;
     this.hand = new ArrayList<>();
+  }
+
+  @Override
+  public void setStrategy(AIStrategy strategy) {
+    this.strategy = strategy;
+  }
+
+  @Override
+  public AIMove getNextMove(MainModelInterface model) {
+    if (strategy == null) {
+      throw new IllegalStateException("No strategy set for player " + color);
+    }
+    return strategy.findBestMove(model, this);
   }
 
   @Override

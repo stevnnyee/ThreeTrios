@@ -65,14 +65,13 @@ public final class ThreeTrios {
       try {
         Thread.sleep(2000);
       } catch (InterruptedException e) {
-        e.printStackTrace();
+        throw new IllegalArgumentException("Thread interrupted while waiting for first move");
       }
       model.setCurrentPlayer(Math.random() < 0.5 ? "RED" : "BLUE");
       view.refresh();
 
     } catch (IllegalArgumentException e) {
-      System.out.println("Error starting game: " + e.getMessage());
-      e.printStackTrace();
+      throw new IllegalArgumentException("Error starting game.");
     }
   }
 }
