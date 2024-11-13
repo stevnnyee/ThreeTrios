@@ -5,10 +5,6 @@ import java.util.List;
 
 /**
  * Implementation of the Grid interface for the ThreeTrios game.
- * Origin of (0,0) in the top left corner with positive dimensions and an odd number of card cells.
- * The axes are organized by: (row, column).
- * Row coordinates are the first index that increase downwards.
- * Column coordinates are the second index that increase towards the right.
  */
 public class ThreeTriosGrid implements Grid {
   private final int rows;
