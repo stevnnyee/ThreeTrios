@@ -5,7 +5,11 @@ import java.util.List;
 
 /**
  * Implementation of the Grid interface for the ThreeTrios game.
-
+ * The coordinate system uses 0-based indexing.
+ * Rows are numbered from 0 to (rows - 1) from top to bottom.
+ * Columns are numbered 0 to (cols - 1) from left to right.
+ * (0,0) is the origin, and it represents the top-left cell of the grid.
+ *
  */
 public class ThreeTriosGrid implements Grid {
   private final int rows;
@@ -147,3 +151,4 @@ public class ThreeTriosGrid implements Grid {
     return count;
   }
 }
+

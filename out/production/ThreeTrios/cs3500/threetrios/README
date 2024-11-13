@@ -1,0 +1,38 @@
+Overview
+The Three Trios game is a two-player card game played on a customizable grid.
+Players take turns placing cards on the grid and battling adjacent cards to flip them.
+The game ends when all card cells are filled, and the winner is determined by counting owned cards.
+
+Game Rules: The model assumes familiarity with the rules of Three Trios.
+Extensibility: The design allows for future enhancements, such as AI players or variant rules.
+Configuration Files: The game setup is customizable through external configuration files for grids
+and cards.
+
+Invariants:
+  1. The number of card cells on the grid is always odd.
+  2. The total number of the cards is the number of cells on the grid plus one and is constant.
+  3. Each card cell is either empty or filled with one card.
+  4. The size of each player's hand is always equal to or less than (N+1)/2,
+     where N is the number of card cells on the grid.
+
+Grid: Represents the layout of the game board, supporting various sizes and hole configurations.
+
+Card: Represents individual cards with attack values for each direction (North, South, East, West).
+  - Has a color, essential to turn management and logic.
+  - Has various methods that may be implemented in future assignments.
+
+Player: Manages player-specific information such as color and hand.
+  - Has rows, columns, and a 2D boolean array to determine whether there are holes,
+  and where they are.
+  - Has various methods to check the state of the grid, retrieve important information, and perform
+  actions.
+
+GameState: Central component that manages the game's rules, turn order, and win conditions.
+  - Has hands of cards, methods to play cards, startgame, and all around logic and implementation
+  to play the game.
+
+ConfigurationReader: Utility class for reading grid and card configurations from files.
+
+
+
+
