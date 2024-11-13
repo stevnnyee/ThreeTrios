@@ -8,7 +8,9 @@ import cs3500.threetrios.strategy.AIStrategy;
 
 /**
  * Implementation of the Player interface for the Three Trios game.
+ * Each player is identified by a unique color, red or blue, and has their own hand of cards.
  * Sets strategy for a player as well as counts the cards in a player's hand.
+ * The player can be controlled by an AI strategy for determining optimal moves.
  */
 public class ThreeTriosPlayer implements Player {
   private final String color;

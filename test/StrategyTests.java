@@ -1,5 +1,3 @@
-package cs3500.threetrios.strategy;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,6 +9,17 @@ import static org.junit.Assert.*;
 
 import cs3500.threetrios.model.Card;
 import cs3500.threetrios.model.Player;
+import cs3500.threetrios.strategy.AIMove;
+import cs3500.threetrios.strategy.AIStrategy;
+import cs3500.threetrios.strategy.CompositeStrategy;
+import cs3500.threetrios.strategy.CornerStrat;
+import cs3500.threetrios.strategy.DefensiveStrat;
+import cs3500.threetrios.strategy.MaxFlipsStrat;
+import cs3500.threetrios.strategy.MinimaxStrat;
+import cs3500.threetrios.strategy.MockCard;
+import cs3500.threetrios.strategy.MockPlayer;
+import cs3500.threetrios.strategy.MockThreeTriosModel;
+import cs3500.threetrios.strategy.Position;
 
 /**
  * Class testing the strategies in the program.

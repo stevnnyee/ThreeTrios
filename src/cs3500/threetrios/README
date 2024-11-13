@@ -33,6 +33,16 @@ GameState: Central component that manages the game's rules, turn order, and win 
 
 ConfigurationReader: Utility class for reading grid and card configurations from files.
 
+Quickstart:
+
+Source Organization:
+  - model: The core mechanics of the game and the management of the state of the game.
+    - configs: Different possible configurations of the game.
+  - view: The user interface implementations to help view the game.
+  - strategy: ai strategies for a player and a computer that aid in the running of the game.
+  - ThreeTrios: The main method where the user is able to run the ThreeTrios game.
+
+
 
 
 
