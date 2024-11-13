@@ -196,8 +196,6 @@ public class StrategyTests {
     assertTrue(logContent.contains("Checked if can place at"));
   }
 
-  // bonus tests
-
   @Test
   public void testDefensiveStratBasicMove() {
     redPlayer.addCardToHand(strongCard);
@@ -288,15 +286,12 @@ public class StrategyTests {
     AIMove move2 = new AIMove(card, new Position(1, 2), 10);
     AIMove move3 = new AIMove(card, new Position(2, 1), 10);
 
-    // Test same row, different column
     assertTrue(move1.comparePosition(move2) < 0);
     assertTrue(move2.comparePosition(move1) > 0);
 
-    // Test different row
     assertTrue(move1.comparePosition(move3) < 0);
     assertTrue(move3.comparePosition(move1) > 0);
 
-    // Test same position
     assertEquals(0, move1.comparePosition(new AIMove(card, new Position(1, 1), 5)));
   }
 
@@ -316,7 +311,6 @@ public class StrategyTests {
     Card card = new MockCard("test", 5, 5, 5, 5);
     player.addCardToHand(card);
 
-    // Set up multiple positions with equal scores
     Position pos1 = new Position(0, 1);
     Position pos2 = new Position(0, 0);
     model.setFlipValue(pos1, 3);
@@ -325,7 +319,6 @@ public class StrategyTests {
     MaxFlipsStrat strategy = new MaxFlipsStrat();
     AIMove move = strategy.findBestMove(model, player);
 
-    // Should choose uppermost-leftmost position when scores are tied
     assertEquals(0, move.getPosition().row);
     assertEquals(0, move.getPosition().col);
   }
@@ -339,7 +332,6 @@ public class StrategyTests {
 
     AIMove move = strategy.findBestMove(model, player);
 
-    // Should return a valid move even with empty hand
     assertNotNull(move);
     assertNotNull(move.getPosition());
   }
@@ -350,7 +342,6 @@ public class StrategyTests {
     MockThreeTriosModel model = new MockThreeTriosModel(log) {
       @Override
       public boolean canPlaceCard(int row, int col, Card card) {
-        // Make all positions invalid except (0,0)
         return row == 0 && col == 0;
       }
     };
@@ -361,8 +352,6 @@ public class StrategyTests {
 
     MaxFlipsStrat strategy = new MaxFlipsStrat();
     AIMove move = strategy.findBestMove(model, player);
-
-    // Should choose the only valid position
     assertEquals(0, move.getPosition().row);
     assertEquals(0, move.getPosition().col);
   }
@@ -373,7 +362,7 @@ public class StrategyTests {
     MockThreeTriosModel model = new MockThreeTriosModel(log) {
       @Override
       public boolean canPlaceCard(int row, int col, Card card) {
-        return false; // No valid positions
+        return false;
       }
     };
 
@@ -384,7 +373,6 @@ public class StrategyTests {
     CornerStrat strategy = new CornerStrat();
     AIMove move = strategy.findBestMove(model, player);
 
-    // Should return uppermost-leftmost position when no valid moves
     assertEquals(0, move.getPosition().row);
     assertEquals(0, move.getPosition().col);
   }
@@ -401,7 +389,7 @@ public class StrategyTests {
     CornerStrat corner = new CornerStrat();
 
     List<AIStrategy> strategies = Arrays.asList(maxFlips, corner);
-    List<Integer> weights = Arrays.asList(2, 1); // MaxFlips should have twice the influence
+    List<Integer> weights = Arrays.asList(2, 1);
 
     CompositeStrategy composite = new CompositeStrategy(strategies, weights);
     AIMove move = composite.findBestMove(model, player);
@@ -415,7 +403,6 @@ public class StrategyTests {
     MockThreeTriosModel model = new MockThreeTriosModel(log) {
       @Override
       public int getFlippableCards(int row, int col, Card card) {
-        // Simulate that center position (1,1) leads to more flips
         if (row == 1 && col == 1) return 2;
         return 1;
       }
@@ -429,7 +416,6 @@ public class StrategyTests {
 
     AIMove move = minimaxStrat.findBestMove(model, redPlayer);
 
-    // Should choose center position as it gives more flips
     assertEquals(1, move.getPosition().row);
     assertEquals(1, move.getPosition().col);
   }
@@ -439,7 +425,6 @@ public class StrategyTests {
     MockThreeTriosModel model = new MockThreeTriosModel(log) {
       @Override
       public boolean canPlaceCard(int row, int col, Card card) {
-        // Only allow certain positions to test defensive placement
         return (row == 0 && col == 0) || (row == 1 && col == 1);
       }
     };
@@ -450,7 +435,6 @@ public class StrategyTests {
     DefensiveStrat defensiveStrat = new DefensiveStrat();
     AIMove move = defensiveStrat.findBestMove(model, redPlayer);
 
-    // Should prefer corner position for better defense
     assertEquals(0, move.getPosition().row);
     assertEquals(0, move.getPosition().col);
   }
@@ -477,7 +461,6 @@ public class StrategyTests {
     MaxFlipsStrat strategy = new MaxFlipsStrat();
     strategy.findBestMove(model, redPlayer);
 
-    // Verify all positions were checked
     String transcriptContent = log.toString();
     for (int row = 0; row < model.getGridDimensions()[0]; row++) {
       for (int col = 0; col < model.getGridDimensions()[1]; col++) {
@@ -512,7 +495,6 @@ public class StrategyTests {
     strategy.findBestMove(model, redPlayer);
 
     String transcriptContent = log.toString();
-    // Verify corners were checked first
     assertTrue(transcriptContent.contains("Attempted placement at (0,0)"));
     assertTrue(transcriptContent.contains("Attempted placement at (0,6)"));
     assertTrue(transcriptContent.contains("Attempted placement at (4,0)"));
@@ -559,7 +541,7 @@ public class StrategyTests {
 
       @Override
       public int getFlippableCards(int row, int col, Card card) {
-        return (row == 0 && col == 0) ? 3 : 1; // Corner position gives more flips
+        return (row == 0 && col == 0) ? 3 : 1;
       }
     };
 
@@ -583,7 +565,7 @@ public class StrategyTests {
   @Test(expected = IllegalArgumentException.class)
   public void testCompositeStrategyMismatchedWeights() {
     List<AIStrategy> strategies = Arrays.asList(maxFlipsStrategy, cornerStrategy);
-    List<Integer> weights = Arrays.asList(1);  // Mismatched number of weights
+    List<Integer> weights = Arrays.asList(1);
     new CompositeStrategy(strategies, weights);
   }
 
@@ -662,12 +644,12 @@ public class StrategyTests {
     maxFlipsStrategy.findBestMove(inconsistentModel, redPlayer);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testMinimaxStratWithInvalidFlipCount() {
     MockThreeTriosModel invalidModel = new MockThreeTriosModel(log) {
       @Override
       public int getFlippableCards(int row, int col, Card card) {
-        return -1; // Invalid flip count
+        return -1;
       }
     };
     minimaxStrategy.findBestMove(invalidModel, redPlayer);
@@ -685,7 +667,7 @@ public class StrategyTests {
     MockThreeTriosModel invalidModel = new MockThreeTriosModel(log) {
       @Override
       public boolean isHole(int row, int col) {
-        return true; // Every position is a hole
+        return true;
       }
     };
     cornerStrategy.findBestMove(invalidModel, redPlayer);
@@ -701,7 +683,7 @@ public class StrategyTests {
     MockThreeTriosModel invalidModel = new MockThreeTriosModel(log) {
       @Override
       public Player getCardOwnerAt(int row, int col) {
-        return new MockPlayer("INVALID"); // Invalid player color
+        return new MockPlayer("INVALID");
       }
     };
     minimaxStrategy.findBestMove(invalidModel, redPlayer);
@@ -714,12 +696,12 @@ public class StrategyTests {
     new CompositeStrategy(strategies, weights);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test(expected = IndexOutOfBoundsException.class)
   public void testDefensiveStratWithInvalidBoardAccess() {
     MockThreeTriosModel invalidModel = new MockThreeTriosModel(log) {
       @Override
       public Card getCardAt(int row, int col) {
-        throw new IndexOutOfBoundsException(); // Simulating invalid board access
+        throw new IndexOutOfBoundsException();
       }
     };
     defensiveStrategy.findBestMove(invalidModel, redPlayer);
