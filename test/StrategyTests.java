@@ -660,7 +660,6 @@ public class StrategyTests {
 
       @Override
       public Card getCardAt(int row, int col) {
-        // Return card even though canPlaceCard said position was empty
         return new MockCard("inconsistent", 1, 1, 1, 1);
       }
     };
