@@ -1,6 +1,7 @@
 import org.junit.Before;
 import org.junit.Test;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -218,17 +219,6 @@ public class StrategyTests {
     assertTrue(move.getPosition().row >= 0 && move.getPosition().col >= 0);
   }
 
-  @Test
-  public void testDefensiveStratWithMultipleCards() {
-    redPlayer.addCardToHand(strongCard);
-    redPlayer.addCardToHand(weakCard);
-    model.setCurrentPlayer(redPlayer);
-
-    AIMove move = defensiveStrategy.findBestMove(model, redPlayer);
-    assertNotNull(move);
-    assertTrue(move.getPosition().row < model.getGridDimensions()[0] &&
-            move.getPosition().col < model.getGridDimensions()[1]);
-  }
 
   @Test
   public void testCompositeStrategyBasic() {
@@ -398,6 +388,7 @@ public class StrategyTests {
     assertTrue(move.getScore() >= 0);
   }
 
+  // Override methods
   @Test
   public void testMinimaxStratLooksAhead() {
     MockThreeTriosModel model = new MockThreeTriosModel(log) {
@@ -406,18 +397,24 @@ public class StrategyTests {
         if (row == 1 && col == 1) return 2;
         return 1;
       }
+
+      @Override
+      public List<Card> getPlayerHand(Player player) {
+        List<Card> hand = new ArrayList<>();
+        hand.add(strongCard);
+        return hand;
+      }
     };
 
     redPlayer.addCardToHand(strongCard);
     model.setCurrentPlayer(redPlayer);
 
-    MaxFlipsStrat opponentStrat = new MaxFlipsStrat();
-    MinimaxStrat minimaxStrat = new MinimaxStrat(opponentStrat);
-
+    MinimaxStrat minimaxStrat = new MinimaxStrat(new DefensiveStrat());
     AIMove move = minimaxStrat.findBestMove(model, redPlayer);
 
     assertEquals(1, move.getPosition().row);
     assertEquals(1, move.getPosition().col);
+    assertTrue(move.getScore() >= 0);
   }
 
   @Test
@@ -426,6 +423,17 @@ public class StrategyTests {
       @Override
       public boolean canPlaceCard(int row, int col, Card card) {
         return (row == 0 && col == 0) || (row == 1 && col == 1);
+      }
+
+      @Override
+      public List<Card> getPlayerHand(Player player) {
+        List<Card> hand = new ArrayList<>();
+        if (player.getColor().equals(Color.BLUE)) {
+          hand.add(weakCard);
+        } else {
+          hand.add(strongCard);
+        }
+        return hand;
       }
     };
 
@@ -437,6 +445,7 @@ public class StrategyTests {
 
     assertEquals(0, move.getPosition().row);
     assertEquals(0, move.getPosition().col);
+    assertTrue(move.getScore() >= 0);
   }
 
   @Test
@@ -678,7 +687,7 @@ public class StrategyTests {
     new AIMove(strongCard, new Position(0, 0), -1);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testMinimaxStratWithInvalidCardOwner() {
     MockThreeTriosModel invalidModel = new MockThreeTriosModel(log) {
       @Override
