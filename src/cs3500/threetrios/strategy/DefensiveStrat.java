@@ -63,7 +63,10 @@ public class DefensiveStrat implements AIStrategy {
    * @param player the current player
    * @return an integer representing the defensibility of the move
    */
-  private int calculateDefensibility(MainModelInterface model, Position pos, Card card, Player player) {
+  private int calculateDefensibility(MainModelInterface model,
+                                     Position pos,
+                                     Card card,
+                                     Player player) {
     if (pos == null) {
       throw new IllegalArgumentException("Position cannot be null");
     }
