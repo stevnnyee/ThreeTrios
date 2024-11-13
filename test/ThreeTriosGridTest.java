@@ -232,12 +232,12 @@ public class ThreeTriosGridTest {
     new ThreeTriosGrid(3, 3, invalidHoles);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testPlaceCardInHoleWithNull() {
     grid.placeCard(0, 1, null);
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testPlaceNullCardOutOfBounds() {
     grid.placeCard(3, 3, null);
   }

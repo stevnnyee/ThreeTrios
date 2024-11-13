@@ -2,6 +2,7 @@
 import cs3500.threetrios.model.Card;
 import cs3500.threetrios.model.Player;
 import cs3500.threetrios.model.ThreeTriosGameModel;
+import cs3500.threetrios.view.ThreeTriosSwingView;
 import cs3500.threetrios.view.ThreeTriosView;
 import cs3500.threetrios.view.ThreeTriosViewImpl;
 
@@ -9,14 +10,18 @@ import org.junit.Before;
 import org.junit.After;
 import org.junit.Test;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import javax.swing.*;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -287,5 +292,91 @@ public class ThreeTriosViewTest {
             tempDir.resolve("malformed-board").toString(),
             tempDir.resolve("test-cards").toString());
     view = new ThreeTriosViewImpl(game);
+  }
+
+  @Test
+  public void testSwingViewInitialization() throws IOException {
+    game.startGameFromConfig(
+            tempDir.resolve("test-board").toString(),
+            tempDir.resolve("test-cards").toString());
+    ThreeTriosSwingView swingView = new ThreeTriosSwingView(game);
+
+    assertNotNull(swingView);
+    assertEquals(JFrame.EXIT_ON_CLOSE, swingView.getDefaultCloseOperation());
+    assertEquals(BorderLayout.class, swingView.getLayout().getClass());
+  }
+
+  @Test
+  public void testSwingViewComponents() throws IOException {
+    game.startGameFromConfig(
+            tempDir.resolve("test-board").toString(),
+            tempDir.resolve("test-cards").toString());
+    ThreeTriosSwingView swingView = new ThreeTriosSwingView(game);
+
+    Component[] components = swingView.getContentPane().getComponents();
+    assertEquals(3, components.length);
+    assertTrue(components[0] instanceof JPanel);
+    assertTrue(components[1] instanceof JPanel);
+    assertTrue(components[2] instanceof JPanel);
+  }
+
+  @Test
+  public void testSwingViewRefresh() throws IOException {
+    game.startGameFromConfig(
+            tempDir.resolve("test-board").toString(),
+            tempDir.resolve("test-cards").toString());
+    ThreeTriosSwingView swingView = new ThreeTriosSwingView(game);
+
+    String initialTitle = swingView.getTitle();
+    game.placeCard(game.getCurrentPlayer(), 0, 0, game.getPlayerHand(game.getCurrentPlayer()).get(0));
+    swingView.refresh();
+
+    assertNotEquals(initialTitle, swingView.getTitle());
+  }
+
+  @Test
+  public void testViewImplCardFormatting() throws IOException {
+    game.startGameFromConfig(
+            tempDir.resolve("test-board").toString(),
+            tempDir.resolve("test-cards").toString());
+    ThreeTriosViewImpl textView = new ThreeTriosViewImpl(game);
+
+    String viewString = textView.toString();
+    assertTrue(viewString.contains("Hand:"));
+
+    String handSection = viewString.substring(viewString.indexOf("Hand:"));
+    String[] cardLines = handSection.split("\n");
+
+    for (int i = 1; i < cardLines.length; i++) {
+      String cardLine = cardLines[i];
+      assertTrue(cardLine.matches(".*\\s[1-9A]\\s[1-9A]\\s[1-9A]\\s[1-9A]\\s*"));
+    }
+  }
+
+  @Test
+  public void testViewImplGridRepresentation() throws IOException {
+    game.startGameFromConfig(
+            tempDir.resolve("test-board").toString(),
+            tempDir.resolve("test-cards").toString());
+    ThreeTriosViewImpl textView = new ThreeTriosViewImpl(game);
+
+    String viewString = textView.toString();
+    String[] lines = viewString.split("\n");
+    assertTrue(lines.length >= 5); // At least 5 lines (player info, 3 grid rows, and hand)
+    assertTrue(lines[1].contains("_") || lines[1].contains(" ")); // Check for empty cells or holes
+  }
+
+  @Test
+  public void testViewImplHandRepresentation() throws IOException {
+    game.startGameFromConfig(
+            tempDir.resolve("test-board").toString(),
+            tempDir.resolve("test-cards").toString());
+    ThreeTriosViewImpl textView = new ThreeTriosViewImpl(game);
+
+    String viewString = textView.toString();
+    assertTrue(viewString.contains("Hand:"));
+    String handSection = viewString.split("Hand:\n")[1];
+    String[] cardLines = handSection.trim().split("\n");
+    assertEquals(3, cardLines.length); // Assuming 3 cards in hand
   }
 }

@@ -27,14 +27,14 @@ public interface MainModelInterface extends ReadOnlyThreeTriosModel {
    */
   void startGameFromConfig(String boardFile, String cardFile) throws IOException;
 
+  void placeCard(Player player, int row, int col, Card card);
+
   /**
    * Places a card on the grid for the current player.
-   *
-   * @param row row coordinate
-   * @param col column coordinate
+   * @param row the row position
+   * @param col the column position
    * @param card the card to place
    * @throws IllegalArgumentException if the move is invalid
-   * @throws IllegalStateException if the game is not in progress
    */
   void placeCard(int row, int col, Card card);
 
