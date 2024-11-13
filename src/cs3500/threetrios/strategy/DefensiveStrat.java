@@ -50,7 +50,6 @@ public class DefensiveStrat implements AIStrategy {
    */
   private int calculateDefensibility(MainModelInterface model, Position pos, Card card, Player player) {
     int score = 0;
-    // Get opponent
     Player opponent = null;
     for (Player p : model.getPlayers()) {
       if (!p.getColor().equals(player.getColor())) {

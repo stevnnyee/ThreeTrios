@@ -4,7 +4,7 @@ package cs3500.threetrios.view;
 import java.awt.*;
 
 /**
- * Interface for the game board panel.
+ * Interface for the game board panel for the game.
  */
 public interface GameBoardPanel {
   /**
