@@ -1,0 +1,7 @@
+// 5x5 board with disconnected card cells
+5 5
+CCXCC
+CCXCC
+XXXXX
+CXXXX
+CCXCC
