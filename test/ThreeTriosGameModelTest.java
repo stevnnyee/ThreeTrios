@@ -272,15 +272,15 @@ public class ThreeTriosGameModelTest {
     assertFalse(grid.isFull());
     int initialEmptyCells = grid.getEmptyCells().size();
     assertEquals(13, initialEmptyCells);
-
-    for (int rowIndex = 0; rowIndex < grid.getRows(); rowIndex++) {
-      for (int columnIndex = 0; columnIndex < grid.getCols(); columnIndex++) {
-        if (!grid.isHole(rowIndex, columnIndex)) {
-          game.placeCard(game.getCurrentPlayer(),
-                  rowIndex, columnIndex, game.getPlayerHand(game.getCurrentPlayer()).get(0));
-        }
+    List<int[]> emptyCells = new ArrayList<>(grid.getEmptyCells());
+    for (int[] pos : emptyCells) {
+      Player currentPlayer = game.getCurrentPlayer();
+      if (!game.getPlayerHand(currentPlayer).isEmpty()) {
+        Card card = game.getPlayerHand(currentPlayer).get(0);
+        game.placeCard(currentPlayer, pos[0], pos[1], card);
       }
     }
+    grid = game.getGrid();
     assertTrue(grid.isFull());
     assertEquals(0, grid.getEmptyCells().size());
   }

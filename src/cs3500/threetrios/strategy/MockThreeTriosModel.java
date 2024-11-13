@@ -105,6 +105,11 @@ public class MockThreeTriosModel implements MainModelInterface {
   }
 
   @Override
+  public void placeCard(Player player, int row, int col, Card card) {
+    log.append(String.format("Placing card for player %s at (%d,%d)\n", player.getColor(), row, col));
+  }
+
+  @Override
   public void placeCard(int row, int col, Card card) {
     log.append(String.format("Placing card at (%d,%d)\n", row, col));
   }
