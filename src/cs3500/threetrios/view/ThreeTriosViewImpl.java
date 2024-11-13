@@ -9,6 +9,8 @@ import cs3500.threetrios.model.Player;
 /**
  * The implementation of ThreeTriosView, creating a new view of the game.
  * Displays the grid and player hands which is required for the game to be played.
+ * The implementation creates a string representation of the game that shoes the player's color,
+ * the grid of the game, and the current player's hand.
  */
 public class ThreeTriosViewImpl implements ThreeTriosView {
   private final MainModelInterface model;
