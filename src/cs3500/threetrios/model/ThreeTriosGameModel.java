@@ -199,49 +199,39 @@ public class ThreeTriosGameModel implements MainModelInterface {
   public void executeBattlePhase(Position newCardPosition) {
     Set<Position> toProcess = new HashSet<>();
     Set<Position> processed = new HashSet<>();
-    List<Position> cardsToFlip = new ArrayList<>();
 
     // Start with the newly placed card
     toProcess.add(newCardPosition);
 
-    // Continue while we have cards to process
     while (!toProcess.isEmpty()) {
-      // Get next card to process
       Position currentPos = toProcess.iterator().next();
       toProcess.remove(currentPos);
       processed.add(currentPos);
 
-      // Get adjacent positions
+      Card currentCard = grid.getCard(currentPos.row, currentPos.col);
+      if (currentCard == null) continue;
+
+      // Get all adjacent positions
       List<Position> adjacentPositions = getAdjacentPositions(currentPos);
 
-      // Check each adjacent position for potential battles
       for (Position adjPos : adjacentPositions) {
-        Card adjacentCard = grid.getCard(adjPos.row, adjPos.col);
-        Card currentCard = grid.getCard(currentPos.row, currentPos.col);
+        // Skip if position was already processed or has no card
+        if (processed.contains(adjPos)) continue;
 
-        // Skip if no card, or already processed
-        if (adjacentCard == null || processed.contains(adjPos)) {
-          continue;
-        }
+        Card adjacentCard = grid.getCard(adjPos.row, adjPos.col);
+        if (adjacentCard == null) continue;
 
         // Only battle against opponent's cards
         if (adjacentCard.getOwner() != currentCard.getOwner()) {
           if (checkCardWinsBattle(currentPos, adjPos)) {
-            cardsToFlip.add(adjPos);
+            // Flip the card immediately
+            adjacentCard.setOwner(currentCard.getOwner());
 
-            // Add this position to be processed for combo battles
-            if (!processed.contains(adjPos)) {
-              toProcess.add(adjPos);
-            }
+            // Add the newly flipped card to be processed for combo battles
+            toProcess.add(adjPos);
           }
         }
       }
-    }
-
-    // Flip all cards at once after determining all battles
-    for (Position pos : cardsToFlip) {
-      Card card = grid.getCard(pos.row, pos.col);
-      card.setOwner(currentPlayer);
     }
   }
 
