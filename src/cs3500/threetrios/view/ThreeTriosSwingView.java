@@ -6,17 +6,26 @@ import cs3500.threetrios.model.ReadOnlyThreeTriosModel;
 import cs3500.threetrios.model.Card;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
+/**
+ * A Swing-based graphical user interface for the Three Trios game.
+ * This view implements a window with three main panels:
+ * <ul>
+ *  <li>Left panel: RED player's hand</li>
+ *  <li>Center panel: Game board grid (5x7)</li>
+ *  <li>Right panel: BLUE player's hand</li>
+ * </ul>
+ */
 public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
   private final ReadOnlyThreeTriosModel model;
   private final GameBoardPanelImpl boardPanel;
   private final PlayerHandPanelImpl leftHandPanel;
   private final PlayerHandPanelImpl rightHandPanel;
-
   private static final Color HOLE_COLOR = Color.LIGHT_GRAY;
   private static final Color PLAYABLE_CELL_COLOR = new Color(238, 232, 170);
   private static final Color RED_PLAYER_COLOR = new Color(255, 182, 193);
@@ -24,10 +33,14 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
   private static final int GRID_ROWS = 5;
   private static final int GRID_COLS = 7;
   private static final int HAND_WIDTH = 150;
-
   private Card selectedCard = null;
   private Player selectedCardPlayer = null;
 
+  /**
+   * Constructs a new ThreeTrios game window.
+   *
+   * @param model the game model
+   */
   public ThreeTriosSwingView(ReadOnlyThreeTriosModel model) {
     this.model = model;
 
@@ -38,7 +51,6 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
     if (currentPlayer != null) {
       setTitle("Current player: " + currentPlayer.getColor());
     }
-
 
     leftHandPanel = new PlayerHandPanelImpl(model, "RED");
     rightHandPanel = new PlayerHandPanelImpl(model, "BLUE");
@@ -55,13 +67,20 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
     pack();
   }
 
-
-
+  /**
+   * Implementation of PlayerHandPanel that displays and manages a player's cards in ThreeTrios.
+   */
   private class PlayerHandPanelImpl extends JPanel implements PlayerHandPanel {
     private final ReadOnlyThreeTriosModel model;
     private final String playerColor;
     private int selectedCardIndex = -1;
 
+    /**
+     * Creates a new player hand panel for the specified player.
+     *
+     * @param model       the model
+     * @param playerColor the player's color
+     */
     public PlayerHandPanelImpl(ReadOnlyThreeTriosModel model, String playerColor) {
       this.model = model;
       this.playerColor = playerColor;
@@ -75,6 +94,11 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
       });
     }
 
+    /**
+     * Returns the current player.
+     *
+     * @return the Player we want to get
+     */
     private Player getPlayer() {
       List<Player> players = model.getPlayers();
       if (players != null) {
@@ -123,6 +147,17 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
       }
     }
 
+    /**
+     * Renders the attack values for a card at the specified position.
+     * The values are drawn in each cardinal direction (NORTH, SOUTH, EAST, WEST)
+     *
+     * @param g2d    the graphics to draw with
+     * @param card   the card
+     * @param x      the x coordinate
+     * @param y      the y coordinate
+     * @param width  the width of the card
+     * @param height the height of the card
+     */
     private void drawCardValues(Graphics2D g2d, Card card, int x, int y, int width, int height) {
       g2d.setFont(new Font("Arial", Font.PLAIN, height / 3));
       FontMetrics fm = g2d.getFontMetrics();
@@ -141,10 +176,23 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
       g2d.drawString(west, x + 5, centerY + fm.getAscent() / 2);
     }
 
+    /**
+     * Formats a card's attack value for display.
+     * Values of 10 are converted to 'A', while all other values are
+     * converted to their string representation.
+     *
+     * @param value value
+     * @return "A" if the value is 10, the number value otherwise as a string
+     */
     private String formatValue(int value) {
       return value == 10 ? "A" : String.valueOf(value);
     }
 
+    /**
+     * Handles mouse clicks on the panel, detecting which card was clicked.
+     *
+     * @param p the point of where the mouse was clicked
+     */
     private void handleCardClick(Point p) {
       Player player = getPlayer();
       if (player == null || player != model.getCurrentPlayer()) return;
@@ -192,9 +240,25 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
     }
   }
 
+  /**
+   * Implementation of the game board panel that displays the Three Trios playing grid.
+   * The panel manages:
+   * <ul>
+   *  <li>A 5x7 grid of cells for card placement</li>
+   *  <li>Visual representation of holes and playable cells</li>
+   *  li>Display of placed cards with their attack values</li>
+   *  <li>Mouse interaction for card placement</li>
+   * </ul>
+   */
   private class GameBoardPanelImpl extends JPanel implements GameBoardPanel {
     private final ReadOnlyThreeTriosModel model;
 
+    /**
+     * Creates a new game board panel linked to the specified model, initializing the model
+     * with a white background and a click listener.
+     *
+     * @param model game model
+     */
     public GameBoardPanelImpl(ReadOnlyThreeTriosModel model) {
       this.model = model;
       setBackground(Color.WHITE);
@@ -207,6 +271,11 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
       });
     }
 
+    /**
+     * Handles mouse clicks on the game board grid, attempting to place the currently selected card.
+     *
+     * @param p the point where the mouse is clicked
+     */
     private void handleGridClick(Point p) {
       if (selectedCard == null) return;
 
@@ -261,6 +330,16 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
       }
     }
 
+    /**
+     * Renders a card on the game board grid with its attack values and player color.
+     *
+     * @param g2d    the graphics to draw with
+     * @param card   the card
+     * @param x      the x coordinate
+     * @param y      the y coordinate
+     * @param width  the width of the card
+     * @param height the height of the card
+     */
     private void drawGridCard(Graphics2D g2d, Card card, int x, int y, int width, int height) {
       g2d.setColor(card.getOwner().getColor().equals("RED") ? RED_PLAYER_COLOR : BLUE_PLAYER_COLOR);
       g2d.fillRect(x + 1, y + 1, width - 2, height - 2);
@@ -283,6 +362,14 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
       g2d.drawString(west, x + 5, centerY + fm.getAscent() / 2);
     }
 
+    /**
+     * Formats a card's attack value for display.
+     * Values of 10 are converted to 'A', while all other values are
+     * converted to their string representation.
+     *
+     * @param value value
+     * @return "A" if the value is 10, the number value otherwise as a string
+     */
     private String formatValue(int value) {
       return value == 10 ? "A" : String.valueOf(value);
     }
