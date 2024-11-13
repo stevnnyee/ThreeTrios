@@ -8,6 +8,7 @@ import java.awt.*;
 public interface PlayerHandPanel {
   /**
    * Gets the card size based on panel dimensions and hand size.
+   *
    * @return The size of each card in pixels
    */
   Dimension getCardSize();

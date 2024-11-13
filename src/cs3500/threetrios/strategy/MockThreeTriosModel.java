@@ -8,6 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A mock implementation of MainModelInterface used for testing game strategies and components.
+ * This class provides a testable game model that logs operations and allows for
+ * controlled testing scenarios.
+ */
 public class MockThreeTriosModel implements MainModelInterface {
   private final StringBuilder log;
   private final List<Position> checkedPositions;
@@ -22,6 +27,11 @@ public class MockThreeTriosModel implements MainModelInterface {
   private boolean isGameOver;
   private Grid mockGrid;
 
+  /**
+   * Constructs a new MockThreeTriosModel with default settings and logging capability.
+   *
+   * @param log Stringbuilder to record changes to the game state and called methods
+   */
   public MockThreeTriosModel(StringBuilder log) {
     this.log = log;
     this.checkedPositions = new ArrayList<>();
@@ -39,11 +49,21 @@ public class MockThreeTriosModel implements MainModelInterface {
     initializeDefaultHand();
   }
 
+  /**
+   * Initializes a default hand, which will be used for testing.
+   */
   private void initializeDefaultHand() {
     mockHand.add(new MockCard("card1", 5, 5, 5, 5));
     mockHand.add(new MockCard("card2", 7, 7, 7, 7));
   }
 
+  /**
+   * Sets the number of cards that can be flipped at a specific position.
+   * Used for testing strategies that consider flips.
+   *
+   * @param pos   the position to set the flip value for
+   * @param value the number of cards that can be flipped
+   */
   public void setFlipValue(Position pos, int value) {
     positionValues.put(pos, value);
   }
@@ -106,7 +126,8 @@ public class MockThreeTriosModel implements MainModelInterface {
 
   @Override
   public void placeCard(Player player, int row, int col, Card card) {
-    log.append(String.format("Placing card for player %s at (%d,%d)\n", player.getColor(), row, col));
+    log.append(String.format("Placing card for player %s at (%d,%d)\n",
+            player.getColor(), row, col));
   }
 
   @Override
@@ -130,6 +151,11 @@ public class MockThreeTriosModel implements MainModelInterface {
     return winner;
   }
 
+  /**
+   * Verifies if all corners have been checked, which will be used for testing corner strategies.
+   *
+   * @return true if all four corners of the grid have been checked, false otherwise
+   */
   public boolean verifiedAllCorners() {
     boolean topLeft = checkedPositions.contains(new Position(0, 0));
     boolean topRight = checkedPositions.contains(new Position(0, cols - 1));
@@ -165,6 +191,11 @@ public class MockThreeTriosModel implements MainModelInterface {
     }
   }
 
+  /**
+   * Sets the current active player.
+   *
+   * @param player the player to set as the current player
+   */
   public void setCurrentPlayer(Player player) {
     this.currentPlayer = player;
   }

@@ -1,6 +1,5 @@
 package cs3500.threetrios.view;
 
-import java.awt.Dimension;
 
 /**
  * Interface for the main game frame.

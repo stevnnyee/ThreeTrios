@@ -34,6 +34,31 @@ GameState: Central component that manages the game's rules, turn order, and win 
 ConfigurationReader: Utility class for reading grid and card configurations from files.
 
 Quickstart:
+Three Trios is a card-based strategy game for two players (Red and Blue). To start playing:
+  - Launch the game to see the main window with three panels:
+  Red's hand (left), the game board (center), and Blue's hand (right).
+  - Players take turns placing cards on the 5x7 game board. Click a card in your hand to select it,
+  then click an empty cell on the board to place it.
+  - Each card has attack values in four directions (North, South, East, West).
+  When you place a card next to an opponent's card, if your card's attack value is higher than
+  their defense value in that direction, you'll capture their card.
+  - The game ends when all valid cells are filled. The player with the most cards on the board wins.
+Note: Cards display attack values 1-9 normally, while a value of 10 is displayed as 'A'.
+Gray cells are holes and cannot be played on.
+
+Quickstart in the main:
+Run the ThreeTrios.java main class to launch the game. The program will:
+Create a 5x7 board with strategically placed holes
+Generate a deck of 35 cards with random attack values
+Randomly select whether Red or Blue goes first
+  - When the game window appears, you'll see three panels: Red's hand (left),
+  the game board (center), and Blue's hand (right).
+  - Players take turns placing cards on the board. Click a card in your hand to select it,
+  then click an empty cell on the board to place it.
+  - Each card has attack values in four directions (North, South, East, West).
+  When you place a card next to an opponent's card, if your card's attack value is higher than their
+  defense value in that direction, you'll capture their card!
+  - The game ends when all valid cells are filled. The player with the most cards on the board wins.
 
 Source Organization:
   - model: The core mechanics of the game and the management of the state of the game.
@@ -42,7 +67,52 @@ Source Organization:
   - strategy: ai strategies for a player and a computer that aid in the running of the game.
   - ThreeTrios: The main method where the user is able to run the ThreeTrios game.
 
+UPDATED Source Organization:
+  model/: Core game logic and state management
+    Handles game rules, card battles, scoring
+    Manages player turns and game progression
+    Tracks board state and card ownership
+    Maintains player hands and validates moves
+
+      configs/: Game configuration files
+        Board layout definitions (placement of holes)
+        Card deck configurations (attack values)
+        Custom game setup options
+
+  view/: User interface implementations
+    ThreeTriosSwingView: Graphical interface using Java Swing
+    ThreeTriosViewImpl: Text-based console interface
+    Renders game board, cards, and player hands
+    Handles user input and interaction events
+    Updates display based on game state changes
+
+  strategy/: AI strategies for a player and a computer that aid in the running of the game.
+
+  ThreeTrios.java: Main application entry point that initializes game components and configurations,
+    Sets up the game board and deck, creates and connects model, view, and AI components,
+    and launches the game interface
+
+  test: tests for methods, model, view, and overall functionality of the ThreeTrios game.
 
 
-
-
+Changes for part 2
+  - Refactored our model to split it into read-only and mutable interfaces. The read-only interface
+  is within the model package, titled ReadOnlyThreeTriosModel. This interface provides methods
+  for observing the game state without modifying it.
+  - Built on the existing view interfaces and implementations from the first homework. Added a new
+  interface, ThreeTriosFrame, and its implementation, ThreeTriosSwingView, within the view package.
+  The ThreeTriosSwingView class serves as the view component in the game's MVC architecture.
+  This view implementation utilizes Java Swing and ensures that players can see and manipulate
+  the game state without directly accessing the underlying game logic, maintaining proper
+  separation of concerns.
+  - Created the strategy package, which contains an overarching interface AIStrategy that helps
+  determine the best move in a game playing system. This modular design allows for multiple
+  AI implementations from simple strategies like prioritizing corner placements to more
+  sophisticated approaches using minimax algorithms. Each strategy calculates the best possible
+  move for the AI player based on the current game state.
+  - Created a MockPlayer and Model for better and functional testing.
+  - Took screenshots to ensure the functionality of our view.
+  - Created a file strategy-transcript.txt containing a transcript from your mocked model
+  of our simplest strategy choosing a move for Red on the starting board configuration
+  of the 3x3 board with no holes.
+  - Created a JAR file that can run the ThreeTrios game.
