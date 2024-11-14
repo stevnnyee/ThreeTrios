@@ -10,15 +10,17 @@ import org.junit.Before;
 import org.junit.After;
 import org.junit.Test;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
 
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.JFrame;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;

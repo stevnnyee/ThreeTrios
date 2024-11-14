@@ -171,8 +171,8 @@ public class DefensiveStrat implements AIStrategy {
    * @return true if position is valid, false otherwise
    */
   private boolean isValidPosition(Position pos, MainModelInterface model) {
-    return pos.row >= 0 && pos.row < model.getGridDimensions()[0] &&
-            pos.col >= 0 && pos.col < model.getGridDimensions()[1] &&
-            !model.isHole(pos.row, pos.col);
+    return pos.row >= 0 && pos.row < model.getGridDimensions()[0]
+            && pos.col >= 0 && pos.col < model.getGridDimensions()[1]
+            && !model.isHole(pos.row, pos.col);
   }
 }

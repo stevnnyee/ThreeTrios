@@ -16,6 +16,9 @@ import cs3500.threetrios.model.Player;
 public class MockPlayer implements Player {
   private final String color;
   private final List<Card> hand;
+  // created AIStrategy as a local variable to ensure that the strategy instance is not shared,
+  // which helps prevent unintended side effects.
+  AIStrategy strategy;
 
   /**
    * Constructs a new MockPlayer with a color as its user.
@@ -54,6 +57,7 @@ public class MockPlayer implements Player {
 
   @Override
   public void setStrategy(AIStrategy strategy) {
+    this.strategy = strategy;
   }
 
   @Override

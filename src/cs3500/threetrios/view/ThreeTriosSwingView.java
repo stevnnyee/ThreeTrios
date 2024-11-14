@@ -5,14 +5,23 @@ import cs3500.threetrios.model.Player;
 import cs3500.threetrios.model.ReadOnlyThreeTriosModel;
 import cs3500.threetrios.model.Card;
 
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.BorderLayout;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-import javax.swing.*;
-
+import javax.swing.JPanel;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  * A Swing-based graphical user interface for the Three Trios game.

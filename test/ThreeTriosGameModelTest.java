@@ -39,30 +39,30 @@ public class ThreeTriosGameModelTest {
 
     createTestFile("board2-CellsReachWithHoles",
             "// 5x3 board with holes and cells connected to each other.\n" +
-                    "5 3\n" +
-                    "CCC\n" +
-                    "CXC\n" +
-                    "CCC\n" +
-                    "CXC\n" +
-                    "CCC");
+                    "5 3\n"
+                    + "CCC\n"
+                    + "CXC\n"
+                    + "CCC\n"
+                    + "CXC\n"
+                    + "CCC");
 
     createTestFile("card2-EnoughCards",
-            "// Cards for testing\n" +
-                    "BlackKnight 8 6 9 7\n" +
-                    "BabyDragon 7 8 6 5\n" +
-                    "IceWizard 6 5 8 7\n" +
-                    "EliteBarbs 9 8 7 9\n" +
-                    "Archer 6 7 8 5\n" +
-                    "Witch 7 5 8 6\n" +
-                    "Goblin 5 6 7 4\n" +
-                    "Princess 6 4 8 5\n" +
-                    "Prince 9 7 8 8\n" +
-                    "Valkyrie 8 8 7 7\n" +
-                    "Pekka 9 9 8 9\n" +
-                    "Warden 8 8 9 7\n" +
-                    "King 9 8 8 9\n" +
-                    "Queen 9 8 9 8\n" +
-                    "Yeti 8 9 7 8");
+            "// Cards for testing\n"
+                    + "BlackKnight 8 6 9 7\n"
+                    + "BabyDragon 7 8 6 5\n"
+                    + "IceWizard 6 5 8 7\n"
+                    + "EliteBarbs 9 8 7 9\n"
+                    + "Archer 6 7 8 5\n"
+                    + "Witch 7 5 8 6\n"
+                    + "Goblin 5 6 7 4\n"
+                    + "Princess 6 4 8 5\n"
+                    + "Prince 9 7 8 8\n"
+                    + "Valkyrie 8 8 7 7\n"
+                    + "Pekka 9 9 8 9\n"
+                    + "Warden 8 8 9 7\n"
+                    + "King 9 8 8 9\n"
+                    + "Queen 9 8 9 8\n"
+                    + "Yeti 8 9 7 8");
   }
 
   @After

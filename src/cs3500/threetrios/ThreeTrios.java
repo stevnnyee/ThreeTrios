@@ -26,7 +26,7 @@ public final class ThreeTrios {
    *
    * @param args command line arguments.
    * @throws IllegalArgumentException if there's an error starting the game or if the thread
-   * is interrupted while waiting for the first move
+   *                                  is interrupted while waiting for the first move
    */
   public static void main(String[] args) {
     ThreeTriosGameModel model = new ThreeTriosGameModel();

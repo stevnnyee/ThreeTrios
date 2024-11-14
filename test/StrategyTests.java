@@ -1,13 +1,13 @@
 import org.junit.Before;
 import org.junit.Test;
 
-import java.awt.*;
+import java.awt.Color;
+import java.util.List;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
 
 import cs3500.threetrios.model.Card;
 import cs3500.threetrios.model.Player;
