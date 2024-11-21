@@ -1,0 +1,22 @@
+We think this MaxFlips the easiest strategy since you just need flip and check each cell
+
+Getting hand for player: RED
+Checked if can place at (0,0)
+Getting card at (0,0)
+Checked if can place at (0,1)
+Getting card at (0,1)
+Checked if can place at (0,2)
+Getting card at (0,2)
+Checked if can place at (1,0)
+Getting card at (1,0)
+Checked if can place at (1,1)
+Getting card at (1,1)
+Checked if can place at (1,2)
+Getting card at (1,2)
+Checked if can place at (2,0)
+Getting card at (2,0)
+Checked if can place at (2,1)
+Getting card at (2,1)
+Checked if can place at (2,2)
+Getting card at (2,2)
+Placing card at (0,0)

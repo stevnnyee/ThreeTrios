@@ -1,0 +1,159 @@
+Overview
+The Three Trios game is a two-player card game played on a customizable grid.
+Players take turns placing cards on the grid and battling adjacent cards to flip them.
+The game ends when all card cells are filled, and the winner is determined by counting owned cards.
+
+Game Rules: The model assumes familiarity with the rules of Three Trios.
+Extensibility: The design allows for future enhancements, such as AI players or variant rules.
+Configuration Files: The game setup is customizable through external configuration files for grids
+and cards.
+
+Invariants:
+  1. The number of card cells on the grid is always odd.
+  2. The total number of the cards is the number of cells on the grid plus one and is constant.
+  3. Each card cell is either empty or filled with one card.
+  4. The size of each player's hand is always equal to or less than (N+1)/2,
+     where N is the number of card cells on the grid.
+
+Grid: Represents the layout of the game board, supporting various sizes and hole configurations.
+
+Card: Represents individual cards with attack values for each direction (North, South, East, West).
+  - Has a color, essential to turn management and logic.
+  - Has various methods that may be implemented in future assignments.
+
+Player: Manages player-specific information such as color and hand.
+  - Has rows, columns, and a 2D boolean array to determine whether there are holes,
+  and where they are.
+  - Has various methods to check the state of the grid, retrieve important information, and perform
+  actions.
+
+GameState: Central component that manages the game's rules, turn order, and win conditions.
+  - Has hands of cards, methods to play cards, startgame, and all around logic and implementation
+  to play the game.
+
+ConfigurationReader: Utility class for reading grid and card configurations from files.
+
+Quickstart:
+Three Trios is a card-based strategy game for two players (Red and Blue). To start playing:
+  - Launch the game to see the main window with three panels:
+  Red's hand (left), the game board (center), and Blue's hand (right).
+  - Players take turns placing cards on the 5x7 game board. Click a card in your hand to select it,
+  then click an empty cell on the board to place it.
+  - Each card has attack values in four directions (North, South, East, West).
+  When you place a card next to an opponent's card, if your card's attack value is higher than
+  their defense value in that direction, you'll capture their card.
+  - The game ends when all valid cells are filled. The player with the most cards on the board wins.
+Note: Cards display attack values 1-9 normally, while a value of 10 is displayed as 'A'.
+Gray cells are holes and cannot be played on.
+
+Quickstart in the main:
+Run the ThreeTrios.java main class to launch the game. The program will:
+Create a 5x7 board with strategically placed holes
+Generate a deck of 35 cards with random attack values
+Randomly select whether Red or Blue goes first
+  - When the game window appears, you'll see three panels: Red's hand (left),
+  the game board (center), and Blue's hand (right).
+  - Players take turns placing cards on the board. Click a card in your hand to select it,
+  then click an empty cell on the board to place it.
+  - Each card has attack values in four directions (North, South, East, West).
+  When you place a card next to an opponent's card, if your card's attack value is higher than their
+  defense value in that direction, you'll capture their card!
+  - The game ends when all valid cells are filled. The player with the most cards on the board wins.
+
+Source Organization:
+  - model: The core mechanics of the game and the management of the state of the game.
+    - configs: Different possible configurations of the game.
+  - view: The user interface implementations to help view the game.
+  - strategy: ai strategies for a player and a computer that aid in the running of the game.
+  - ThreeTrios: The main method where the user is able to run the ThreeTrios game.
+
+UPDATED Source Organization:
+  model/: Core game logic and state management
+    Handles game rules, card battles, scoring
+    Manages player turns and game progression
+    Tracks board state and card ownership
+    Maintains player hands and validates moves
+
+      configs/: Game configuration files
+        Board layout definitions (placement of holes)
+        Card deck configurations (attack values)
+        Custom game setup options
+
+  view/: User interface implementations
+    ThreeTriosSwingView: Graphical interface using Java Swing
+    ThreeTriosViewImpl: Text-based console interface
+    Renders game board, cards, and player hands
+    Handles user input and interaction events
+    Updates display based on game state changes
+
+  strategy/: AI strategies for a player and a computer that aid in the running of the game.
+
+  ThreeTrios.java: Main application entry point that initializes game components and configurations,
+    Sets up the game board and deck, creates and connects model, view, and AI components,
+    and launches the game interface
+
+  test: tests for methods, model, view, and overall functionality of the ThreeTrios game.
+
+
+Changes for part 2
+  - Refactored our model to split it into read-only and mutable interfaces. The read-only interface
+  is within the model package, titled ReadOnlyThreeTriosModel. This interface provides methods
+  for observing the game state without modifying it.
+  - Built on the existing view interfaces and implementations from the first homework. Added a new
+  interface, ThreeTriosFrame, and its implementation, ThreeTriosSwingView, within the view package.
+  The ThreeTriosSwingView class serves as the view component in the game's MVC architecture.
+  This view implementation utilizes Java Swing and ensures that players can see and manipulate
+  the game state without directly accessing the underlying game logic, maintaining proper
+  separation of concerns.
+  - Created the strategy package, which contains an overarching interface AIStrategy that helps
+  determine the best move in a game playing system. This modular design allows for multiple
+  AI implementations from simple strategies like prioritizing corner placements to more
+  sophisticated approaches using minimax algorithms. Each strategy calculates the best possible
+  move for the AI player based on the current game state.
+  - Created a MockPlayer and Model for better and functional testing.
+  - Took screenshots to ensure the functionality of our view.
+  - Created a file strategy-transcript.txt containing a transcript from your mocked model
+  of our simplest strategy choosing a move for Red on the starting board configuration
+  of the 3x3 board with no holes.
+  - Created a JAR file that can run the ThreeTrios game.
+
+EXTRA CREDIT STRATEGIES IMPLEMENTATION:
+
+Defensive Strategy:
+  - Predicts and chooses cards with the lowest risk of being flipped by the opponent.
+  - Checks each card's position and direction and calculates how many of the opponents
+  cards can flip them.
+
+Implementation:
+  - This strategy can be located in strategy/DefensiveStrat.java.
+
+Test Coverage:
+  - The tests checking if this strategy works properly are located in test/StrategyTests.java.
+  - The mock inside of the strategy package assists with the testing.
+
+
+Minimax Strategy:
+  - Predicts the opponent's moves and chooses a move that minimizes the maximum advantage the
+  opponent can gain.
+  - Simulates potential cases against the opponent's strategy in order to
+  decide which case is best.
+
+Implementation:
+  - This strategy can be located in strategy/MinimaxStrat.java.
+
+Test Coverage:
+  - The tests checking if this strategy works properly are located in test/StrategyTests.java.
+  - The mock inside of the strategy package assists with the testing.
+
+
+Composite Strategy:
+  - CompositeStrategy implements a weighted combination approach, allowing multiple strategies
+  to be combined with different importance weights to create a more sophisticated decision-making
+  process that considers multiple factors when choosing a move.
+
+Implementation:
+  - This strategy can be located in strategy/CompositeStrategy.java.
+
+Test Coverage:
+  - The tests checking if this strategy works properly are located in test/StrategyTests.java.
+  - The mock inside of the strategy package assists with the testing.
