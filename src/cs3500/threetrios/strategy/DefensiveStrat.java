@@ -15,21 +15,26 @@ import cs3500.threetrios.model.Player;
 public class DefensiveStrat implements AIStrategy {
   @Override
   public AIMove findBestMove(MainModelInterface model, Player player) {
-    if (model == null) {
-      throw new IllegalArgumentException("Model cannot be null");
+    if (model == null || player == null) {
+      throw new IllegalArgumentException("Model and player cannot be null");
     }
-    if (player == null) {
-      throw new IllegalArgumentException("Player cannot be null");
+
+    // Get hand directly from model using player's color
+    List<Card> hand = null;
+    for (Player p : model.getPlayers()) {
+      if (p.getColor().equals(player.getColor())) {
+        hand = model.getPlayerHand(p);
+        break;
+      }
     }
-    List<Card> hand = model.getPlayerHand(player);
-    if (hand == null) {
-      throw new IllegalStateException("Player hand cannot be null");
+
+    if (hand == null || hand.isEmpty()) {
+      throw new IllegalStateException("No cards in player's hand");
     }
-    if (model.getPlayers() == null || model.getPlayers().isEmpty()) {
-      throw new IllegalStateException("No players in game");
-    }
+
     List<AIMove> possibleMoves = new ArrayList<>();
 
+    // Rest of your existing code stays the same
     for (int row = 0; row < model.getGridDimensions()[0]; row++) {
       for (int col = 0; col < model.getGridDimensions()[1]; col++) {
         if (model.isHole(row, col) || model.getCardAt(row, col) != null) {
@@ -39,7 +44,9 @@ public class DefensiveStrat implements AIStrategy {
         for (Card card : hand) {
           if (model.canPlaceCard(row, col, card)) {
             int defensibility = calculateDefensibility(model, new Position(row, col), card, player);
-            possibleMoves.add(new AIMove(card, new Position(row, col), defensibility));
+            // Add a base score to ensure positive values
+            int adjustedScore = defensibility + 1000; // Offset negative scores
+            possibleMoves.add(new AIMove(card, new Position(row, col), adjustedScore));
           }
         }
       }
@@ -63,16 +70,11 @@ public class DefensiveStrat implements AIStrategy {
    * @param player the current player
    * @return an integer representing the defensibility of the move
    */
-  private int calculateDefensibility(MainModelInterface model,
-                                     Position pos,
-                                     Card card,
-                                     Player player) {
-    if (pos == null) {
-      throw new IllegalArgumentException("Position cannot be null");
+  private int calculateDefensibility(MainModelInterface model, Position pos, Card card, Player player) {
+    if (pos == null || card == null) {
+      throw new IllegalArgumentException("Position and card cannot be null");
     }
-    if (card == null) {
-      throw new IllegalArgumentException("Card cannot be null");
-    }
+
     int score = 0;
     Player opponent = null;
     for (Player p : model.getPlayers()) {
@@ -87,8 +89,15 @@ public class DefensiveStrat implements AIStrategy {
     }
 
     List<Card> opponentHand = model.getPlayerHand(opponent);
-
     Direction[] directions = {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
+
+    // Base score for card strength
+    score += (card.getAttackPower(Direction.NORTH) +
+            card.getAttackPower(Direction.SOUTH) +
+            card.getAttackPower(Direction.EAST) +
+            card.getAttackPower(Direction.WEST)) * 5;
+
+    // Evaluate position defensibility
     for (Direction dir : directions) {
       Position adjPos = getAdjacentPosition(pos, dir);
       if (isValidPosition(adjPos, model)) {
@@ -98,9 +107,9 @@ public class DefensiveStrat implements AIStrategy {
             vulnerableToFlips++;
           }
         }
-        score -= vulnerableToFlips * 100;
+        score -= vulnerableToFlips * 50;  // Reduced penalty
       } else {
-        score += 50;
+        score += 25;  // Bonus for edge positions
       }
     }
 

@@ -48,6 +48,7 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
   private Card selectedCard = null;
   private Player selectedCardPlayer = null;
   private ViewFeatures features;
+  private boolean gameOverMessageShown = false;
 
   /**
    * Constructs a new ThreeTrios game window.
@@ -113,17 +114,10 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
      * @return the Player we want to get
      */
     private Player getPlayer() {
-      List<Player> players = model.getPlayers();
-      if (players != null) {
-        for (Player player : players) {
-          if (player.getColor().equals(playerColor)) {
-            return player;
-          }
+      for (Player player : model.getPlayers()) {
+        if (player.getColor().equals(playerColor)) {
+          return player;
         }
-      }
-      Player currentPlayer = model.getCurrentPlayer();
-      if (currentPlayer != null && currentPlayer.getColor().equals(playerColor)) {
-        return currentPlayer;
       }
       return null;
     }
@@ -145,12 +139,15 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
       }
 
       int cardSpacing = getHeight() / hand.size();
+      boolean isCurrentPlayer = model.getCurrentPlayer() != null &&
+              player.getColor().equals(model.getCurrentPlayer().getColor());
 
       for (int i = 0; i < hand.size(); i++) {
         Card card = hand.get(i);
         int yPos = i * cardSpacing + 5;
 
-        g2d.setColor(i == selectedCardIndex ? Color.YELLOW : Color.WHITE);
+        // Only highlight cards if it's this player's turn
+        g2d.setColor(i == selectedCardIndex && isCurrentPlayer ? Color.YELLOW : Color.WHITE);
         g2d.fillRect(10, yPos, getWidth() - 20, cardSpacing - 10);
 
         g2d.setColor(Color.BLACK);
@@ -159,6 +156,7 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
         drawCardValues(g2d, card, 10, yPos, getWidth() - 20, cardSpacing - 10);
       }
     }
+
 
     /**
      * Renders the attack values for a card at the specified position.
@@ -208,7 +206,7 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
      */
     private void handleCardClick(Point p) {
       Player player = getPlayer();
-      if (player == null || player != model.getCurrentPlayer()) {
+      if (player == null) {
         return;
       }
 
@@ -226,9 +224,10 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
                 cardSpacing - 10);
 
         if (cardBounds.contains(p)) {
-          // Only notify the controller, let it handle selection state
+          Card clickedCard = hand.get(i);
+          // Let the controller handle the turn checking
           if (features != null) {
-            features.onCardSelected(player, hand.get(i));
+            features.onCardSelected(player, clickedCard);
           }
           break;
         }
@@ -251,12 +250,21 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
     }
 
     private int findCardIndex(Card card) {
-      Player player = getPlayer();
-      if (player == null) return -1;
+      try {
+        Player player = getPlayer();
+        if (player == null || card == null) return -1;
 
-      List<Card> hand = model.getPlayerHand(player);
-      for (int i = 0; i < hand.size(); i++) {
-        if (hand.get(i) == card) return i;
+        List<Card> hand = model.getPlayerHand(player);
+        if (hand == null) return -1;
+
+        for (int i = 0; i < hand.size(); i++) {
+          Card handCard = hand.get(i);
+          if (handCard != null && handCard.getName().equals(card.getName())) {
+            return i;
+          }
+        }
+      } catch (Exception e) {
+        System.err.println("Error in findCardIndex: " + e.getMessage());
       }
       return -1;
     }
@@ -304,7 +312,17 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
      * @param p the point where the mouse is clicked
      */
     private void handleGridClick(Point p) {
-      if (selectedCard == null) {
+      if (selectedCard == null || selectedCardPlayer == null) {
+        return;
+      }
+
+      // Check if it's the selected card's player's turn
+      if (!selectedCardPlayer.getColor().equals(model.getCurrentPlayer().getColor())) {
+        selectedCard = null;
+        selectedCardPlayer = null;
+        leftHandPanel.selectedCardIndex = -1;
+        rightHandPanel.selectedCardIndex = -1;
+        refresh();
         return;
       }
 
@@ -314,20 +332,8 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
 
       if (row >= 0 && row < model.getGridDimensions()[0] &&
               col >= 0 && col < model.getGridDimensions()[1]) {
-        try {
-          if (!model.isHole(row, col) && model.canPlaceCard(row, col, selectedCard)) {
-            model.placeCard(row, col, selectedCard);
-            if (features != null) {
-              features.onCellSelected(row, col);
-            }
-            selectedCard = null;
-            selectedCardPlayer = null;
-            leftHandPanel.selectedCardIndex = -1;
-            rightHandPanel.selectedCardIndex = -1;
-            ThreeTriosSwingView.this.refresh();
-          }
-        } catch (IllegalArgumentException | IllegalStateException e) {
-          throw new IllegalArgumentException("Illegal move");
+        if (features != null) {
+          features.onCellSelected(row, col);
         }
       }
     }
@@ -416,6 +422,7 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
 
   @Override
   public void refresh() {
+    // Update window title
     Player currentPlayer = model.getCurrentPlayer();
     if (currentPlayer != null) {
       if (model.isGameOver() && model.getWinner() != null) {
@@ -425,19 +432,25 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
       }
     }
 
-    boardPanel.refresh();
-    leftHandPanel.refresh();
-    rightHandPanel.refresh();
+    // Only repaint the panels, don't call their refresh methods
+    boardPanel.repaint();
+    leftHandPanel.repaint();
+    rightHandPanel.repaint();
 
-    if (selectedCardPlayer != null && selectedCardPlayer != model.getCurrentPlayer()) {
+    if (selectedCardPlayer != null && currentPlayer != null &&
+            !selectedCardPlayer.getColor().equals(currentPlayer.getColor())) {
       selectedCard = null;
       selectedCardPlayer = null;
+      leftHandPanel.selectedCardIndex = -1;
+      rightHandPanel.selectedCardIndex = -1;
     }
 
     revalidate();
     repaint();
 
-    if (model.isGameOver()) {
+    // Handle game over state
+    if (model.isGameOver() && !gameOverMessageShown) {  // Add a flag to prevent multiple messages
+      gameOverMessageShown = true;  // Add this field to the class
       Player winner = model.getWinner();
       int redScore = model.getPlayerScore(model.getPlayers().get(0));
       int blueScore = model.getPlayerScore(model.getPlayers().get(1));
@@ -451,14 +464,7 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
                 redScore, blueScore);
       }
 
-      JOptionPane.showMessageDialog(this,
-              message,
-              "Game Over",
-              JOptionPane.INFORMATION_MESSAGE);
-
-      boardPanel.setEnabled(false);
-      leftHandPanel.setEnabled(false);
-      rightHandPanel.setEnabled(false);
+      JOptionPane.showMessageDialog(this, message, "Game Over", JOptionPane.INFORMATION_MESSAGE);
     }
   }
 
@@ -478,15 +484,27 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
   public void setSelectedCard(Card card, Player player) {
     this.selectedCard = card;
     this.selectedCardPlayer = player;
-    if (player != null) {
-      if (player.getColor().equals("RED")) {
-        leftHandPanel.selectedCardIndex = player == selectedCardPlayer ?
-                leftHandPanel.findCardIndex(card) : -1;
-      } else {
-        rightHandPanel.selectedCardIndex = player == selectedCardPlayer ?
-                rightHandPanel.findCardIndex(card) : -1;
+
+    try {
+      // Clear all selections first
+      leftHandPanel.selectedCardIndex = -1;
+      rightHandPanel.selectedCardIndex = -1;
+
+      // Then set the appropriate selection
+      if (player != null && card != null) {
+        if (player.getColor().equals("RED")) {
+          leftHandPanel.selectedCardIndex = leftHandPanel.findCardIndex(card);
+        } else if (player.getColor().equals("BLUE")) {
+          rightHandPanel.selectedCardIndex = rightHandPanel.findCardIndex(card);
+        }
       }
+
+      // Refresh the UI
+      leftHandPanel.refresh();
+      rightHandPanel.refresh();
+      repaint();
+    } catch (Exception e) {
+      System.err.println("Error in setSelectedCard: " + e.getMessage());
     }
-    refresh();
   }
 }

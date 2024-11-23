@@ -1,6 +1,7 @@
 package cs3500.threetrios.strategy;
 
 import cs3500.threetrios.model.Card;
+import cs3500.threetrios.model.Direction;
 import cs3500.threetrios.model.MainModelInterface;
 import cs3500.threetrios.model.Player;
 
@@ -15,10 +16,6 @@ public class MinimaxStrat implements AIStrategy {
   private final AIStrategy opponentStrategy;
   private static final int MAX_DEPTH = 2;
 
-  /**
-   * Constructor for the minimax strategy by using the opponent's strategy.
-   * @param opponentStrategy the strategy the opponent is using.
-   */
   public MinimaxStrat(AIStrategy opponentStrategy) {
     if (opponentStrategy == null) {
       throw new IllegalArgumentException("Opponent strategy cannot be null");
@@ -28,22 +25,28 @@ public class MinimaxStrat implements AIStrategy {
 
   @Override
   public AIMove findBestMove(MainModelInterface model, Player player) {
-    if (model == null) {
-      throw new IllegalArgumentException("Model cannot be null");
+    if (model == null || player == null) {
+      throw new IllegalArgumentException("Model and player cannot be null");
     }
-    if (player == null) {
-      throw new IllegalArgumentException("Player cannot be null");
-    }
-    int[] dimensions = model.getGridDimensions();
-    if (dimensions[0] <= 0 || dimensions[1] <= 0) {
-      throw new IllegalStateException("Invalid grid dimensions");
-    }
-    List<Card> hand = model.getPlayerHand(player);
-    if (hand == null) {
-      throw new IllegalStateException("Player hand cannot be null");
-    }
-    List<AIMove> possibleMoves = new ArrayList<>();
 
+    // Get hand directly from model using player's color
+    List<Card> hand = null;
+    for (Player p : model.getPlayers()) {
+      if (p.getColor().equals(player.getColor())) {
+        hand = model.getPlayerHand(p);
+        break;
+      }
+    }
+
+    if (hand == null || hand.isEmpty()) {
+      throw new IllegalStateException("No cards in player's hand");
+    }
+
+    List<AIMove> possibleMoves = new ArrayList<>();
+    int bestScore = Integer.MIN_VALUE;
+    AIMove bestMove = null;
+
+    // Try all possible moves
     for (int row = 0; row < model.getGridDimensions()[0]; row++) {
       for (int col = 0; col < model.getGridDimensions()[1]; col++) {
         if (model.isHole(row, col) || model.getCardAt(row, col) != null) {
@@ -52,35 +55,30 @@ public class MinimaxStrat implements AIStrategy {
 
         for (Card card : hand) {
           if (model.canPlaceCard(row, col, card)) {
-            // Calculate score based on minimizing opponent's best move
-            int minimaxScore = evaluateMove(model, new Position(row, col), card, player);
-            possibleMoves.add(new AIMove(card, new Position(row, col), minimaxScore));
+            int score = evaluateMove(model, new Position(row, col), card, player);
+            // Add 1000 to ensure positive scores for AIMove constructor
+            score += 1000;
+            AIMove move = new AIMove(card, new Position(row, col), score);
+            if (score > bestScore) {
+              bestScore = score;
+              bestMove = move;
+            }
           }
         }
       }
     }
 
-    if (possibleMoves.isEmpty()) {
+    if (bestMove == null) {
       return StrategyUtil.getDefaultMove(model, player);
     }
 
-    possibleMoves.sort(new MoveComparator());
-    return possibleMoves.get(0);
+    return bestMove;
   }
 
-  /**
-   * Evaluates a move by calculating the immediate value of a move, considering the possible
-   * moves of an opposing player.
-   *
-   * @param model model
-   * @param pos position
-   * @param card card
-   * @param currentPlayer current player
-   * @return the combined score of the move's value
-   */
-  private int evaluateMove(MainModelInterface model,
-                           Position pos, Card card, Player currentPlayer) {
+  private int evaluateMove(MainModelInterface model, Position pos, Card card, Player currentPlayer) {
     int immediateScore = calculateImmediateScore(model, pos, card, currentPlayer);
+
+    // Find opponent
     Player opponent = null;
     for (Player p : model.getPlayers()) {
       if (!p.getColor().equals(currentPlayer.getColor())) {
@@ -88,36 +86,41 @@ public class MinimaxStrat implements AIStrategy {
         break;
       }
     }
+
     if (opponent == null) {
       return immediateScore;
     }
 
-    AIMove opponentMove = opponentStrategy.findBestMove(model, opponent);
-    int opponentScore = opponentMove.getScore();
-
-    return immediateScore - opponentScore;
+    // Evaluate opponent's best response
+    try {
+      AIMove opponentMove = opponentStrategy.findBestMove(model, opponent);
+      int opponentScore = opponentMove.getScore();
+      return immediateScore - (opponentScore / 2); // Weight opponent moves less
+    } catch (Exception e) {
+      // If opponent evaluation fails, return just the immediate score
+      return immediateScore;
+    }
   }
 
-  /**
-   * Calculates the immediate value of a move without considering the opponents possible moves.
-   *
-   * @param model model
-   * @param pos position
-   * @param card card
-   * @param player player
-   * @return the immediate value of a move without considering the opponents possible moves
-   */
-  private int calculateImmediateScore(MainModelInterface model,
-                                      Position pos, Card card, Player player) {
+  private int calculateImmediateScore(MainModelInterface model, Position pos, Card card, Player player) {
     int score = 0;
-    score += model.getFlippableCards(pos.row, pos.col, card) * 100;
 
-    DefensiveStrat defensiveStrat = new DefensiveStrat();
-    score += defensiveStrat.findBestMove(model, player).getScore() * 0.5;
+    // Flips are most important
+    score += model.getFlippableCards(pos.row, pos.col, card) * 1000;
 
-    if ((pos.row == 0 || pos.row == model.getGridDimensions()[0] - 1)
-            && (pos.col == 0 || pos.col == model.getGridDimensions()[1] - 1)) {
-      score += 50;
+    // Card strength is second priority
+    score += (card.getAttackPower(Direction.NORTH) +
+            card.getAttackPower(Direction.SOUTH) +
+            card.getAttackPower(Direction.EAST) +
+            card.getAttackPower(Direction.WEST)) * 10;
+
+    // Position value
+    if ((pos.row == 0 || pos.row == model.getGridDimensions()[0] - 1) &&
+            (pos.col == 0 || pos.col == model.getGridDimensions()[1] - 1)) {
+      score += 500; // Corner bonus
+    } else if (pos.row == 0 || pos.row == model.getGridDimensions()[0] - 1 ||
+            pos.col == 0 || pos.col == model.getGridDimensions()[1] - 1) {
+      score += 200; // Edge bonus
     }
 
     return score;

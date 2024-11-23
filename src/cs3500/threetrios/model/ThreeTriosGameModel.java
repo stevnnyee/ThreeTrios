@@ -41,11 +41,18 @@ public class ThreeTriosGameModel implements MainModelInterface {
     this.grid = grid;
     initialize(grid);
     dealCards(deck);
-
-    this.currentPlayer = Math.random() < 0.5 ? redPlayer : bluePlayer;
-
     this.gameStarted = true;
     this.gameOver = false;
+
+    // Set initial player and notify listeners
+    setCurrentPlayer("RED");  // Start with RED player
+
+    // Notify all listeners that game has started with initial player
+    for (ModelFeatures listener : featureListeners) {
+      if (listener != null) {
+        listener.notifyTurnChange(this.currentPlayer);
+      }
+    }
   }
 
   /**
@@ -103,9 +110,8 @@ public class ThreeTriosGameModel implements MainModelInterface {
    * @param deck the deck to draw from
    */
   public void dealCards(List<Card> deck) {
-    // Calculate required hand size based on grid
     int totalRequiredCards = grid.getCardCellCount() + 1;
-    int handSize = (totalRequiredCards + 1) / 2;  // Round up to next even number divided by 2
+    int handSize = (totalRequiredCards + 1) / 2;
 
     if (deck.size() < handSize * 2) {
       throw new IllegalArgumentException(
@@ -135,10 +141,8 @@ public class ThreeTriosGameModel implements MainModelInterface {
     grid.placeCard(row, col, card);
     playerHands.get(player).remove(card);
     executeBattlePhase(new Position(row, col));
-    currentPlayer = (currentPlayer == redPlayer) ? bluePlayer : redPlayer;
-    for (ModelFeatures listener : featureListeners) {
-      listener.notifyTurnChange(currentPlayer);
-    }
+    String nextPlayer = (currentPlayer == redPlayer) ? "BLUE" : "RED";
+    setCurrentPlayer(nextPlayer);
     gameOver = isGridFull();
     if (gameOver) {
       for (ModelFeatures listener : featureListeners) {
@@ -147,10 +151,21 @@ public class ThreeTriosGameModel implements MainModelInterface {
     }
   }
 
-  // Keep the old method for backward compatibility if needed, internally calling the new one
   @Override
   public void placeCard(int row, int col, Card card) {
-    placeCard(currentPlayer, row, col, card);
+    validateMove(getCurrentPlayer(), row, col, card);
+    grid.placeCard(row, col, card);
+    playerHands.get(currentPlayer).remove(card);
+    executeBattlePhase(new Position(row, col));
+    String nextPlayerColor = (currentPlayer == redPlayer) ? "BLUE" : "RED";
+    boolean isGameFinished = isGridFull();
+    setCurrentPlayer(nextPlayerColor);
+    if (isGameFinished) {
+      gameOver = true;
+      for (ModelFeatures listener : featureListeners) {
+        listener.notifyGameOver(determineWinner());
+      }
+    }
   }
 
   /**
@@ -390,7 +405,6 @@ public class ThreeTriosGameModel implements MainModelInterface {
    */
 
   private int countPlayerCards(Player player) {
-    // Prevent recursive scoring
     if (isScoring) {
       return 0;
     }
@@ -398,12 +412,10 @@ public class ThreeTriosGameModel implements MainModelInterface {
     isScoring = true;
     int count = 0;
 
-    // Only count hand cards if game is NOT over
     if (!isGameOver()) {
       count += playerHands.get(player).size();
     }
 
-    // Count cards on the board
     for (int i = 0; i < grid.getRows(); i++) {
       for (int j = 0; j < grid.getCols(); j++) {
         Card card = grid.getCard(i, j);
@@ -419,9 +431,7 @@ public class ThreeTriosGameModel implements MainModelInterface {
 
   @Override
   public Grid getGrid() {
-    // Return a deep copy of the grid to prevent modification
     ThreeTriosGrid newGrid = new ThreeTriosGrid(grid.getRows(), grid.getCols(), getHoles());
-    // Copy all cards to the new grid
     for (int i = 0; i < grid.getRows(); i++) {
       for (int j = 0; j < grid.getCols(); j++) {
         Card card = grid.getCard(i, j);
@@ -526,11 +536,30 @@ public class ThreeTriosGameModel implements MainModelInterface {
    *
    * @param color the color to set the player
    */
+  @Override
   public void setCurrentPlayer(String color) {
-    if (color.equals("RED")) {
-      this.currentPlayer = redPlayer;
+    if (color == null) {
+      throw new IllegalArgumentException("Color cannot be null");
+    }
+
+    Player newPlayer;
+    if (color.equalsIgnoreCase("RED")) {
+      newPlayer = redPlayer;
+    } else if (color.equalsIgnoreCase("BLUE")) {
+      newPlayer = bluePlayer;
     } else {
-      this.currentPlayer = bluePlayer;
+      throw new IllegalArgumentException("Invalid player color: " + color);
+    }
+
+    boolean changed = (this.currentPlayer != newPlayer);
+    this.currentPlayer = newPlayer;
+
+    if (changed) {
+      for (ModelFeatures listener : featureListeners) {
+        if (listener != null) {
+          listener.notifyTurnChange(this.currentPlayer);
+        }
+      }
     }
   }
 

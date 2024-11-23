@@ -3,6 +3,8 @@ package cs3500.threetrios.model;
 import java.io.IOException;
 import java.util.List;
 
+import cs3500.threetrios.features.ModelFeatures;
+
 /**
  * Interface for the model of the ThreeTrios game, extending the read-only interface
  * to add methods that modify game state.
@@ -39,4 +41,8 @@ public interface MainModelInterface extends ReadOnlyThreeTriosModel {
   void placeCard(int row, int col, Card card);
 
   List<Player> getPlayers();
+
+  void setCurrentPlayer(String color);
+
+  void addFeaturesListener(ModelFeatures listener);
 }

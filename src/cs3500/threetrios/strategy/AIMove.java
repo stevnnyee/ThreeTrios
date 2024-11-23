@@ -24,9 +24,6 @@ public class AIMove {
     if (position == null) {
       throw new IllegalArgumentException("Position cannot be null");
     }
-    if (score < 0) {
-      throw new IllegalArgumentException("Score cannot be negative");
-    }
     this.card = card;
     this.position = position;
     this.score = score;
@@ -39,6 +36,24 @@ public class AIMove {
    */
   public Card getCard() {
     return card;
+  }
+
+  /**
+   * Returns the row coordinate for this move.
+   *
+   * @return the row number
+   */
+  public int getRow() {
+    return position.row;
+  }
+
+  /**
+   * Returns the column coordinate for this move.
+   *
+   * @return the column number
+   */
+  public int getCol() {
+    return position.col;
   }
 
   /**
