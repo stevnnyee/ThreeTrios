@@ -27,19 +27,12 @@ public class ThreeTriosController implements ModelFeatures, ViewFeatures {
     this.view = view;
     this.controlledPlayer = player;
 
-    // Initialize turn state based on current player
     Player currentPlayer = model.getCurrentPlayer();
     this.isMyTurn = (currentPlayer != null &&
             player != null &&
             currentPlayer.getColor().equals(player.getColor()));
-
-    System.out.println("Initializing controller for " + player.getColor() +
-            ", isMyTurn=" + isMyTurn);
-
-    // Register this controller as a listener for model events
     model.addFeaturesListener(this);
 
-    // Register with view if it's a SwingView
     if (view instanceof ThreeTriosSwingView) {
       ((ThreeTriosSwingView) view).addViewFeatures(this);
     }
@@ -49,10 +42,6 @@ public class ThreeTriosController implements ModelFeatures, ViewFeatures {
 
   @Override
   public void onCardSelected(Player player, Card card) {
-    System.out.println(controlledPlayer.getColor() + " controller handling card selection");
-    System.out.println("Is my turn: " + isMyTurn);
-    System.out.println("Current player: " + model.getCurrentPlayer().getColor());
-
     if (!isMyTurn) {
       clearSelection();
       showErrorDialog("Not your turn!");
@@ -71,9 +60,6 @@ public class ThreeTriosController implements ModelFeatures, ViewFeatures {
 
   @Override
   public void onCellSelected(int row, int col) {
-    System.out.println(controlledPlayer.getColor() + " controller handling cell selection");
-    System.out.println("Is my turn: " + isMyTurn);
-
     if (!isMyTurn) {
       clearSelection();
       showErrorDialog("Not your turn!");
@@ -101,15 +87,8 @@ public class ThreeTriosController implements ModelFeatures, ViewFeatures {
 
   @Override
   public void notifyTurnChange(Player player) {
-    System.out.println(controlledPlayer.getColor() + " controller notified of turn change to " +
-            (player != null ? player.getColor() : "null"));
-
     boolean wasMyTurn = isMyTurn;
     isMyTurn = player != null && player.getColor().equals(controlledPlayer.getColor());
-
-    System.out.println(controlledPlayer.getColor() + " turn state changed from " +
-            wasMyTurn + " to " + isMyTurn);
-
     updateViewTitle();
     view.refresh();
 
@@ -125,11 +104,10 @@ public class ThreeTriosController implements ModelFeatures, ViewFeatures {
   @Override
   public void notifyGameOver(Player winner) {
     clearSelection();
-    view.refresh();  // Refresh the view one last time
-
+    view.refresh();
     String message;
-    Player redPlayer = model.getPlayers().get(0);  // First player is RED
-    Player bluePlayer = model.getPlayers().get(1); // Second player is BLUE
+    Player redPlayer = model.getPlayers().get(0);
+    Player bluePlayer = model.getPlayers().get(1);
 
     int redScore = model.getPlayerScore(redPlayer);
     int blueScore = model.getPlayerScore(bluePlayer);
@@ -149,14 +127,10 @@ public class ThreeTriosController implements ModelFeatures, ViewFeatures {
       );
     }
 
-    // Use SwingUtilities.invokeLater to ensure dialog shows on EDT
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         JOptionPane.showMessageDialog(
-                null,  // Use null for parent to center on screen
-                message,
-                "Game Over",
-                JOptionPane.INFORMATION_MESSAGE
+                null, message, "Game Over", JOptionPane.INFORMATION_MESSAGE
         );
       }
     });
@@ -164,36 +138,29 @@ public class ThreeTriosController implements ModelFeatures, ViewFeatures {
 
   private void makeAIMove() {
     if (!isMyTurn) {
-      System.out.println("Not AI's turn anymore");
       return;
     }
 
     try {
       AIPlayer aiPlayer = (AIPlayer) controlledPlayer;
-      System.out.println("AI " + aiPlayer.getColor() + " making move");
 
       AIMove move = aiPlayer.getNextMove(model);
       if (move == null) {
-        System.out.println("AI returned null move");
         return;
       }
 
       Card card = move.getCard();
       if (card == null) {
-        System.out.println("AI selected null card");
         return;
       }
 
       if (model.canPlaceCard(move.getRow(), move.getCol(), card)) {
-        System.out.println("AI placing card at " + move.getRow() + "," + move.getCol());
         model.placeCard(move.getRow(), move.getCol(), card);
         view.refresh();
       } else {
-        System.out.println("AI attempted invalid move");
       }
 
     } catch (Exception e) {
-      System.out.println("AI Error: " + e.getMessage());
       e.printStackTrace();
     }
   }
@@ -214,12 +181,9 @@ public class ThreeTriosController implements ModelFeatures, ViewFeatures {
   }
 
   public void startGame() {
-    System.out.println("Starting game for " + controlledPlayer.getColor() +
-            " controller, isMyTurn=" + isMyTurn);
     updateViewTitle();
     view.display();
 
-    // If this is an AI player and it's their turn, make a move
     if (isMyTurn && controlledPlayer instanceof AIPlayer) {
       makeAIMove();
     }

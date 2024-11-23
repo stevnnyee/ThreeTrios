@@ -16,13 +16,20 @@ public class CornerStrat implements AIStrategy {
       throw new IllegalArgumentException("Model and player cannot be null");
     }
 
-    // Get hand safely
-    List<Card> hand = model.getPlayerHand(player);
-    if (hand == null || hand.isEmpty()) {
-      throw new IllegalStateException("Player has no cards");
+    // Get hand directly from the model using our player's color
+    List<Card> hand = null;
+    for (Player p : model.getPlayers()) {
+      if (p.getColor().equals(player.getColor())) {
+        hand = model.getPlayerHand(p);
+        break;
+      }
     }
 
-    // Get dimensions safely
+    if (hand == null || hand.isEmpty()) {
+      throw new IllegalStateException("No cards in player's hand");
+    }
+
+    // Get dimensions
     int[] dimensions = model.getGridDimensions();
     int rows = dimensions[0];
     int cols = dimensions[1];
@@ -34,34 +41,51 @@ public class CornerStrat implements AIStrategy {
     corners.add(new Position(rows - 1, 0));
     corners.add(new Position(rows - 1, cols - 1));
 
-    // Check corner positions first
+    // Check corner positions first with best scoring
+    AIMove bestMove = null;
+    int bestScore = -1;
+
+    // Try corners first
     for (Position pos : corners) {
       if (!model.isHole(pos.row, pos.col) && model.getCardAt(pos.row, pos.col) == null) {
         for (Card card : hand) {
           if (model.canPlaceCard(pos.row, pos.col, card)) {
             int score = evaluateMove(model, pos, card);
-            return new AIMove(card, pos, score);
-          }
-        }
-      }
-    }
-
-    // If no corner moves, try any valid move
-    for (int r = 0; r < rows; r++) {
-      for (int c = 0; c < cols; c++) {
-        if (!model.isHole(r, c) && model.getCardAt(r, c) == null) {
-          for (Card card : hand) {
-            if (model.canPlaceCard(r, c, card)) {
-              Position pos = new Position(r, c);
-              int score = evaluateMove(model, pos, card);
-              return new AIMove(card, pos, score);
+            if (score > bestScore) {
+              bestScore = score;
+              bestMove = new AIMove(card, pos, score);
             }
           }
         }
       }
     }
 
-    throw new IllegalStateException("No valid moves available");
+    // If no corner moves available, try other positions
+    // If no corner moves available, try other positions
+    if (bestMove == null) {
+      for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+          Position currentPos = new Position(r, c);  // Create position object here
+          if (!model.isHole(r, c) && model.getCardAt(r, c) == null) {
+            for (Card card : hand) {
+              if (model.canPlaceCard(r, c, card)) {
+                int score = evaluateMove(model, currentPos, card);  // Use the created position
+                if (score > bestScore) {
+                  bestScore = score;
+                  bestMove = new AIMove(card, currentPos, score);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (bestMove == null) {
+      throw new IllegalStateException("No valid moves available");
+    }
+
+    return bestMove;
   }
 
   private int evaluateMove(MainModelInterface model, Position pos, Card card) {
@@ -76,7 +100,14 @@ public class CornerStrat implements AIStrategy {
       score += 1000;  // Corner position
     }
 
-    // Card strength
+    // Card strength - prioritize high values
+    int maxAttack = Math.max(
+            Math.max(card.getAttackPower(Direction.NORTH), card.getAttackPower(Direction.SOUTH)),
+            Math.max(card.getAttackPower(Direction.EAST), card.getAttackPower(Direction.WEST))
+    );
+    score += maxAttack * 2;  // Give extra weight to high attack values
+
+    // Add base card strength
     score += card.getAttackPower(Direction.NORTH) +
             card.getAttackPower(Direction.SOUTH) +
             card.getAttackPower(Direction.EAST) +

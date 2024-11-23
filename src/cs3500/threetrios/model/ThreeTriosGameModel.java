@@ -110,9 +110,8 @@ public class ThreeTriosGameModel implements MainModelInterface {
    * @param deck the deck to draw from
    */
   public void dealCards(List<Card> deck) {
-    // Calculate required hand size based on grid
     int totalRequiredCards = grid.getCardCellCount() + 1;
-    int handSize = (totalRequiredCards + 1) / 2;  // Round up to next even number divided by 2
+    int handSize = (totalRequiredCards + 1) / 2;
 
     if (deck.size() < handSize * 2) {
       throw new IllegalArgumentException(
@@ -142,12 +141,8 @@ public class ThreeTriosGameModel implements MainModelInterface {
     grid.placeCard(row, col, card);
     playerHands.get(player).remove(card);
     executeBattlePhase(new Position(row, col));
-
-    // Switch turns and notify listeners
     String nextPlayer = (currentPlayer == redPlayer) ? "BLUE" : "RED";
-    setCurrentPlayer(nextPlayer);  // This will handle notification
-
-    // Check for game over
+    setCurrentPlayer(nextPlayer);
     gameOver = isGridFull();
     if (gameOver) {
       for (ModelFeatures listener : featureListeners) {
@@ -156,29 +151,15 @@ public class ThreeTriosGameModel implements MainModelInterface {
     }
   }
 
-  // Keep the old method for backward compatibility if needed, internally calling the new one
   @Override
   public void placeCard(int row, int col, Card card) {
-    // First validate the move
     validateMove(getCurrentPlayer(), row, col, card);
-
-    // Place the card
     grid.placeCard(row, col, card);
     playerHands.get(currentPlayer).remove(card);
-
-    // Execute battle phase
     executeBattlePhase(new Position(row, col));
-
-    // Switch turns - store the next player color
     String nextPlayerColor = (currentPlayer == redPlayer) ? "BLUE" : "RED";
-
-    // Check for game over BEFORE switching turns
     boolean isGameFinished = isGridFull();
-
-    // Switch the turn using setCurrentPlayer to ensure proper notification
     setCurrentPlayer(nextPlayerColor);
-
-    // If game is over, notify after turn change
     if (isGameFinished) {
       gameOver = true;
       for (ModelFeatures listener : featureListeners) {
@@ -424,7 +405,6 @@ public class ThreeTriosGameModel implements MainModelInterface {
    */
 
   private int countPlayerCards(Player player) {
-    // Prevent recursive scoring
     if (isScoring) {
       return 0;
     }
@@ -432,12 +412,10 @@ public class ThreeTriosGameModel implements MainModelInterface {
     isScoring = true;
     int count = 0;
 
-    // Only count hand cards if game is NOT over
     if (!isGameOver()) {
       count += playerHands.get(player).size();
     }
 
-    // Count cards on the board
     for (int i = 0; i < grid.getRows(); i++) {
       for (int j = 0; j < grid.getCols(); j++) {
         Card card = grid.getCard(i, j);
@@ -453,9 +431,7 @@ public class ThreeTriosGameModel implements MainModelInterface {
 
   @Override
   public Grid getGrid() {
-    // Return a deep copy of the grid to prevent modification
     ThreeTriosGrid newGrid = new ThreeTriosGrid(grid.getRows(), grid.getCols(), getHoles());
-    // Copy all cards to the new grid
     for (int i = 0; i < grid.getRows(); i++) {
       for (int j = 0; j < grid.getCols(); j++) {
         Card card = grid.getCard(i, j);
@@ -579,8 +555,6 @@ public class ThreeTriosGameModel implements MainModelInterface {
     this.currentPlayer = newPlayer;
 
     if (changed) {
-      System.out.println("Current player changed to: " + newPlayer.getColor());
-      // Notify all listeners of the turn change
       for (ModelFeatures listener : featureListeners) {
         if (listener != null) {
           listener.notifyTurnChange(this.currentPlayer);

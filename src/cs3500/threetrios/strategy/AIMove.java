@@ -24,9 +24,6 @@ public class AIMove {
     if (position == null) {
       throw new IllegalArgumentException("Position cannot be null");
     }
-    if (score < 0) {
-      throw new IllegalArgumentException("Score cannot be negative");
-    }
     this.card = card;
     this.position = position;
     this.score = score;

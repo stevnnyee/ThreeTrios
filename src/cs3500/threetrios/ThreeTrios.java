@@ -11,12 +11,14 @@ import cs3500.threetrios.model.ThreeTriosGrid;
 import cs3500.threetrios.model.ThreeTriosCard;
 import cs3500.threetrios.strategy.CornerStrat;
 import cs3500.threetrios.strategy.DefensiveStrat;
+import cs3500.threetrios.strategy.MaxFlipsStrat;
 import cs3500.threetrios.strategy.MinimaxStrat;
 import cs3500.threetrios.view.ThreeTriosSwingView;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
 /**
  * Main class for the ThreeTrios game. This class initializes and starts the game with
  * a predefined board layout and randomly generated cards.
@@ -35,74 +37,57 @@ public final class ThreeTrios {
    *                                  is interrupted while waiting for the first move
    */
   public static void main(String[] args) {
-    // Get player types with default to human
     String redType = args.length > 0 ? args[0].toLowerCase() : "human";
     String blueType = args.length > 1 ? args[1].toLowerCase() : "human";
 
-    System.out.println("Starting game with Red=" + redType + ", Blue=" + blueType);
-
-    // Create and setup model
     ThreeTriosGameModel model = new ThreeTriosGameModel();
     setupGame(model);
 
-    // Get initial players
     Player redPlayer = model.getPlayers().get(0);
     Player bluePlayer = model.getPlayers().get(1);
 
-    // Create wrapped players
     redPlayer = createPlayer(redType, redPlayer);
     bluePlayer = createPlayer(blueType, bluePlayer);
 
-    // Create views
     ThreeTriosSwingView redView = new ThreeTriosSwingView(model);
     ThreeTriosSwingView blueView = new ThreeTriosSwingView(model);
 
-    // Create controllers
     ThreeTriosController redController = new ThreeTriosController(model, redView, redPlayer);
     ThreeTriosController blueController = new ThreeTriosController(model, blueView, bluePlayer);
 
-    // Set up views
     redView.setLocation(100, 100);
     blueView.setLocation(700, 100);
 
-    // Start the controllers
     redController.startGame();
     blueController.startGame();
-
-    // Print status
-    System.out.println("Game initialized with:");
-    System.out.println("Red player: " + redPlayer.getColor() + " (" + redType + ")");
-    System.out.println("Blue player: " + bluePlayer.getColor() + " (" + blueType + ")");
-    System.out.println("Current player: " + model.getCurrentPlayer().getColor());
   }
 
   private static Player createPlayer(String type, Player basePlayer) {
-    System.out.println("Creating player of type: " + type);
     switch (type.toLowerCase()) {
       case "human":
         return basePlayer;
       case "cornerstrat":
         AIPlayer ai1 = new AIPlayer(basePlayer);
         ai1.setStrategy(new CornerStrat());
-        System.out.println("Created AI player with CornerStrat for " + basePlayer.getColor());
         return ai1;
       case "defensivestrat":
         AIPlayer ai2 = new AIPlayer(basePlayer);
         ai2.setStrategy(new DefensiveStrat());
-        System.out.println("Created AI player with DefensiveStrat for " + basePlayer.getColor());
         return ai2;
       case "minimaxstrat":
         AIPlayer ai3 = new AIPlayer(basePlayer);
         ai3.setStrategy(new MinimaxStrat(new DefensiveStrat()));
-        System.out.println("Created AI player with MinimaxStrat for " + basePlayer.getColor());
         return ai3;
+      case "maxflipsstrat":  // New case
+        AIPlayer ai4 = new AIPlayer(basePlayer);
+        ai4.setStrategy(new MaxFlipsStrat());
+        return ai4;
       default:
-        throw new IllegalArgumentException("Unknown player type: " + type + ". Valid types are: human, cornerstrat, defensivestrat, minimaxstrat");
+        throw new IllegalArgumentException("Unknown player type");
     }
   }
 
   private static void setupGame(ThreeTriosGameModel model) {
-    // Your existing setup code
     int rows = 5;
     int cols = 7;
     boolean[][] holes = new boolean[rows][cols];
