@@ -42,6 +42,24 @@ public class AIMove {
   }
 
   /**
+   * Returns the row coordinate for this move.
+   *
+   * @return the row number
+   */
+  public int getRow() {
+    return position.row;
+  }
+
+  /**
+   * Returns the column coordinate for this move.
+   *
+   * @return the column number
+   */
+  public int getCol() {
+    return position.col;
+  }
+
+  /**
    * Returns the position associated with the AI move.
    *
    * @return the position of the card

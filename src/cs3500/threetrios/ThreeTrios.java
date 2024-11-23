@@ -35,62 +35,69 @@ public final class ThreeTrios {
    *                                  is interrupted while waiting for the first move
    */
   public static void main(String[] args) {
-    // Create model and initial setup
+    // Get player types with default to human
+    String redType = args.length > 0 ? args[0].toLowerCase() : "human";
+    String blueType = args.length > 1 ? args[1].toLowerCase() : "human";
+
+    System.out.println("Starting game with Red=" + redType + ", Blue=" + blueType);
+
+    // Create and setup model
     ThreeTriosGameModel model = new ThreeTriosGameModel();
     setupGame(model);
 
-    // Create views for both players
-    ThreeTriosSwingView redView = new ThreeTriosSwingView(model);
-    ThreeTriosSwingView blueView = new ThreeTriosSwingView(model);
-
-    // Configure players based on arguments
-    String redType = args.length > 0 ? args[0] : "human";
-    String blueType = args.length > 1 ? args[1] : "human";
-
+    // Get initial players
     Player redPlayer = model.getPlayers().get(0);
     Player bluePlayer = model.getPlayers().get(1);
 
-    // Create wrapped players based on type
-    Player redWrapped = createPlayer(redType, redPlayer);
-    Player blueWrapped = createPlayer(blueType, bluePlayer);
+    // Create wrapped players
+    redPlayer = createPlayer(redType, redPlayer);
+    bluePlayer = createPlayer(blueType, bluePlayer);
 
-    // Create and setup controllers
-    ThreeTriosController redController = new ThreeTriosController(model, redView, redWrapped);
-    ThreeTriosController blueController = new ThreeTriosController(model, blueView, blueWrapped);
+    // Create views
+    ThreeTriosSwingView redView = new ThreeTriosSwingView(model);
+    ThreeTriosSwingView blueView = new ThreeTriosSwingView(model);
 
-    // Add feature listeners
-    model.addFeaturesListener(redController);
-    model.addFeaturesListener(blueController);
-    redView.addViewFeatures(redController);
-    blueView.addViewFeatures(blueController);
+    // Create controllers
+    ThreeTriosController redController = new ThreeTriosController(model, redView, redPlayer);
+    ThreeTriosController blueController = new ThreeTriosController(model, blueView, bluePlayer);
 
-    // Position windows side by side
+    // Set up views
     redView.setLocation(100, 100);
     blueView.setLocation(700, 100);
 
-    // Start game
+    // Start the controllers
     redController.startGame();
     blueController.startGame();
+
+    // Print status
+    System.out.println("Game initialized with:");
+    System.out.println("Red player: " + redPlayer.getColor() + " (" + redType + ")");
+    System.out.println("Blue player: " + bluePlayer.getColor() + " (" + blueType + ")");
+    System.out.println("Current player: " + model.getCurrentPlayer().getColor());
   }
 
   private static Player createPlayer(String type, Player basePlayer) {
+    System.out.println("Creating player of type: " + type);
     switch (type.toLowerCase()) {
       case "human":
         return basePlayer;
-      case "strategy1":
+      case "cornerstrat":
         AIPlayer ai1 = new AIPlayer(basePlayer);
         ai1.setStrategy(new CornerStrat());
+        System.out.println("Created AI player with CornerStrat for " + basePlayer.getColor());
         return ai1;
-      case "strategy2":
+      case "defensivestrat":
         AIPlayer ai2 = new AIPlayer(basePlayer);
         ai2.setStrategy(new DefensiveStrat());
+        System.out.println("Created AI player with DefensiveStrat for " + basePlayer.getColor());
         return ai2;
-      case "strategy3":
+      case "minimaxstrat":
         AIPlayer ai3 = new AIPlayer(basePlayer);
-        ai3.setStrategy(new MinimaxStrat(new DefensiveStrat())); // Using DefensiveStrat as opponent strategy
+        ai3.setStrategy(new MinimaxStrat(new DefensiveStrat()));
+        System.out.println("Created AI player with MinimaxStrat for " + basePlayer.getColor());
         return ai3;
       default:
-        throw new IllegalArgumentException("Unknown player type: " + type);
+        throw new IllegalArgumentException("Unknown player type: " + type + ". Valid types are: human, cornerstrat, defensivestrat, minimaxstrat");
     }
   }
 
@@ -100,7 +107,6 @@ public final class ThreeTrios {
     int cols = 7;
     boolean[][] holes = new boolean[rows][cols];
 
-    // ... rest of your setup code ...
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
         holes[i][j] = true;

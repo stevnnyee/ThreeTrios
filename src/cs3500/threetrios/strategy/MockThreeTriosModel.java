@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cs3500.threetrios.features.ModelFeatures;
 import cs3500.threetrios.model.Card;
 import cs3500.threetrios.model.Grid;
 import cs3500.threetrios.model.MainModelInterface;
@@ -29,6 +30,7 @@ public class MockThreeTriosModel implements MainModelInterface {
   private Player winner;
   private boolean isGameOver;
   private Grid mockGrid;
+  private final List<ModelFeatures> featureListeners;
 
   /**
    * Constructs a new MockThreeTriosModel with default settings and logging capability.
@@ -49,6 +51,7 @@ public class MockThreeTriosModel implements MainModelInterface {
     this.currentPlayer = players.get(0);
     this.winner = null;
     this.isGameOver = false;
+    this.featureListeners = new ArrayList<>();
     initializeDefaultHand();
   }
 
@@ -128,6 +131,42 @@ public class MockThreeTriosModel implements MainModelInterface {
   }
 
   @Override
+  public void setCurrentPlayer(String color) {
+    log.append(String.format("Setting current player to: %s\n", color));
+
+    Player previousPlayer = this.currentPlayer;
+
+    if (color.equalsIgnoreCase("RED")) {
+      this.currentPlayer = players.get(0);  // RED is first player
+    } else if (color.equalsIgnoreCase("BLUE")) {
+      this.currentPlayer = players.get(1);  // BLUE is second player
+    } else {
+      throw new IllegalArgumentException("Invalid player color: " + color);
+    }
+
+    // Log the actual change
+    if (previousPlayer != this.currentPlayer) {
+      log.append(String.format("Current player changed from %s to %s\n",
+              previousPlayer.getColor(),
+              this.currentPlayer.getColor()));
+      // Notify listeners
+      for (ModelFeatures listener : featureListeners) {
+        log.append("Notifying listener of turn change\n");
+        listener.notifyTurnChange(this.currentPlayer);
+      }
+    }
+  }
+
+  @Override
+  public void addFeaturesListener(ModelFeatures listener) {
+    log.append("Adding features listener\n");
+    if (listener != null) {
+      featureListeners.add(listener);
+    }
+  }
+
+
+  @Override
   public void placeCard(Player player, int row, int col, Card card) {
     log.append(String.format("Placing card for player %s at (%d,%d)\n",
             player.getColor(), row, col));
@@ -200,6 +239,7 @@ public class MockThreeTriosModel implements MainModelInterface {
    * @param player the player to set as the current player
    */
   public void setCurrentPlayer(Player player) {
+    log.append(String.format("Setting current player directly to: %s\n", player.getColor()));
     this.currentPlayer = player;
   }
 }

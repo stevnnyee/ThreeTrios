@@ -20,12 +20,30 @@ public class StrategyUtil {
    * @return returns an AIMove representing the first available valid move
    */
   public static AIMove getDefaultMove(MainModelInterface model, Player player) {
-    for (int row = 0; row < model.getGridDimensions()[0]; row++) {
-      for (int col = 0; col < model.getGridDimensions()[1]; col++) {
+    if (model == null || player == null) {
+      throw new IllegalArgumentException("Model and player cannot be null");
+    }
+
+    // Get hand safely
+    List<Card> hand = model.getPlayerHand(player);
+    if (hand == null || hand.isEmpty()) {
+      throw new IllegalStateException("No cards in hand");
+    }
+
+    // Get dimensions safely
+    int[] dims = model.getGridDimensions();
+    int rows = dims[0];
+    int cols = dims[1];
+
+    // Find first valid move
+    for (int row = 0; row < rows; row++) {
+      for (int col = 0; col < cols; col++) {
         if (!model.isHole(row, col) && model.getCardAt(row, col) == null) {
-          List<Card> hand = model.getPlayerHand(player);
-          if (!hand.isEmpty()) {
-            return new AIMove(hand.get(0), new Position(row, col), 0);
+          // Try each card in hand
+          for (Card card : hand) {
+            if (model.canPlaceCard(row, col, card)) {
+              return new AIMove(card, new Position(row, col), 0);
+            }
           }
         }
       }

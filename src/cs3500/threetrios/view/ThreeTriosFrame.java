@@ -2,6 +2,7 @@ package cs3500.threetrios.view;
 
 
 
+import cs3500.threetrios.features.ViewFeatures;
 import cs3500.threetrios.model.Card;
 import cs3500.threetrios.model.Player;
 
@@ -22,4 +23,5 @@ public interface ThreeTriosFrame {
   void setTitle(String title);
 
   void setSelectedCard(Card card, Player player);
+  void addViewFeatures(ViewFeatures features);
 }

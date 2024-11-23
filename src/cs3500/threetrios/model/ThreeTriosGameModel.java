@@ -41,11 +41,18 @@ public class ThreeTriosGameModel implements MainModelInterface {
     this.grid = grid;
     initialize(grid);
     dealCards(deck);
-
-    this.currentPlayer = Math.random() < 0.5 ? redPlayer : bluePlayer;
-
     this.gameStarted = true;
     this.gameOver = false;
+
+    // Set initial player and notify listeners
+    setCurrentPlayer("RED");  // Start with RED player
+
+    // Notify all listeners that game has started with initial player
+    for (ModelFeatures listener : featureListeners) {
+      if (listener != null) {
+        listener.notifyTurnChange(this.currentPlayer);
+      }
+    }
   }
 
   /**
@@ -135,10 +142,12 @@ public class ThreeTriosGameModel implements MainModelInterface {
     grid.placeCard(row, col, card);
     playerHands.get(player).remove(card);
     executeBattlePhase(new Position(row, col));
-    currentPlayer = (currentPlayer == redPlayer) ? bluePlayer : redPlayer;
-    for (ModelFeatures listener : featureListeners) {
-      listener.notifyTurnChange(currentPlayer);
-    }
+
+    // Switch turns and notify listeners
+    String nextPlayer = (currentPlayer == redPlayer) ? "BLUE" : "RED";
+    setCurrentPlayer(nextPlayer);  // This will handle notification
+
+    // Check for game over
     gameOver = isGridFull();
     if (gameOver) {
       for (ModelFeatures listener : featureListeners) {
@@ -150,7 +159,32 @@ public class ThreeTriosGameModel implements MainModelInterface {
   // Keep the old method for backward compatibility if needed, internally calling the new one
   @Override
   public void placeCard(int row, int col, Card card) {
-    placeCard(currentPlayer, row, col, card);
+    // First validate the move
+    validateMove(getCurrentPlayer(), row, col, card);
+
+    // Place the card
+    grid.placeCard(row, col, card);
+    playerHands.get(currentPlayer).remove(card);
+
+    // Execute battle phase
+    executeBattlePhase(new Position(row, col));
+
+    // Switch turns - store the next player color
+    String nextPlayerColor = (currentPlayer == redPlayer) ? "BLUE" : "RED";
+
+    // Check for game over BEFORE switching turns
+    boolean isGameFinished = isGridFull();
+
+    // Switch the turn using setCurrentPlayer to ensure proper notification
+    setCurrentPlayer(nextPlayerColor);
+
+    // If game is over, notify after turn change
+    if (isGameFinished) {
+      gameOver = true;
+      for (ModelFeatures listener : featureListeners) {
+        listener.notifyGameOver(determineWinner());
+      }
+    }
   }
 
   /**
@@ -526,11 +560,32 @@ public class ThreeTriosGameModel implements MainModelInterface {
    *
    * @param color the color to set the player
    */
+  @Override
   public void setCurrentPlayer(String color) {
-    if (color.equals("RED")) {
-      this.currentPlayer = redPlayer;
+    if (color == null) {
+      throw new IllegalArgumentException("Color cannot be null");
+    }
+
+    Player newPlayer;
+    if (color.equalsIgnoreCase("RED")) {
+      newPlayer = redPlayer;
+    } else if (color.equalsIgnoreCase("BLUE")) {
+      newPlayer = bluePlayer;
     } else {
-      this.currentPlayer = bluePlayer;
+      throw new IllegalArgumentException("Invalid player color: " + color);
+    }
+
+    boolean changed = (this.currentPlayer != newPlayer);
+    this.currentPlayer = newPlayer;
+
+    if (changed) {
+      System.out.println("Current player changed to: " + newPlayer.getColor());
+      // Notify all listeners of the turn change
+      for (ModelFeatures listener : featureListeners) {
+        if (listener != null) {
+          listener.notifyTurnChange(this.currentPlayer);
+        }
+      }
     }
   }
 
