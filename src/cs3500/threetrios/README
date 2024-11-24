@@ -157,3 +157,17 @@ Implementation:
 Test Coverage:
   - The tests checking if this strategy works properly are located in test/StrategyTests.java.
   - The mock inside of the strategy package assists with the testing.
+
+
+Changes for part 3:
+  - Implemented a Features interface to handle player actions (card selection and grid placement)
+  and model status notifications ("your turn" events).
+  - Created a controller for each player that mediates between the model, view, and player strategy.
+  Each controller ensures players can only act on their turn and prevents invalid moves.
+  - Enhanced the model with a startGame() method and the ability to notify players
+  when it's their turn through a listener pattern.
+  - Updated the main method to support different player configurations (human vs. AI)
+  through command-line arguments.
+  - Added error handling to display invalid move messages to users through dialog boxes instead of
+  console output.
+  - Implemented game-end notifications to display the winner and final score through the UI.

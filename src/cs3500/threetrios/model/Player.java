@@ -47,7 +47,24 @@ public interface Player {
    */
   int countOwnedCards(Grid grid);
 
+  /**
+   * Sets the AI strategy that this player will use to determine their moves.
+   * This strategy defines the decision-making logic for the player's turns.
+   *
+   * @param strategy the AI strategy implementation to be used by this player
+   * @throws IllegalArgumentException if the provided strategy is null
+   */
   void setStrategy(AIStrategy strategy);
 
+  /**
+   * Determines and returns the next move for this player using their current AI strategy
+   * and the current state of the game. The move is calculated based on the strategy's
+   * logic and the information available in the game model.
+   *
+   * @param model the current game state and rules interface
+   * @return an AIMove object representing the player's chosen move
+   * @throws IllegalStateException    if no strategy has been set for this player
+   * @throws IllegalArgumentException if the provided model is null
+   */
   AIMove getNextMove(MainModelInterface model);
 }
