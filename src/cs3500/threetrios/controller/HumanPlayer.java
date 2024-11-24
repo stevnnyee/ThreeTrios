@@ -18,7 +18,6 @@ import cs3500.threetrios.strategy.AIMove;
  */
 public class HumanPlayer implements Player {
   private final Player basePlayer;
-  private final ViewFeatures features;
 
   /**
    * Constructs a new human player that wraps around an existing base player.
@@ -33,7 +32,6 @@ public class HumanPlayer implements Player {
       throw new IllegalArgumentException("Baseplayer or features cannot be null.");
     }
     this.basePlayer = basePlayer;
-    this.features = features;
   }
 
   @Override

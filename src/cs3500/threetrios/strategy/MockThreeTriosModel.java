@@ -161,6 +161,16 @@ public class MockThreeTriosModel implements MainModelInterface {
     }
   }
 
+  /**
+   * Sets the current active player.
+   *
+   * @param player the player to set as the current player
+   */
+  public void setCurrentPlayer(Player player) {
+    log.append(String.format("Setting current player directly to: %s\n", player.getColor()));
+    this.currentPlayer = player;
+  }
+
   @Override
   public void addFeaturesListener(ModelFeatures listener) {
     log.append("Adding features listener\n");
@@ -235,15 +245,5 @@ public class MockThreeTriosModel implements MainModelInterface {
     if (this.mockHand.isEmpty()) {
       initializeDefaultHand();
     }
-  }
-
-  /**
-   * Sets the current active player.
-   *
-   * @param player the player to set as the current player
-   */
-  public void setCurrentPlayer(Player player) {
-    log.append(String.format("Setting current player directly to: %s\n", player.getColor()));
-    this.currentPlayer = player;
   }
 }

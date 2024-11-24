@@ -1,7 +1,6 @@
 package cs3500.threetrios;
 
 import cs3500.threetrios.controller.AIPlayer;
-import cs3500.threetrios.controller.HumanPlayer;
 import cs3500.threetrios.controller.ThreeTriosController;
 import cs3500.threetrios.model.ThreeTriosGameModel;
 import cs3500.threetrios.model.Grid;
@@ -78,7 +77,7 @@ public final class ThreeTrios {
         AIPlayer ai3 = new AIPlayer(basePlayer);
         ai3.setStrategy(new MinimaxStrat(new DefensiveStrat()));
         return ai3;
-      case "maxflipsstrat":  // New case
+      case "maxflipsstrat":
         AIPlayer ai4 = new AIPlayer(basePlayer);
         ai4.setStrategy(new MaxFlipsStrat());
         return ai4;
@@ -128,10 +127,20 @@ public final class ThreeTrios {
 
       if (i <= 6) {
         switch (i % 4) {
-          case 0: north = 10; break;
-          case 1: south = 10; break;
-          case 2: east = 10; break;
-          case 3: west = 10; break;
+          case 0:
+            north = 10;
+            break;
+          case 1:
+            south = 10;
+            break;
+          case 2:
+            east = 10;
+            break;
+          case 3:
+            west = 10;
+            break;
+          default:
+            break;
         }
       }
       deck.add(new ThreeTriosCard("card" + i, north, south, east, west));

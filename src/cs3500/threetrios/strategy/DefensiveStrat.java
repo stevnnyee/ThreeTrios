@@ -18,8 +18,6 @@ public class DefensiveStrat implements AIStrategy {
     if (model == null || player == null) {
       throw new IllegalArgumentException("Model and player cannot be null");
     }
-
-    // Get hand directly from model using player's color
     List<Card> hand = null;
     for (Player p : model.getPlayers()) {
       if (p.getColor().equals(player.getColor())) {
@@ -43,8 +41,7 @@ public class DefensiveStrat implements AIStrategy {
         for (Card card : hand) {
           if (model.canPlaceCard(row, col, card)) {
             int defensibility = calculateDefensibility(model, new Position(row, col), card, player);
-            // Add a base score to ensure positive values
-            int adjustedScore = defensibility + 1000; // Offset negative scores
+            int adjustedScore = defensibility + 1000;
             possibleMoves.add(new AIMove(card, new Position(row, col), adjustedScore));
           }
         }
@@ -69,7 +66,8 @@ public class DefensiveStrat implements AIStrategy {
    * @param player the current player
    * @return an integer representing the defensibility of the move
    */
-  private int calculateDefensibility(MainModelInterface model, Position pos, Card card, Player player) {
+  private int calculateDefensibility(MainModelInterface model, Position pos,
+                                     Card card, Player player) {
     if (pos == null || card == null) {
       throw new IllegalArgumentException("Position and card cannot be null");
     }
@@ -90,13 +88,11 @@ public class DefensiveStrat implements AIStrategy {
     List<Card> opponentHand = model.getPlayerHand(opponent);
     Direction[] directions = {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
 
-    // Base score for card strength
     score += (card.getAttackPower(Direction.NORTH) +
             card.getAttackPower(Direction.SOUTH) +
             card.getAttackPower(Direction.EAST) +
             card.getAttackPower(Direction.WEST)) * 5;
 
-    // Evaluate position defensibility
     for (Direction dir : directions) {
       Position adjPos = getAdjacentPosition(pos, dir);
       if (isValidPosition(adjPos, model)) {
@@ -106,9 +102,9 @@ public class DefensiveStrat implements AIStrategy {
             vulnerableToFlips++;
           }
         }
-        score -= vulnerableToFlips * 50;  // Reduced penalty
+        score -= vulnerableToFlips * 50;
       } else {
-        score += 25;  // Bonus for edge positions
+        score += 25;
       }
     }
 

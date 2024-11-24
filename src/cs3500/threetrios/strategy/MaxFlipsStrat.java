@@ -19,8 +19,6 @@ public class MaxFlipsStrat implements AIStrategy {
   public AIMove findBestMove(MainModelInterface model, Player player) {
     validateInputs(model, player);
     List<Card> hand = getPlayerHand(model, player);
-
-    // Handle empty hand case by returning default move
     if (hand == null || hand.isEmpty()) {
       return new AIMove(new MockCard("defaultCard", 5, 5, 5, 5),
               new Position(0, 0), 0);

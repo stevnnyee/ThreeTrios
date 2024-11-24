@@ -245,10 +245,14 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
     private int findCardIndex(Card card) {
       try {
         Player player = getPlayer();
-        if (player == null || card == null) return -1;
+        if (player == null || card == null) {
+          return -1;
+        }
 
         List<Card> hand = model.getPlayerHand(player);
-        if (hand == null) return -1;
+        if (hand == null) {
+          return -1;
+        }
 
         for (int i = 0; i < hand.size(); i++) {
           Card handCard = hand.get(i);

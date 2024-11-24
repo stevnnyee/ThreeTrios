@@ -83,8 +83,8 @@ public class AIMove {
    *
    * @param other the other AI move
    * @return positive if the position comes after other,
-   * negative if the position comes before,
-   * 0 if the positions are the same
+   *     negative if the position comes before,
+   *     0 if the positions are the same
    */
   public int comparePosition(AIMove other) {
     if (this.position.row != other.position.row) {

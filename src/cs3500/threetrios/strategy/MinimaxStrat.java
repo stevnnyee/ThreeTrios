@@ -5,7 +5,6 @@ import cs3500.threetrios.model.Direction;
 import cs3500.threetrios.model.MainModelInterface;
 import cs3500.threetrios.model.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -119,8 +118,8 @@ public class MinimaxStrat implements AIStrategy {
    * @return the evaluated score for the move
    * @throws IllegalArgumentException if card ownership is invalid
    */
-  private int evaluateMove(MainModelInterface model, Position pos, Card card, Player currentPlayer) {
-    // Validate card ownership
+  private int evaluateMove(MainModelInterface model, Position pos,
+                           Card card, Player currentPlayer) {
     Player cardOwner = model.getCardOwnerAt(pos.row, pos.col);
     if (cardOwner != null && !cardOwner.getColor().equals(currentPlayer.getColor())) {
       throw new IllegalArgumentException("Invalid card owner");
@@ -132,8 +131,6 @@ public class MinimaxStrat implements AIStrategy {
     if (opponent == null) {
       return immediateScore;
     }
-
-    // Evaluate opponent's best response
     try {
       AIMove opponentMove = opponentStrategy.findBestMove(model, opponent);
       int opponentScore = opponentMove.getScore();
@@ -168,32 +165,28 @@ public class MinimaxStrat implements AIStrategy {
    * @param player the current player
    * @return the immediate score for the move
    */
-  private int calculateImmediateScore(MainModelInterface model, Position pos, Card card, Player player) {
+  private int calculateImmediateScore(MainModelInterface model, Position pos, Card card,
+                                      Player player) {
     int score = 0;
 
-    // Validate flip count
     int flips = model.getFlippableCards(pos.row, pos.col, card);
     if (flips < 0) {
       throw new IllegalArgumentException("Invalid flip count");
     }
 
     score += flips * 1000;
-
-    // Card strength is second priority
     score += (card.getAttackPower(Direction.NORTH) +
             card.getAttackPower(Direction.SOUTH) +
             card.getAttackPower(Direction.EAST) +
             card.getAttackPower(Direction.WEST)) * 10;
 
-    // Position value
     if ((pos.row == 0 || pos.row == model.getGridDimensions()[0] - 1) &&
             (pos.col == 0 || pos.col == model.getGridDimensions()[1] - 1)) {
-      score += 500; // Corner bonus
+      score += 500;
     } else if (pos.row == 0 || pos.row == model.getGridDimensions()[0] - 1 ||
             pos.col == 0 || pos.col == model.getGridDimensions()[1] - 1) {
-      score += 200; // Edge bonus
+      score += 200;
     }
-
     return score;
   }
 }

@@ -91,7 +91,8 @@ public class CornerStrat implements AIStrategy {
    * @param dimensions the grid dimensions
    * @return the best move found, or null if no valid corner moves exist
    */
-  private AIMove findBestMoveInCorners(MainModelInterface model, List<Card> hand, int[] dimensions) {
+  private AIMove findBestMoveInCorners(MainModelInterface model,
+                                       List<Card> hand, int[] dimensions) {
     List<Position> corners = getCornerPositions(dimensions[0], dimensions[1]);
     return findBestMoveInPositions(model, hand, corners);
   }

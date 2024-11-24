@@ -44,9 +44,9 @@ public class ThreeTriosController implements ModelFeatures, ViewFeatures {
     this.controlledPlayer = player;
 
     Player currentPlayer = model.getCurrentPlayer();
-    this.isMyTurn = (currentPlayer != null &&
-            player != null &&
-            currentPlayer.getColor().equals(player.getColor()));
+    this.isMyTurn = (currentPlayer != null
+            && player != null
+            && currentPlayer.getColor().equals(player.getColor()));
     model.addFeaturesListener(this);
 
     if (view instanceof ThreeTriosSwingView) {
@@ -177,9 +177,7 @@ public class ThreeTriosController implements ModelFeatures, ViewFeatures {
       if (model.canPlaceCard(move.getRow(), move.getCol(), card)) {
         model.placeCard(move.getRow(), move.getCol(), card);
         view.refresh();
-      } else {
       }
-
     } catch (Exception e) {
       e.printStackTrace();
     }
