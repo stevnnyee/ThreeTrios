@@ -157,3 +157,59 @@ Implementation:
 Test Coverage:
   - The tests checking if this strategy works properly are located in test/StrategyTests.java.
   - The mock inside of the strategy package assists with the testing.
+
+
+Changes for part 3:
+  - Implemented a Features interface to handle player actions (card selection and grid placement)
+  and model status notifications ("your turn" events).
+  - Created a controller for each player that mediates between the model, view, and player strategy.
+  Each controller ensures players can only act on their turn and prevents invalid moves.
+  - Updated the main method to support different player configurations (human vs. AI)
+  through command-line arguments.
+  - Added error handling to display invalid move messages to users through dialog boxes instead of
+  console output.
+  - Implemented game-end notifications to display the winner and final score through the UI.
+  - We did not make any major changes to our model from the previous assignment.
+
+Homework 7 Source Organization and Explanations:
+
+  features/
+    ViewFeatures.java
+    │ // Interface for handling user interaction events from the view component of the game,
+    │    such as selecting cards or grid cells.
+    │ // Methods
+    │ - void onCardSelected(Player player, Card card)
+    │ - void onCellSelected(int row, int col)
+
+    ModelFeatures.java
+    │ // Interface for handling model-related game events and notifying observers of significant
+    │    changes in the game state.
+    │ // Methods
+    │ - void notifyTurnChange(Player player)
+    │ - void notifyGameOver(Player winner)
+
+  controller/
+    HumanPlayer.java
+    │ // Implementation for human players
+    │ - Doesn't generate moves, just implements Player interface
+
+    AIPlayer.java
+    │ // Implementation for computer players
+    │ - Uses strategy to generate moves
+    │ - Shows player actions when strategy decides on a move
+
+    ThreeTriosController.java
+    │ // Main controller class
+    │ - Listens to both features interfaces
+    │ - Coordinates between model, view, and player
+    │ - Handles error messages and game state updates
+    │ - Controller for the ThreeTrios game that manages game flow and coordinates between the model,
+    │ - view, and players. Handles both human and AI player interactions, processing view events for
+    │ - human players and automatically triggering moves for AI players.
+
+    ThreeTrios.java
+    │ // Main class updates
+    │ - Modified the main to handle command-line arguments that specify player types.
+    │ - Create appropriate player instances
+    │ - Set up controllers and views
+    │ - Like previously, start the game
