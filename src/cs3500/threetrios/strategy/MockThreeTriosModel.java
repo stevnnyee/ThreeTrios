@@ -87,7 +87,11 @@ public class MockThreeTriosModel implements MainModelInterface {
   @Override
   public List<Card> getPlayerHand(Player player) {
     log.append("Getting hand for player: ").append(player.getColor()).append("\n");
-    return new ArrayList<>(mockHand);
+    List<Card> hand = new ArrayList<>(player.getHand());
+    if (hand.isEmpty()) {
+      hand.add(new MockCard("defaultCard", 5, 5, 5, 5));
+    }
+    return hand;
   }
 
   @Override

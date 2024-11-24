@@ -34,7 +34,6 @@ public class DefensiveStrat implements AIStrategy {
 
     List<AIMove> possibleMoves = new ArrayList<>();
 
-    // Rest of your existing code stays the same
     for (int row = 0; row < model.getGridDimensions()[0]; row++) {
       for (int col = 0; col < model.getGridDimensions()[1]; col++) {
         if (model.isHole(row, col) || model.getCardAt(row, col) != null) {

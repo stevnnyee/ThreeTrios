@@ -24,6 +24,9 @@ public class AIMove {
     if (position == null) {
       throw new IllegalArgumentException("Position cannot be null");
     }
+    if (score < 0) {
+      throw new IllegalArgumentException("Score cannot be negative");
+    }
     this.card = card;
     this.position = position;
     this.score = score;
@@ -80,8 +83,8 @@ public class AIMove {
    *
    * @param other the other AI move
    * @return positive if the position comes after other,
-   *         negative if the position comes before,
-   *         0 if the positions are the same
+   * negative if the position comes before,
+   * 0 if the positions are the same
    */
   public int comparePosition(AIMove other) {
     if (this.position.row != other.position.row) {
