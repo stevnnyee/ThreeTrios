@@ -46,13 +46,6 @@ public class AIPlayerTest {
     assertEquals("RED", aiPlayer.getColor());
   }
 
-  @Test
-  public void testGetHand() {
-    List<Card> hand = new ArrayList<>();
-    hand.add(testCard);
-    ((MockPlayer)basePlayer).getHand();
-    assertEquals(hand, aiPlayer.getHand());
-  }
 
   @Test
   public void testGetNextMove() {

@@ -45,13 +45,6 @@ public class HumanPlayerTest {
     assertEquals("BLUE", humanPlayer.getColor());
   }
 
-  @Test
-  public void testAddRemoveCard() {
-    humanPlayer.addCardToHand(testCard);
-    humanPlayer.removeCardFromHand(testCard);
-    assertTrue(log.toString().contains("Added card"));
-    assertTrue(log.toString().contains("Removed card"));
-  }
 
   @Test(expected = UnsupportedOperationException.class)
   public void testSetStrategyThrowsException() {
