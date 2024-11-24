@@ -212,4 +212,4 @@ Homework 7 Source Organization and Explanations:
     │ - Modified the main to handle command-line arguments that specify player types.
     │ - Create appropriate player instances
     │ - Set up controllers and views
-    │ - Start the game
+    │ - Like previously, start the game
