@@ -15,7 +15,6 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.BorderLayout;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -216,20 +215,14 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
       }
 
       int cardSpacing = getHeight() / hand.size();
+      int cardIndex = Math.min((p.y / cardSpacing), hand.size() - 1);
 
-      for (int i = 0; i < hand.size(); i++) {
-        Rectangle cardBounds = new Rectangle(10,
-                i * cardSpacing + 5,
-                getWidth() - 20,
-                cardSpacing - 10);
+      System.out.println("Hand click at index: " + cardIndex);
 
-        if (cardBounds.contains(p)) {
-          Card clickedCard = hand.get(i);
-          // Let the controller handle the turn checking
-          if (features != null) {
-            features.onCardSelected(player, clickedCard);
-          }
-          break;
+      if (cardIndex >= 0 && cardIndex < hand.size()) {
+        Card clickedCard = hand.get(cardIndex);
+        if (features != null) {
+          features.onCardSelected(player, clickedCard);
         }
       }
     }
@@ -312,26 +305,14 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
      * @param p the point where the mouse is clicked
      */
     private void handleGridClick(Point p) {
-      if (selectedCard == null || selectedCardPlayer == null) {
-        return;
-      }
-
-      // Check if it's the selected card's player's turn
-      if (!selectedCardPlayer.getColor().equals(model.getCurrentPlayer().getColor())) {
-        selectedCard = null;
-        selectedCardPlayer = null;
-        leftHandPanel.selectedCardIndex = -1;
-        rightHandPanel.selectedCardIndex = -1;
-        refresh();
-        return;
-      }
-
       Dimension cellSize = getCellSize();
       int row = p.y / cellSize.height;
       int col = p.x / cellSize.width;
 
-      if (row >= 0 && row < model.getGridDimensions()[0] &&
-              col >= 0 && col < model.getGridDimensions()[1]) {
+      // Print coordinates for debugging
+      System.out.println("Grid click at: " + row + "," + col);
+
+      if (row >= 0 && row < GRID_ROWS && col >= 0 && col < GRID_COLS) {
         if (features != null) {
           features.onCellSelected(row, col);
         }
