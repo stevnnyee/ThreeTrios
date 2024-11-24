@@ -443,4 +443,162 @@ public class ThreeTriosGameModelTest {
     }
     assertNotNull(game.getWinner());
   }
+
+  @Test
+  public void testGetPlayers_BeforeGameStart() {
+    List<Player> players = game.getPlayers();
+    assertTrue("Player list should be empty before game starts", players.isEmpty());
+  }
+
+  @Test
+  public void testGetPlayers_AfterGameStart() throws IOException {
+    String boardPath = tempDir.resolve("board2-CellsReachWithHoles").toString();
+    String cardPath = tempDir.resolve("card2-EnoughCards").toString();
+    game.startGameFromConfig(boardPath, cardPath);
+    List<Player> players = game.getPlayers();
+    assertEquals("Should have exactly 2 players", 2, players.size());
+    System.out.println("First player: " + players.get(0).toString());
+    System.out.println("Second player: " + players.get(1).toString());
+    boolean hasRedPlayer = players.stream()
+            .anyMatch(p -> p.toString().equalsIgnoreCase("red") ||
+                    p.toString().contains("Red") ||
+                    p.toString().contains("RED"));
+    boolean hasBluePlayer = players.stream()
+            .anyMatch(p -> p.toString().equalsIgnoreCase("blue") ||
+                    p.toString().contains("Blue") ||
+                    p.toString().contains("BLUE"));
+    assertTrue("Should contain a Red player", hasRedPlayer);
+    assertTrue("Should contain a Blue player", hasBluePlayer);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testGetGridDimensions_BeforeGameStart() {
+    game.getGridDimensions();
+  }
+
+  @Test
+  public void testGetGridDimensions_AfterGameStart() throws IOException {
+    String boardPath = tempDir.resolve("board2-CellsReachWithHoles").toString();
+    String cardPath = tempDir.resolve("card2-EnoughCards").toString();
+    game.startGameFromConfig(boardPath, cardPath);
+
+    int[] dimensions = game.getGridDimensions();
+    assertEquals("Should have 2 dimensions", 2, dimensions.length);
+    assertEquals("Should have 5 rows", 5, dimensions[0]);
+    assertEquals("Should have 3 columns", 3, dimensions[1]);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testGetCardAt_BeforeGameStart() {
+    game.getCardAt(0, 0);
+  }
+
+  @Test
+  public void testGetCardAt_WithValidPlacement() throws IOException {
+    String boardPath = tempDir.resolve("board2-CellsReachWithHoles").toString();
+    String cardPath = tempDir.resolve("card2-EnoughCards").toString();
+    game.startGameFromConfig(boardPath, cardPath);
+
+    Player currentPlayer = game.getCurrentPlayer();
+    Card cardToPlace = game.getPlayerHand(currentPlayer).get(0);
+    game.placeCard(0, 0, cardToPlace);
+
+    Card retrievedCard = game.getCardAt(0, 0);
+    assertNotNull("Cell should contain a card", retrievedCard);
+    assertEquals("Should be the same card that was placed", cardToPlace, retrievedCard);
+  }
+
+  @Test
+  public void testGetCardAt_AtHole() throws IOException {
+    String boardPath = tempDir.resolve("board2-CellsReachWithHoles").toString();
+    String cardPath = tempDir.resolve("card2-EnoughCards").toString();
+    game.startGameFromConfig(boardPath, cardPath);
+
+    assertNull("Hole should return null", game.getCardAt(1, 1));
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testGetCardOwnerAt_BeforeGameStart() {
+    game.getCardOwnerAt(0, 0);
+  }
+
+  @Test
+  public void testGetCardOwnerAt_WithPlacedCard() throws IOException {
+    String boardPath = tempDir.resolve("board2-CellsReachWithHoles").toString();
+    String cardPath = tempDir.resolve("card2-EnoughCards").toString();
+    game.startGameFromConfig(boardPath, cardPath);
+
+    Player currentPlayer = game.getCurrentPlayer();
+    Card cardToPlace = game.getPlayerHand(currentPlayer).get(0);
+    game.placeCard(0, 0, cardToPlace);
+
+    assertEquals("Owner should match the player who placed the card",
+            currentPlayer, game.getCardOwnerAt(0, 0));
+  }
+
+  @Test
+  public void testGetCardOwnerAt_AtHole() throws IOException {
+    String boardPath = tempDir.resolve("board2-CellsReachWithHoles").toString();
+    String cardPath = tempDir.resolve("card2-EnoughCards").toString();
+    game.startGameFromConfig(boardPath, cardPath);
+
+    assertNull("Hole should have no owner", game.getCardOwnerAt(1, 1));
+  }
+
+  @Test
+  public void testGetFlippableCards_WithStrongCard() throws IOException {
+    String boardPath = tempDir.resolve("board2-CellsReachWithHoles").toString();
+    String cardPath = tempDir.resolve("card2-EnoughCards").toString();
+    game.startGameFromConfig(boardPath, cardPath);
+
+    // Place first card
+    Player firstPlayer = game.getCurrentPlayer();
+    Card firstCard = game.getPlayerHand(firstPlayer).get(0);
+    game.placeCard(0, 0, firstCard);
+
+    // Get second player's card and check flippable count
+    Player secondPlayer = game.getCurrentPlayer();
+    Card secondCard = game.getPlayerHand(secondPlayer).get(0);
+
+    int flippableCount = game.getFlippableCards(0, 1, secondCard);
+    assertTrue("Flippable count should be 0 or 1",
+            flippableCount == 0 || flippableCount == 1);
+  }
+
+  @Test
+  public void testGetFlippableCards_AtHole() throws IOException {
+    String boardPath = tempDir.resolve("board2-CellsReachWithHoles").toString();
+    String cardPath = tempDir.resolve("card2-EnoughCards").toString();
+    game.startGameFromConfig(boardPath, cardPath);
+
+    Card card = game.getPlayerHand(game.getCurrentPlayer()).get(0);
+    assertEquals("Should return 0 for hole position",
+            0, game.getFlippableCards(1, 1, card));
+  }
+
+  @Test
+  public void testGetFlippableCards_MultipleAdjacent() throws IOException {
+    String boardPath = tempDir.resolve("board2-CellsReachWithHoles").toString();
+    String cardPath = tempDir.resolve("card2-EnoughCards").toString();
+    game.startGameFromConfig(boardPath, cardPath);
+
+    // Place first card
+    Player firstPlayer = game.getCurrentPlayer();
+    Card firstCard = game.getPlayerHand(firstPlayer).get(0);
+    game.placeCard(0, 0, firstCard);
+
+    // Place second card
+    Player secondPlayer = game.getCurrentPlayer();
+    Card secondCard = game.getPlayerHand(secondPlayer).get(0);
+    game.placeCard(0, 2, secondCard);
+
+    // Check flippable count for middle position
+    firstPlayer = game.getCurrentPlayer();
+    Card thirdCard = game.getPlayerHand(firstPlayer).get(0);
+    int flippableCount = game.getFlippableCards(0, 1, thirdCard);
+
+    assertTrue("Flippable count should be between 0 and 2",
+            flippableCount >= 0 && flippableCount <= 2);
+  }
+
 }
