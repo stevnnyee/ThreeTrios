@@ -43,11 +43,7 @@ public class ThreeTriosGameModel implements MainModelInterface {
     dealCards(deck);
     this.gameStarted = true;
     this.gameOver = false;
-
-    // Set initial player and notify listeners
-    setCurrentPlayer("RED");  // Start with RED player
-
-    // Notify all listeners that game has started with initial player
+    setCurrentPlayer("RED");
     for (ModelFeatures listener : featureListeners) {
       if (listener != null) {
         listener.notifyTurnChange(this.currentPlayer);
@@ -124,7 +120,6 @@ public class ThreeTriosGameModel implements MainModelInterface {
     playerHands.get(redPlayer).clear();
     playerHands.get(bluePlayer).clear();
 
-    // Deal cards to each player
     for (int i = 0; i < handSize; i++) {
       Card redCard = shuffledDeck.get(i);
       Card blueCard = shuffledDeck.get(i + handSize);
@@ -266,7 +261,6 @@ public class ThreeTriosGameModel implements MainModelInterface {
           continue;
         }
 
-        // Only battle against opponent's cards
         if (adjacentCard.getOwner() != currentCard.getOwner()) {
           if (checkCardWinsBattle(currentPos, adjPos)) {
             adjacentCard.setOwner(currentCard.getOwner());

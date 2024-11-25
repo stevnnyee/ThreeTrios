@@ -148,12 +148,10 @@ public class MockThreeTriosModel implements MainModelInterface {
       throw new IllegalArgumentException("Invalid player color: " + color);
     }
 
-    // Log the actual change
     if (previousPlayer != this.currentPlayer) {
       log.append(String.format("Current player changed from %s to %s\n",
               previousPlayer.getColor(),
               this.currentPlayer.getColor()));
-      // Notify listeners
       for (ModelFeatures listener : featureListeners) {
         log.append("Notifying listener of turn change\n");
         listener.notifyTurnChange(this.currentPlayer);
