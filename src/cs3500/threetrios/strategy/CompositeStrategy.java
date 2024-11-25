@@ -48,14 +48,11 @@ public class CompositeStrategy implements AIStrategy {
   @Override
   public AIMove findBestMove(MainModelInterface model, Player player) {
     List<AIMove> allMoves = new ArrayList<>();
-
-    // Get moves from all strategies
     for (int row = 0; row < model.getGridDimensions()[0]; row++) {
       for (int col = 0; col < model.getGridDimensions()[1]; col++) {
         for (Card card : model.getPlayerHand(player)) {
           if (model.canPlaceCard(row, col, card)) {
             int totalScore = 0;
-            // Calculate weighted score from each strategy
             for (WeightedStrategy ws : strategies) {
               AIMove move = ws.strategy.findBestMove(model, player);
               if (move.getPosition().row == row && move.getPosition().col == col

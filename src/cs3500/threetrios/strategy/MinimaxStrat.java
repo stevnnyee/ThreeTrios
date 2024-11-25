@@ -90,7 +90,6 @@ public class MinimaxStrat implements AIStrategy {
         for (Card card : hand) {
           if (model.canPlaceCard(row, col, card)) {
             int score = evaluateMove(model, new Position(row, col), card, player);
-            // Ensure positive score and create new card instance
             if (score > bestScore) {
               Card moveCard = new MockCard(card.getName(),
                       card.getAttackPower(Direction.NORTH),
@@ -134,7 +133,7 @@ public class MinimaxStrat implements AIStrategy {
     try {
       AIMove opponentMove = opponentStrategy.findBestMove(model, opponent);
       int opponentScore = opponentMove.getScore();
-      return immediateScore - (opponentScore / 2); // Weight opponent moves less
+      return immediateScore - (opponentScore / 2);
     } catch (Exception e) {
       return immediateScore;
     }

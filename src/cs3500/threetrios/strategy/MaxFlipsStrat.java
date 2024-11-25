@@ -76,8 +76,6 @@ public class MaxFlipsStrat implements AIStrategy {
     if (dimensions[0] <= 0 || dimensions[1] <= 0) {
       throw new IllegalStateException("Invalid grid dimensions");
     }
-
-    // Try all possible moves
     for (int row = 0; row < dimensions[0]; row++) {
       for (int col = 0; col < dimensions[1]; col++) {
         if (model.isHole(row, col) || model.getCardAt(row, col) != null) {
@@ -112,7 +110,6 @@ public class MaxFlipsStrat implements AIStrategy {
       if (model.canPlaceCard(row, col, card)) {
         int score = calculateScore(model, card, row, col);
         if (score > bestScore) {
-          // Create a new card to preserve identity
           Card moveCard = new MockCard(card.getName(),
                   card.getAttackPower(Direction.NORTH),
                   card.getAttackPower(Direction.SOUTH),
@@ -140,14 +137,8 @@ public class MaxFlipsStrat implements AIStrategy {
   private int calculateScore(MainModelInterface model, Card card, int row, int col) {
     int flips = model.getFlippableCards(row, col, card);
     int cardStrength = calculateCardStrength(card);
-
-    // Base score from flips
     int score = flips * 1000;
-
-    // Add card strength bonus
     score += cardStrength * 10;
-
-    // Add position bonus
     score += calculatePositionBonus(model, row, col);
 
     return score;
@@ -177,10 +168,10 @@ public class MaxFlipsStrat implements AIStrategy {
   private int calculatePositionBonus(MainModelInterface model, int row, int col) {
     if ((row == 0 || row == model.getGridDimensions()[0] - 1) &&
             (col == 0 || col == model.getGridDimensions()[1] - 1)) {
-      return 500; // Corner bonus
+      return 500;
     } else if (row == 0 || row == model.getGridDimensions()[0] - 1 ||
             col == 0 || col == model.getGridDimensions()[1] - 1) {
-      return 200; // Edge bonus
+      return 200;
     }
     return 0;
   }

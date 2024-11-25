@@ -141,7 +141,7 @@ public class ThreeTriosController implements ModelFeatures, ViewFeatures {
    * This method is called automatically when it becomes an AI player's turn.
    */
   private void makeAIMove() {
-    if (!isMyTurn || model.isGameOver()) {  // Add isGameOver check
+    if (!isMyTurn || model.isGameOver()) {
       return;
     }
 
@@ -173,8 +173,6 @@ public class ThreeTriosController implements ModelFeatures, ViewFeatures {
     isMyTurn = player != null && player.getColor().equals(controlledPlayer.getColor());
     updateViewTitle();
     view.refresh();
-
-    // Only make AI move if game isn't over
     if (isMyTurn && !wasMyTurn && controlledPlayer instanceof AIPlayer && !model.isGameOver()) {
       SwingUtilities.invokeLater(new Runnable() {
         public void run() {

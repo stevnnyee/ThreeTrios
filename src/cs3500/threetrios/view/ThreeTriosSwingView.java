@@ -144,8 +144,6 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
       for (int i = 0; i < hand.size(); i++) {
         Card card = hand.get(i);
         int yPos = i * cardSpacing + 5;
-
-        // Only highlight cards if it's this player's turn
         g2d.setColor(i == selectedCardIndex && isCurrentPlayer ? Color.YELLOW : Color.WHITE);
         g2d.fillRect(10, yPos, getWidth() - 20, cardSpacing - 10);
 
@@ -313,7 +311,7 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
       int row = p.y / cellSize.height;
       int col = p.x / cellSize.width;
 
-      // Print coordinates for debugging
+      // print to console for debugging
       System.out.println("Grid click at: " + row + "," + col);
 
       if (row >= 0 && row < GRID_ROWS && col >= 0 && col < GRID_COLS) {
@@ -407,7 +405,6 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
 
   @Override
   public void refresh() {
-    // Update window title
     Player currentPlayer = model.getCurrentPlayer();
     if (currentPlayer != null) {
       if (model.isGameOver() && model.getWinner() != null) {
@@ -417,7 +414,6 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
       }
     }
 
-    // Only repaint the panels, don't call their refresh methods
     boardPanel.repaint();
     leftHandPanel.repaint();
     rightHandPanel.repaint();
@@ -432,10 +428,8 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
 
     revalidate();
     repaint();
-
-    // Handle game over state
-    if (model.isGameOver() && !gameOverMessageShown) {  // Add a flag to prevent multiple messages
-      gameOverMessageShown = true;  // Add this field to the class
+    if (model.isGameOver() && !gameOverMessageShown) {
+      gameOverMessageShown = true;
       Player winner = model.getWinner();
       int redScore = model.getPlayerScore(model.getPlayers().get(0));
       int blueScore = model.getPlayerScore(model.getPlayers().get(1));
@@ -471,11 +465,8 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
     this.selectedCardPlayer = player;
 
     try {
-      // Clear all selections first
       leftHandPanel.selectedCardIndex = -1;
       rightHandPanel.selectedCardIndex = -1;
-
-      // Then set the appropriate selection
       if (player != null && card != null) {
         if (player.getColor().equals("RED")) {
           leftHandPanel.selectedCardIndex = leftHandPanel.findCardIndex(card);
@@ -483,8 +474,6 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
           rightHandPanel.selectedCardIndex = rightHandPanel.findCardIndex(card);
         }
       }
-
-      // Refresh the UI
       leftHandPanel.refresh();
       rightHandPanel.refresh();
       repaint();
