@@ -5,7 +5,9 @@ import cs3500.threetrios.model.Card;
 import cs3500.threetrios.model.Player;
 import cs3500.threetrios.view.ThreeTriosFrame;
 
-// Mock ThreeTriosFrame for testing
+/**
+ * Mock ThreeTriosFrame used for testing.
+ */
 public class MockThreeTriosFrame implements ThreeTriosFrame {
   private final StringBuilder log;
 

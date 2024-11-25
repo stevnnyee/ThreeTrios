@@ -1,9 +1,6 @@
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import cs3500.threetrios.controller.AIPlayer;
 import cs3500.threetrios.model.Card;
 import cs3500.threetrios.model.Player;
@@ -17,21 +14,22 @@ import cs3500.threetrios.strategy.MockThreeTriosModel;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Tests the functionality of the methods in the AIPlayer class.
+ */
 public class AIPlayerTest {
   private StringBuilder log;
   private Player basePlayer;
   private AIPlayer aiPlayer;
-  private AIStrategy strategy;
   private MockThreeTriosModel model;
-  private Card testCard;
 
   @Before
   public void setUp() {
     log = new StringBuilder();
     basePlayer = new MockPlayer("RED");
-    strategy = new MockStrategy(log);
+    AIStrategy strategy = new MockStrategy(log);
     model = new MockThreeTriosModel(log);
-    testCard = new MockCard("test", 5, 5, 5, 5);
+    Card testCard = new MockCard("test", 5, 5, 5, 5);
     aiPlayer = new AIPlayer(basePlayer);
     aiPlayer.setStrategy(strategy);
   }

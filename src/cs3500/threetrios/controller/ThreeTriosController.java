@@ -102,22 +102,6 @@ public class ThreeTriosController implements ModelFeatures, ViewFeatures {
   }
 
   @Override
-  public void notifyTurnChange(Player player) {
-    boolean wasMyTurn = isMyTurn;
-    isMyTurn = player != null && player.getColor().equals(controlledPlayer.getColor());
-    updateViewTitle();
-    view.refresh();
-
-    if (isMyTurn && !wasMyTurn && controlledPlayer instanceof AIPlayer) {
-      SwingUtilities.invokeLater(new Runnable() {
-        public void run() {
-          makeAIMove();
-        }
-      });
-    }
-  }
-
-  @Override
   public void notifyGameOver(Player winner) {
     clearSelection();
     view.refresh();
@@ -157,7 +141,7 @@ public class ThreeTriosController implements ModelFeatures, ViewFeatures {
    * This method is called automatically when it becomes an AI player's turn.
    */
   private void makeAIMove() {
-    if (!isMyTurn) {
+    if (!isMyTurn || model.isGameOver()) {  // Add isGameOver check
       return;
     }
 
@@ -180,6 +164,23 @@ public class ThreeTriosController implements ModelFeatures, ViewFeatures {
       }
     } catch (Exception e) {
       e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void notifyTurnChange(Player player) {
+    boolean wasMyTurn = isMyTurn;
+    isMyTurn = player != null && player.getColor().equals(controlledPlayer.getColor());
+    updateViewTitle();
+    view.refresh();
+
+    // Only make AI move if game isn't over
+    if (isMyTurn && !wasMyTurn && controlledPlayer instanceof AIPlayer && !model.isGameOver()) {
+      SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          makeAIMove();
+        }
+      });
     }
   }
 

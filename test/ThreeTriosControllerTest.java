@@ -1,20 +1,21 @@
 import cs3500.threetrios.controller.ThreeTriosController;
-import cs3500.threetrios.features.ViewFeatures;
 import cs3500.threetrios.model.Card;
 import cs3500.threetrios.model.Player;
 import cs3500.threetrios.strategy.MockCard;
 import cs3500.threetrios.strategy.MockPlayer;
 import cs3500.threetrios.strategy.MockThreeTriosModel;
 import cs3500.threetrios.view.MockThreeTriosFrame;
-import cs3500.threetrios.view.ThreeTriosFrame;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
+/**
+ * Tests the functionality of the methods in the ThreeTriosController class.
+ */
 public class ThreeTriosControllerTest {
   private StringBuilder log;
   private MockThreeTriosModel model;

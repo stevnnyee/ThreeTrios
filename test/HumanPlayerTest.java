@@ -12,14 +12,15 @@ import cs3500.threetrios.strategy.MockStrategy;
 import cs3500.threetrios.strategy.MockThreeTriosModel;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
+/**
+ * Tests the functionality of the methods in the HumanPlayer class.
+ */
 public class HumanPlayerTest {
   private StringBuilder log;
   private Player basePlayer;
   private ViewFeatures features;
   private HumanPlayer humanPlayer;
-  private Card testCard;
 
   @Before
   public void setUp() {
@@ -27,7 +28,7 @@ public class HumanPlayerTest {
     basePlayer = new MockPlayer("BLUE");
     features = new MockViewFeatures(log);
     humanPlayer = new HumanPlayer(basePlayer, features);
-    testCard = new MockCard("test", 5, 5, 5, 5);
+    Card testCard = new MockCard("test", 5, 5, 5, 5);
   }
 
   @Test(expected = IllegalArgumentException.class)
