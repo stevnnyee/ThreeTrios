@@ -7,6 +7,8 @@ import cs3500.threetrios.provider.model.Cell;
 import cs3500.threetrios.provider.model.CardCell;
 import cs3500.threetrios.provider.model.Card;
 import cs3500.threetrios.model.Player;
+
+import java.awt.*;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -27,9 +29,25 @@ public class ReadOnlyTTAdapter implements ReadOnlyTT {
   @Override
   public Cell getCell(int row, int col) {
     CardCell cell = new CardCell();
+
+    // Make sure holes are properly represented
     if (model.isHole(row, col)) {
-      return cell; // Their CardCell defaults to being a hole
+      return new Cell() {
+        @Override
+        public boolean isHole() { return true; }
+        @Override
+        public boolean isEmpty() { return true; }
+        @Override
+        public void updateCard(Card card, boolean makeMove) {
+          throw new IllegalStateException("Cannot place card in hole");
+        }
+        @Override
+        public Color getColor() { return Color.GRAY; }
+        @Override
+        public Cell clone() { return this; }
+      };
     }
+
     cs3500.threetrios.model.Card modelCard = model.getCardAt(row, col);
     if (modelCard != null) {
       cell.updateCard(new CardAdapter(modelCard), false);
@@ -97,7 +115,9 @@ public class ReadOnlyTTAdapter implements ReadOnlyTT {
     for (Player p : model.getPlayers()) {
       if (p.getColor().equals(colorStr)) {
         List<Card> adaptedHand = new ArrayList<>();
-        for (cs3500.threetrios.model.Card modelCard : model.getPlayerHand(p)) {
+        List<cs3500.threetrios.model.Card> playerHand = model.getPlayerHand(p);
+        System.out.println("Hand for " + colorStr + ": " + playerHand.size() + " cards");
+        for (cs3500.threetrios.model.Card modelCard : playerHand) {
           adaptedHand.add(new CardAdapter(modelCard));
         }
         return adaptedHand;

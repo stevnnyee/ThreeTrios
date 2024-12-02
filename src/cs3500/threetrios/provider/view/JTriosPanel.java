@@ -12,6 +12,7 @@ import java.awt.Font;
 
 import javax.swing.JPanel;
 
+import cs3500.threetrios.provider.controller.TriosController;
 import cs3500.threetrios.provider.model.Card;
 import cs3500.threetrios.provider.model.CardCell;
 import cs3500.threetrios.provider.model.Cell;
@@ -25,7 +26,7 @@ import cs3500.threetrios.provider.model.ReadOnlyTT;
 public class JTriosPanel extends JPanel {
 
   private final ReadOnlyTT model;
-  private TriosController features; // Add this field
+  private cs3500.threetrios.provider.controller.TriosController features;
   private int selectedCardIndex = -1;
   private PlayerColor selectedCardColor = PlayerColor.RED;
 
@@ -63,7 +64,6 @@ public class JTriosPanel extends JPanel {
   public void addClickListener(TriosController features) {
     this.features = features;
   }
-
   /**
    * Selects a card.
    *

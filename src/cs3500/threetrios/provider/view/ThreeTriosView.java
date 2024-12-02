@@ -1,8 +1,8 @@
 package cs3500.threetrios.provider.view;
 
 import javax.swing.JFrame;
-
 import cs3500.threetrios.provider.model.ReadOnlyTT;
+import cs3500.threetrios.provider.controller.TriosController;
 
 /**
  * Represents a view for the ThreeTrios Game.
@@ -22,13 +22,11 @@ public class ThreeTriosView extends JFrame implements TriosView {
   }
 
   @Override
-  public void addClickListener(TriosController listener) {
+  public void addClickListener(TriosController listener) {  // Remove the full qualification
     this.panel.addClickListener(listener);
   }
 
-  /**
-   * Refresh the view to reflect any changes in the game state.
-   */
+
   @Override
   public void refresh() {
     this.repaint();
@@ -49,10 +47,8 @@ public class ThreeTriosView extends JFrame implements TriosView {
     return this.panel.getHeight() / this.model.numRows();
   }
 
-
   @Override
   public boolean selectCard(int row, int col) {
     return this.panel.selectCard(row, col);
   }
-
 }

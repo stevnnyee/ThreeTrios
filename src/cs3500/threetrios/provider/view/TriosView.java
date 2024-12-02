@@ -1,6 +1,6 @@
 package cs3500.threetrios.provider.view;
 
-import cs3500.threetrios.provider.view.TriosController;
+import cs3500.threetrios.provider.controller.TriosController;
 
 /**
  * The interface for all types of View. Can be text-based or GUI-based.
