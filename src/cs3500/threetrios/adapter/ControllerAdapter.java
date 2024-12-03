@@ -126,12 +126,37 @@ public class ControllerAdapter implements TriosController, ModelFeatures {
     try {
       AIPlayer aiPlayer = (AIPlayer) controlledPlayer;
       cs3500.threetrios.strategy.AIMove move = aiPlayer.getNextMove(model);
+
       if (move != null && move.getCard() != null) {
-        model.placeCard(move.getRow(), move.getCol(), move.getCard());
-        view.refresh();
+        // First, find the matching provider card and select it
+        PlayerColor aiColor = controlledPlayer.getColor().equals("RED") ?
+                PlayerColor.RED : PlayerColor.BLUE;
+        List<Card> hand = modelAdapter.getHand(aiColor);
+
+        for (int i = 0; i < hand.size(); i++) {
+          Card providerCard = hand.get(i);
+          if (providerCard.getName().equals(move.getCard().getName())) {
+            // Simulate card selection
+            selectedCard = providerCard;
+            selectedColor = aiColor;
+            int col = aiColor == PlayerColor.RED ? 0 : modelAdapter.numCols() + 1;
+            view.selectCard(i, col);
+            break;
+          }
+        }
+
+        // Now place the card
+        if (selectedCard != null) {
+          model.placeCard(move.getRow(), move.getCol(), move.getCard());
+          selectedCard = null;
+          selectedColor = null;
+          view.selectCard(-1, -1);  // Clear selection
+          view.refresh();
+        }
       }
     } catch (Exception e) {
       System.err.println("Error making AI move: " + e.getMessage());
+      e.printStackTrace();  // Add stack trace for debugging
     }
   }
 

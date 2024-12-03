@@ -60,13 +60,11 @@ public final class ThreeTrios {
       cs3500.threetrios.provider.view.ThreeTriosView blueView =
               new cs3500.threetrios.provider.view.ThreeTriosView(modelAdapter, "Blue Player");
       ControllerAdapter blueController = new ControllerAdapter(model, blueView, bluePlayer);
-      model.addFeaturesListener(blueController);
       blueView.addClickListener(blueController);
-      blueView.setLocation(700, 100);
-      model.addFeaturesListener(redController);
-      redController.startGame();
       model.addFeaturesListener(blueController);
+      redController.startGame();
       blueView.makeVisible();
+      blueController.notifyTurnChange(model.getCurrentPlayer());
     } else {
       ThreeTriosSwingView blueView = new ThreeTriosSwingView(model);
       ThreeTriosController blueController = new ThreeTriosController(model, blueView, bluePlayer);
