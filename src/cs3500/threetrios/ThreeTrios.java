@@ -1,5 +1,7 @@
 package cs3500.threetrios;
 
+import cs3500.threetrios.adapter.ControllerAdapter;
+import cs3500.threetrios.adapter.ReadOnlyTTAdapter;
 import cs3500.threetrios.controller.AIPlayer;
 import cs3500.threetrios.controller.ThreeTriosController;
 import cs3500.threetrios.model.ThreeTriosGameModel;
@@ -38,6 +40,7 @@ public final class ThreeTrios {
   public static void main(String[] args) {
     String redType = args.length > 0 ? args[0].toLowerCase() : "human";
     String blueType = args.length > 1 ? args[1].toLowerCase() : "human";
+    boolean useProviderView = args.length > 2 && args[2].equalsIgnoreCase("provider");
 
     ThreeTriosGameModel model = new ThreeTriosGameModel();
     setupGame(model);
@@ -49,16 +52,26 @@ public final class ThreeTrios {
     bluePlayer = createPlayer(blueType, bluePlayer);
 
     ThreeTriosSwingView redView = new ThreeTriosSwingView(model);
-    ThreeTriosSwingView blueView = new ThreeTriosSwingView(model);
-
     ThreeTriosController redController = new ThreeTriosController(model, redView, redPlayer);
-    ThreeTriosController blueController = new ThreeTriosController(model, blueView, bluePlayer);
-
     redView.setLocation(100, 100);
-    blueView.setLocation(700, 100);
 
-    redController.startGame();
-    blueController.startGame();
+    if (useProviderView) {
+      ReadOnlyTTAdapter modelAdapter = new ReadOnlyTTAdapter(model);
+      cs3500.threetrios.provider.view.ThreeTriosView blueView =
+              new cs3500.threetrios.provider.view.ThreeTriosView(modelAdapter, "Blue Player");
+      ControllerAdapter blueController = new ControllerAdapter(model, blueView, bluePlayer);
+      blueView.addClickListener(blueController);
+      model.addFeaturesListener(blueController);
+      redController.startGame();
+      blueView.makeVisible();
+      blueController.notifyTurnChange(model.getCurrentPlayer());
+    } else {
+      ThreeTriosSwingView blueView = new ThreeTriosSwingView(model);
+      ThreeTriosController blueController = new ThreeTriosController(model, blueView, bluePlayer);
+      blueView.setLocation(700, 100);
+      redController.startGame();
+      blueController.startGame();
+    }
   }
 
   private static Player createPlayer(String type, Player basePlayer) {
