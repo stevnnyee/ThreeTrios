@@ -28,29 +28,39 @@ public class ReadOnlyTTAdapter implements ReadOnlyTT {
 
   @Override
   public Cell getCell(int row, int col) {
-    CardCell cell = new CardCell();
-
-    // Make sure holes are properly represented
     if (model.isHole(row, col)) {
       return new Cell() {
         @Override
-        public boolean isHole() { return true; }
+        public boolean isHole() {
+          return true;
+        }
+
         @Override
-        public boolean isEmpty() { return true; }
+        public boolean isEmpty() {
+          return true;
+        }
+
         @Override
         public void updateCard(Card card, boolean makeMove) {
           throw new IllegalStateException("Cannot place card in hole");
         }
+
         @Override
-        public Color getColor() { return Color.GRAY; }
+        public java.awt.Color getColor() {
+          return Color.GRAY;
+        }
+
         @Override
-        public Cell clone() { return this; }
+        public Cell clone() {
+          return this;
+        }
       };
     }
 
+    CardCell cell = new CardCell();
     cs3500.threetrios.model.Card modelCard = model.getCardAt(row, col);
     if (modelCard != null) {
-      cell.updateCard(new CardAdapter(modelCard), false);
+      cell.updateCard(new CardAdapter(modelCard), true);
     }
     return cell;
   }
@@ -64,20 +74,15 @@ public class ReadOnlyTTAdapter implements ReadOnlyTT {
 
   @Override
   public boolean isValidMove(int row, int col) {
-    // In your model, a valid move is one where:
-    // - The position is within bounds
-    // - The position is not a hole
-    // - The position is empty
     try {
       return !model.isHole(row, col) && model.getCardAt(row, col) == null;
     } catch (IllegalArgumentException e) {
-      return false; // Out of bounds or invalid position
+      return false;
     }
   }
 
   @Override
   public int countNumFlipped(Card toPlace, int row, int col) {
-    // Convert their Card back to our Card type to use with our model
     cs3500.threetrios.model.Card ourCard = adaptProviderCard(toPlace);
     return model.getFlippableCards(row, col, ourCard);
   }
@@ -152,10 +157,7 @@ public class ReadOnlyTTAdapter implements ReadOnlyTT {
     return winner.getColor().equals("RED") ? PlayerColor.RED : PlayerColor.BLUE;
   }
 
-  // Helper method to convert provider Card to our Card type
   private cs3500.threetrios.model.Card adaptProviderCard(Card providerCard) {
-    // You'll need to implement this based on your Card implementation
-    // This is just a placeholder - implement the actual conversion
     throw new UnsupportedOperationException("Need to implement card conversion");
   }
 }
