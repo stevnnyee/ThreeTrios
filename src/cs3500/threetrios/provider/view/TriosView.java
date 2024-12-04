@@ -14,7 +14,6 @@ public interface TriosView {
    */
   void addClickListener(TriosController listener);
 
-
   /**
    * Refresh the view to reflect any changes in the game state.
    */

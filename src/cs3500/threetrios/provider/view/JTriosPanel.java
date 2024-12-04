@@ -26,9 +26,10 @@ import cs3500.threetrios.provider.model.ReadOnlyTT;
 public class JTriosPanel extends JPanel {
 
   private final ReadOnlyTT model;
-  private cs3500.threetrios.provider.controller.TriosController features;
+  private TriosController features;
   private int selectedCardIndex = -1;
   private PlayerColor selectedCardColor = PlayerColor.RED;
+
 
   /**
    * Constructs a JTriosPanel.
@@ -64,6 +65,7 @@ public class JTriosPanel extends JPanel {
   public void addClickListener(TriosController features) {
     this.features = features;
   }
+
   /**
    * Selects a card.
    *
@@ -92,22 +94,22 @@ public class JTriosPanel extends JPanel {
     Graphics2D g2d = (Graphics2D) g.create();
 
     int rows = model.numRows();
-    int cols = model.numCols() + 2;
+    int cols = model.numCols() + 2; // add player hands on either side
     int cellWidth = getWidth() / cols;
     int cellHeight = getHeight() / rows;
     List<Card> playerRedHand = model.getHand(PlayerColor.RED);
     List<Card> playerBlueHand = model.getHand(PlayerColor.BLUE);
 
-    for (int row = 0; row < rows; row++) {
+    for (int row = 0; row < rows; row++) { // loop to iterate through and draw each cell
       for (int col = 0; col < cols; col++) {
         Cell currentCell;
         boolean isHighlighted = false;
 
         List<Card> currentHand = (col == 0) ? playerRedHand : playerBlueHand;
         PlayerColor currentColor = (col == 0) ? PlayerColor.RED : PlayerColor.BLUE;
-        if (col == 0 || col == cols - 1) {
+        if (col == 0 || col == cols - 1) {  // player hands
           if (row > currentHand.size() - 1) {
-            currentCell = null;
+            currentCell = null; // then this spot in player's hand is empty
           } else {
             Card currentCard = currentHand.get(row);
             CardCell temp = new CardCell();
@@ -130,7 +132,7 @@ public class JTriosPanel extends JPanel {
         g2d.setColor(cellColor);
         g2d.fillRect(x, y, cellWidth, cellHeight);
 
-        g2d.setColor(Color.BLACK);
+        g2d.setColor(Color.BLACK); // Draw the black outline around the cell
         g2d.drawRect(x, y, cellWidth, cellHeight);
         if (currentCell == null || currentCell.isHole() || currentCell.isEmpty()) {
           continue;
@@ -138,6 +140,8 @@ public class JTriosPanel extends JPanel {
         paintCard((CardCell) currentCell, g2d, x, cellWidth, y, cellHeight);
       }
     }
+
+    // draw black lines separating hands from the board
     g2d.setColor(Color.BLACK);
     g2d.setStroke(new BasicStroke(5));
     g2d.drawLine(cellWidth, 0, cellWidth, getHeight());
@@ -151,6 +155,7 @@ public class JTriosPanel extends JPanel {
       cellColor = Color.DARK_GRAY;
     } else {
       cellColor = currentCell.getColor();
+      // deal with highlighted cards
       if (isHighlighted) {
         if (col == 0 || col == cols - 1 || selectedCardIndex != -1) {
           cellColor = cellColor.brighter().brighter();
@@ -162,7 +167,9 @@ public class JTriosPanel extends JPanel {
 
   private static void paintCard(CardCell currentCell, Graphics2D g2d, int x, int cellWidth,
                                 int y, int cellHeight) {
+    // if not empty then has a card
     Card currentCard = currentCell.getCard();
+    // Draw text
     g2d.setColor(Color.BLACK);
     String cardText = currentCard.getAttackValues();
 
@@ -170,20 +177,22 @@ public class JTriosPanel extends JPanel {
     String southValue = cardText.substring(1, 2);
     String eastValue = cardText.substring(2, 3);
     String westValue = cardText.substring(3, 4);
+
+    // Calculate positions for attack values
     int centerX = x + cellWidth / 2;
     int centerY = y + cellHeight / 2;
 
-    int textYOffset = cellHeight / 4;
-    int textXOffset = cellWidth / 4;
+    int textYOffset = cellHeight / 4; // Offset for north/south
+    int textXOffset = cellWidth / 4;  // Offset for east/west
 
     g2d.setFont(new Font("Arial", Font.BOLD, 16));
     g2d.setColor(Color.BLACK);
 
     // Draw attack values
-    g2d.drawString(northValue, centerX, centerY - textYOffset);
-    g2d.drawString(southValue, centerX, centerY + textYOffset);
-    g2d.drawString(eastValue, centerX + textXOffset, centerY);
-    g2d.drawString(westValue, centerX - textXOffset, centerY);
+    g2d.drawString(northValue, centerX, centerY - textYOffset); // North
+    g2d.drawString(southValue, centerX, centerY + textYOffset); // South
+    g2d.drawString(eastValue, centerX + textXOffset, centerY);  // East
+    g2d.drawString(westValue, centerX - textXOffset, centerY);  // West
   }
 
   private class TriosClickListener implements MouseListener {
@@ -195,18 +204,23 @@ public class JTriosPanel extends JPanel {
 
     @Override
     public void mousePressed(MouseEvent e) {
+      //empty
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
+      //empty
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
+      //empty
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
+      //empty
     }
+
   }
 }
