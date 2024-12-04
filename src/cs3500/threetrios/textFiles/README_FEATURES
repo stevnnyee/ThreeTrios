@@ -1,0 +1,19 @@
+Working Features
+- Basic game functionality with two different views
+- Card placement on the game board
+- Card selection
+- Turn switching between players
+- Display of player hands on both sides
+- Color coding (red/blue) for different players
+- Score tracking
+- Win condition detection
+- Card battle/flipping mechanics
+- AI player strategies
+- Provider's view display and interaction
+- Command line arguments still work as before
+
+Non-Working Features
+- Card Visibility - we could only see five out of the 8 cards
+
+How to Run:
+
