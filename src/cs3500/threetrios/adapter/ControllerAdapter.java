@@ -14,7 +14,7 @@ import cs3500.threetrios.provider.model.Card;
 public class ControllerAdapter implements TriosController, ModelFeatures {
   private final MainModelInterface model;
   private final ReadOnlyTTAdapter modelAdapter;
-  private final ViewAdapter view;  // Changed from ThreeTriosView to ViewAdapter
+  private final ViewAdapter view;
   private final Player controlledPlayer;
   private Card selectedCard;
   private PlayerColor selectedColor;
@@ -99,7 +99,7 @@ public class ControllerAdapter implements TriosController, ModelFeatures {
         selectedCard = null;
         selectedColor = null;
         System.out.println("Card placed at " + row + "," + col);
-        view.selectCard(-1, -1);  // Clear selection
+        view.selectCard(-1, -1);
         view.refresh();
       } catch (Exception e) {
         System.out.println("Error placing card: " + e.getMessage());
@@ -128,7 +128,6 @@ public class ControllerAdapter implements TriosController, ModelFeatures {
       cs3500.threetrios.strategy.AIMove move = aiPlayer.getNextMove(model);
 
       if (move != null && move.getCard() != null) {
-        // First, find the matching provider card and select it
         PlayerColor aiColor = controlledPlayer.getColor().equals("RED") ?
                 PlayerColor.RED : PlayerColor.BLUE;
         List<Card> hand = modelAdapter.getHand(aiColor);
@@ -136,7 +135,6 @@ public class ControllerAdapter implements TriosController, ModelFeatures {
         for (int i = 0; i < hand.size(); i++) {
           Card providerCard = hand.get(i);
           if (providerCard.getName().equals(move.getCard().getName())) {
-            // Simulate card selection
             selectedCard = providerCard;
             selectedColor = aiColor;
             int col = aiColor == PlayerColor.RED ? 0 : modelAdapter.numCols() + 1;
@@ -145,18 +143,17 @@ public class ControllerAdapter implements TriosController, ModelFeatures {
           }
         }
 
-        // Now place the card
         if (selectedCard != null) {
           model.placeCard(move.getRow(), move.getCol(), move.getCard());
           selectedCard = null;
           selectedColor = null;
-          view.selectCard(-1, -1);  // Clear selection
+          view.selectCard(-1, -1);
           view.refresh();
         }
       }
     } catch (Exception e) {
       System.err.println("Error making AI move: " + e.getMessage());
-      e.printStackTrace();  // Add stack trace for debugging
+      e.printStackTrace();
     }
   }
 
