@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * Represents a card in a Trios game. The card has 4 numbers and a color.
  */
-public class Card {
+public class Card implements TriosCard {
 
   private final String name;
   private final int north;
@@ -133,6 +133,7 @@ public class Card {
    *
    * @param neighbors a map containing this card's neighbors and their relative direction
    */
+  @Override
   public List<Card> battle(Map<String, Card> neighbors) {
 
     List<Card> result = new ArrayList<>();
@@ -181,6 +182,7 @@ public class Card {
    * @return true if this card's value in the given direction is less than
    *     the provided value, and false otherwise
    */
+  @Override
   public boolean compare(String direction, int value) {
     switch (direction.toLowerCase()) {
       case "north":
@@ -203,6 +205,7 @@ public class Card {
    * @return the value of this card in the given direction
    * @throws IllegalArgumentException if the direction is invalid
    */
+  @Override
   public int getDirection(String direction) {
     switch (direction.toLowerCase()) {
       case "north":
