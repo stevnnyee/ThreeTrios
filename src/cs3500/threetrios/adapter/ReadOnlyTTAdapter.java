@@ -12,9 +12,19 @@ import java.awt.*;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * Adapts our read-only model implementation to work with the provider's ReadOnlyTT interface.
+ * This adapter translates between our model's representation of the game state and the provider's
+ * expected format.
+ */
 public class ReadOnlyTTAdapter implements ReadOnlyTT {
   private final ReadOnlyThreeTriosModel model;
 
+  /**
+   * Constructs a new ReadOnlyTTAdapter.
+   *
+   * @param model the read-only model to adapt
+   */
   public ReadOnlyTTAdapter(ReadOnlyThreeTriosModel model) {
     this.model = model;
   }

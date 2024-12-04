@@ -1,7 +1,9 @@
 package cs3500.threetrios.adapter;
 
 import javax.swing.JFrame;
+
 import java.awt.Dimension;
+
 import cs3500.threetrios.provider.model.ReadOnlyTT;
 import cs3500.threetrios.provider.controller.TriosController;
 import cs3500.threetrios.provider.model.PlayerColor;
@@ -17,6 +19,12 @@ public class ViewAdapter extends JFrame implements TriosView {
   private static final int MIN_CARD_HEIGHT = 75;
   private static final int HAND_WIDTH = 150;
 
+  /**
+   * Constructs a new ViewAdapter with the specified model and title.
+   *
+   * @param model model to display
+   * @param title the title
+   */
   public ViewAdapter(ReadOnlyTT model, String title) {
     this.model = model;
     this.panel = new JTriosPanel(model);
@@ -29,6 +37,10 @@ public class ViewAdapter extends JFrame implements TriosView {
     this.setResizable(true);
   }
 
+  /**
+   * Updates the window size based on the current game state.
+   * Calculates appropriate dimensions based on hand sizes and grid dimensions.
+   */
   private void updateWindowSize() {
     int redHandSize = model.getHand(PlayerColor.RED).size();
     int blueHandSize = model.getHand(PlayerColor.BLUE).size();
