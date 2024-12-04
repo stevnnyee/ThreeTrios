@@ -1,0 +1,20 @@
+Review of the Experience
+
+After working with the provider's code, we've gained valuable insights about our own implementation.
+One key lesson was about interface design - seeing how the provider structured their interfaces with
+clear separation between Card, Cell, and View components made us realize our implementation could
+have benefited from similar clarity. Their use of enums for PlayerColor was particularly clever
+compared to our string-based approach. Additionally, their battle mechanics implementation was more
+robust and clearly structured than ours. The adapter pattern implementation taught us the importance
+of planning for clearer and cohesive code from the start. If we had designed our interfaces with more
+consideration for potential integration with other implementations, the adaptation process would
+have been smoother.
+
+Our experience with the providers was generally positive and professional. The code they provided was
+well-documented and followed consistent patterns, making it relatively straightforward to understand.
+When questions arose about specific implementations or missing components, like the Hole class,
+they were responsive and helpful in clarifying their design decisions. The main challenge was working
+around the missing implementations while maintaining the integrity of their design. However, this
+challenge turned into a valuable learning experience about interface design and adaptation.
+Their view implementation was planned very well, and working with it helped us to understand
+better approaches to UI design in Java.
