@@ -10,7 +10,11 @@ import cs3500.threetrios.provider.controller.TriosController;
 import cs3500.threetrios.provider.model.PlayerColor;
 import cs3500.threetrios.provider.model.Card;
 
-
+/**
+ * Adapts our controller implementation to work with the provider's TriosController interface.
+ * This adapter manages game flow, user interactions, and coordinates between the model and view.
+ * Implements both TriosController for view interactions and ModelFeatures for model notifications.
+ */
 public class ControllerAdapter implements TriosController, ModelFeatures {
   private final MainModelInterface model;
   private final ReadOnlyTTAdapter modelAdapter;
@@ -19,6 +23,14 @@ public class ControllerAdapter implements TriosController, ModelFeatures {
   private Card selectedCard;
   private PlayerColor selectedColor;
 
+  /**
+   * Constructs a new ControllerAdapter.
+   *
+   * @param model  the game model to control
+   * @param view   the view adapter to display the game
+   * @param player the player this controller is responsible for
+   * @throws IllegalArgumentException if any parameter is null
+   */
   public ControllerAdapter(MainModelInterface model, ViewAdapter view, Player player) {  // Changed parameter type
     this.model = model;
     this.modelAdapter = new ReadOnlyTTAdapter(model);
@@ -27,6 +39,10 @@ public class ControllerAdapter implements TriosController, ModelFeatures {
     updateTitle();
   }
 
+  /**
+   * Updates the view's title based on the current game state.
+   * Shows the current player's color and indicates if it's their turn or if the game is over.
+   */
   private void updateTitle() {
     String title = "Three Trios - " + controlledPlayer.getColor();
     if (model.isGameOver()) {
