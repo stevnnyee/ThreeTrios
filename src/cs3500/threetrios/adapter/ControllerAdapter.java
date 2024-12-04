@@ -9,22 +9,22 @@ import cs3500.threetrios.model.Player;
 import cs3500.threetrios.provider.controller.TriosController;
 import cs3500.threetrios.provider.model.PlayerColor;
 import cs3500.threetrios.provider.model.Card;
-import cs3500.threetrios.provider.view.ThreeTriosView;
+
 
 public class ControllerAdapter implements TriosController, ModelFeatures {
   private final MainModelInterface model;
   private final ReadOnlyTTAdapter modelAdapter;
-  private final ThreeTriosView view;
+  private final ViewAdapter view;  // Changed from ThreeTriosView to ViewAdapter
   private final Player controlledPlayer;
   private Card selectedCard;
   private PlayerColor selectedColor;
 
-  public ControllerAdapter(MainModelInterface model, ThreeTriosView view, Player player) {
+  public ControllerAdapter(MainModelInterface model, ViewAdapter view, Player player) {  // Changed parameter type
     this.model = model;
     this.modelAdapter = new ReadOnlyTTAdapter(model);
     this.view = view;
     this.controlledPlayer = player;
-    updateTitle(); // Set initial title
+    updateTitle();
   }
 
   private void updateTitle() {

@@ -1,21 +1,23 @@
-package cs3500.threetrios.provider.view;
+package cs3500.threetrios.adapter;
 
 import javax.swing.JFrame;
 import java.awt.Dimension;
 import cs3500.threetrios.provider.model.ReadOnlyTT;
 import cs3500.threetrios.provider.controller.TriosController;
 import cs3500.threetrios.provider.model.PlayerColor;
+import cs3500.threetrios.provider.view.TriosView;
+import cs3500.threetrios.provider.view.JTriosPanel;
 
 /**
- * Represents a view for the ThreeTrios Game.
+ * Adapter class that adapts JTriosPanel to work with our model implementation.
  */
-public class ThreeTriosView extends JFrame implements TriosView {
+public class ViewAdapter extends JFrame implements TriosView {
   private final JTriosPanel panel;
   private final ReadOnlyTT model;
   private static final int MIN_CARD_HEIGHT = 75;
   private static final int HAND_WIDTH = 150;
 
-  public ThreeTriosView(ReadOnlyTT model, String title) {
+  public ViewAdapter(ReadOnlyTT model, String title) {
     this.model = model;
     this.panel = new JTriosPanel(model);
     this.setTitle(title);

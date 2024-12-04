@@ -15,6 +15,7 @@ import cs3500.threetrios.strategy.DefensiveStrat;
 import cs3500.threetrios.strategy.MaxFlipsStrat;
 import cs3500.threetrios.strategy.MinimaxStrat;
 import cs3500.threetrios.view.ThreeTriosSwingView;
+import cs3500.threetrios.adapter.ViewAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,20 +52,30 @@ public final class ThreeTrios {
     redPlayer = createPlayer(redType, redPlayer);
     bluePlayer = createPlayer(blueType, bluePlayer);
 
+    // Always use your view for RED player
     ThreeTriosSwingView redView = new ThreeTriosSwingView(model);
     ThreeTriosController redController = new ThreeTriosController(model, redView, redPlayer);
     redView.setLocation(100, 100);
 
     if (useProviderView) {
+      // Use ViewAdapter for BLUE player
       ReadOnlyTTAdapter modelAdapter = new ReadOnlyTTAdapter(model);
-      cs3500.threetrios.provider.view.ThreeTriosView blueView =
-              new cs3500.threetrios.provider.view.ThreeTriosView(modelAdapter, "Blue Player");
+      ViewAdapter blueView = new ViewAdapter(modelAdapter, "Blue Player");
       ControllerAdapter blueController = new ControllerAdapter(model, blueView, bluePlayer);
       blueView.addClickListener(blueController);
+      blueView.setLocation(700, 100);
+
+      // Add listeners and start game
+      model.addFeaturesListener(redController);
       model.addFeaturesListener(blueController);
       redController.startGame();
       blueView.makeVisible();
-      blueController.notifyTurnChange(model.getCurrentPlayer());
+
+      // If it's BLUE's turn and they're AI, trigger turn notification
+      if (model.getCurrentPlayer().getColor().equals("BLUE") &&
+              bluePlayer instanceof AIPlayer) {
+        blueController.notifyTurnChange(model.getCurrentPlayer());
+      }
     } else {
       ThreeTriosSwingView blueView = new ThreeTriosSwingView(model);
       ThreeTriosController blueController = new ThreeTriosController(model, blueView, bluePlayer);
