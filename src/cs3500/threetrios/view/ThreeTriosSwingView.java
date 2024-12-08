@@ -15,12 +15,15 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.BorderLayout;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-import javax.swing.JPanel;
 import javax.swing.JFrame;
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 import javax.swing.JOptionPane;
 
 /**
@@ -48,6 +51,8 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
   private Player selectedCardPlayer = null;
   private ViewFeatures features;
   private boolean gameOverMessageShown = false;
+  private final HintDecorator boardDecorator;
+  private final JCheckBox hintsToggle;
 
   /**
    * Constructs a new ThreeTrios game window.
@@ -73,10 +78,36 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
     rightHandPanel.setPreferredSize(new Dimension(HAND_WIDTH, 400));
     boardPanel.setPreferredSize(new Dimension(500, 400));
 
+    String currentColor = model.getCurrentPlayer() != null ?
+            model.getCurrentPlayer().getColor() : "RED";
+    this.boardDecorator = new HintDecorator(boardPanel, model, currentColor);
+    this.hintsToggle = new JCheckBox("Show Hints");
+    hintsToggle.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        boardDecorator.setShowHints(hintsToggle.isSelected());
+      }
+    });
+    JPanel controlPanel = new JPanel();
+    controlPanel.add(hintsToggle);
+    add(controlPanel, BorderLayout.NORTH);
     add(leftHandPanel, BorderLayout.WEST);
-    add(boardPanel, BorderLayout.CENTER);
+    add(boardDecorator, BorderLayout.CENTER);
     add(rightHandPanel, BorderLayout.EAST);
 
+    boardDecorator.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        Point p = e.getPoint();
+        Dimension cellSize = boardDecorator.getCellSize();
+        int row = p.y / cellSize.height;
+        int col = p.x / cellSize.width;
+
+        if (features != null) {
+          features.onCellSelected(row, col);
+        }
+      }
+    });
     pack();
   }
 
@@ -267,6 +298,7 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
     @Override
     public void refresh() {
       repaint();
+      boardDecorator.refresh();
     }
   }
 
@@ -480,5 +512,6 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
     } catch (Exception e) {
       System.err.println("Error in setSelectedCard: " + e.getMessage());
     }
+    boardDecorator.setSelectedCard(card, player);
   }
 }
