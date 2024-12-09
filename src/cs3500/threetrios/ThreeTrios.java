@@ -4,6 +4,11 @@ import cs3500.threetrios.adapter.ControllerAdapter;
 import cs3500.threetrios.adapter.ReadOnlyTTAdapter;
 import cs3500.threetrios.controller.AIPlayer;
 import cs3500.threetrios.controller.ThreeTriosController;
+import cs3500.threetrios.model.FallenAceDecorator;
+import cs3500.threetrios.model.MainModelInterface;
+import cs3500.threetrios.model.PlusRuleDecorator;
+import cs3500.threetrios.model.ReverseRuleDecorator;
+import cs3500.threetrios.model.SameRuleDecorator;
 import cs3500.threetrios.model.ThreeTriosGameModel;
 import cs3500.threetrios.model.Grid;
 import cs3500.threetrios.model.Card;
@@ -20,6 +25,16 @@ import cs3500.threetrios.adapter.ViewAdapter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+/**
+ * java -jar threetrios.jar [player1] [player2] [variant rules...] [provider]
+ *
+ * java -jar threetrios.jar human human
+ * java -jar threetrios.jar human human reverse fallenace
+ * java -jar threetrios.jar human cornerstrat same
+ * java -jar threetrios.jar human human reverse provider
+ *
+ */
 
 /**
  * Main class for the ThreeTrios game. This class initializes and starts the game with
@@ -39,12 +54,47 @@ public final class ThreeTrios {
    *                                  is interrupted while waiting for the first move
    */
   public static void main(String[] args) {
-    String redType = args.length > 0 ? args[0].toLowerCase() : "human";
-    String blueType = args.length > 1 ? args[1].toLowerCase() : "human";
-    boolean useProviderView = args.length > 2 && args[2].equalsIgnoreCase("provider");
+    List<String> variantArgs = new ArrayList<>();
+    List<String> playerArgs = new ArrayList<>();
+    boolean useProviderView = false;
 
-    ThreeTriosGameModel model = new ThreeTriosGameModel();
-    setupGame(model);
+    for (String arg : args) {
+      switch (arg.toLowerCase()) {
+        case "reverse":
+        case "fallenace":
+        case "same":
+        case "plus":
+          variantArgs.add(arg.toLowerCase());
+          break;
+        case "provider":
+          useProviderView = true;
+          break;
+        default:
+          playerArgs.add(arg.toLowerCase());
+          break;
+      }
+    }
+
+    if (variantArgs.contains("same") && variantArgs.contains("plus")) {
+      throw new IllegalArgumentException("Cannot use Same and Plus rules together");
+    }
+
+    MainModelInterface model = new ThreeTriosGameModel();
+    if (variantArgs.contains("reverse")) {
+      model = new ReverseRuleDecorator(model);
+    }
+    if (variantArgs.contains("fallenace")) {
+      model = new FallenAceDecorator(model);
+    }
+    if (variantArgs.contains("same")) {
+      model = new SameRuleDecorator(model);
+    } else if (variantArgs.contains("plus")) {
+      model = new PlusRuleDecorator(model);
+    }
+    setupGame((ThreeTriosGameModel)model);
+
+    String redType = playerArgs.size() > 0 ? playerArgs.get(0) : "human";
+    String blueType = playerArgs.size() > 1 ? playerArgs.get(1) : "human";
 
     Player redPlayer = model.getPlayers().get(0);
     Player bluePlayer = model.getPlayers().get(1);
@@ -52,26 +102,22 @@ public final class ThreeTrios {
     redPlayer = createPlayer(redType, redPlayer);
     bluePlayer = createPlayer(blueType, bluePlayer);
 
-    // Always use your view for RED player
     ThreeTriosSwingView redView = new ThreeTriosSwingView(model);
     ThreeTriosController redController = new ThreeTriosController(model, redView, redPlayer);
     redView.setLocation(100, 100);
 
     if (useProviderView) {
-      // Use ViewAdapter for BLUE player
       ReadOnlyTTAdapter modelAdapter = new ReadOnlyTTAdapter(model);
       ViewAdapter blueView = new ViewAdapter(modelAdapter, "Blue Player");
       ControllerAdapter blueController = new ControllerAdapter(model, blueView, bluePlayer);
       blueView.addClickListener(blueController);
       blueView.setLocation(700, 100);
 
-      // Add listeners and start game
       model.addFeaturesListener(redController);
       model.addFeaturesListener(blueController);
       redController.startGame();
       blueView.makeVisible();
 
-      // If it's BLUE's turn and they're AI, trigger turn notification
       if (model.getCurrentPlayer().getColor().equals("BLUE") &&
               bluePlayer instanceof AIPlayer) {
         blueController.notifyTurnChange(model.getCurrentPlayer());

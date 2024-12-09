@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Color;
 import java.awt.RenderingHints;
 
@@ -21,8 +20,7 @@ public class HintDecorator extends JPanel implements GameBoardPanel {
   private final ReadOnlyThreeTriosModel model;
   private boolean showHints;
   private Card selectedCard;
-  private static final Color HINT_OVERLAY = new Color(255, 255, 0, 128);
-  private static final Font HINT_FONT = new Font("Arial", Font.BOLD, 24);
+  private static final Font HINT_FONT = new Font("Arial", Font.BOLD, 14);
 
   public HintDecorator(GameBoardPanel panel, ReadOnlyThreeTriosModel model, String playerColor) {
     this.decoratedPanel = panel;
@@ -33,52 +31,73 @@ public class HintDecorator extends JPanel implements GameBoardPanel {
       add((JComponent) panel, BorderLayout.CENTER);
     }
     setOpaque(false);
+
+    // Set custom UI to ensure painting
+    setUI(new javax.swing.plaf.PanelUI() {
+      @Override
+      public void paint(Graphics g, JComponent c) {
+        paintHints(g);
+      }
+    });
+  }
+
+  private void paintHints(Graphics g) {
+    System.out.println("Attempting to paint hints"); // Debug
+
+    if (!showHints || selectedCard == null) {
+      System.out.println("Hints disabled or no card selected"); // Debug
+      return;
+    }
+
+    Graphics2D g2d = (Graphics2D) g.create();
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+    Dimension cellSize = getCellSize();
+    int[] dims = model.getGridDimensions();
+
+    g2d.setFont(HINT_FONT);
+
+    for (int row = 0; row < dims[0]; row++) {
+      for (int col = 0; col < dims[1]; col++) {
+        if (!model.isHole(row, col) && model.getCardAt(row, col) == null) {
+          int flips = model.getFlippableCards(row, col, selectedCard);
+          System.out.println("Cell [" + row + "," + col + "] flips: " + flips); // Debug
+
+          int x = col * cellSize.width;
+          int y = row * cellSize.height;
+
+          // Draw hint number
+          g2d.setColor(Color.BLACK);
+          String hint = String.valueOf(flips);
+          int padding = 5;
+          int textX = x + padding;
+          int textY = y + cellSize.height - padding;
+          g2d.drawString(hint, textX, textY);
+        }
+      }
+    }
+    g2d.dispose();
   }
 
   @Override
   protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
+    System.out.println("PaintComponent called"); // Debug
+
+    // Paint the base panel
     if (decoratedPanel instanceof JComponent) {
       ((JComponent) decoratedPanel).paint(g);
     }
 
-    if (showHints && selectedCard != null) {
-      Graphics2D g2d = (Graphics2D) g;
-      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    // Paint the hints
+    paintHints(g);
+  }
 
-      Dimension cellSize = getCellSize();
-      int[] dims = model.getGridDimensions();
-
-      // Set font size based on cell size
-      int fontSize = Math.min(cellSize.height / 3, cellSize.width / 3);
-      g2d.setFont(HINT_FONT.deriveFont((float)fontSize));
-
-      // Draw hints for each cell
-      for (int row = 0; row < dims[0]; row++) {
-        for (int col = 0; col < dims[1]; col++) {
-          // Check if cell is empty and not a hole
-          if (!model.isHole(row, col) && model.getCardAt(row, col) == null) {
-            int flips = model.getFlippableCards(row, col, selectedCard);
-            int x = col * cellSize.width;
-            int y = row * cellSize.height;
-
-            // Only show hint if card can be placed here
-            if (model.canPlaceCard(row, col, selectedCard)) {
-              // Draw yellow highlight
-              g2d.setColor(HINT_OVERLAY);
-              g2d.fillRect(x, y, cellSize.width, cellSize.height);
-
-              // Draw number of flips
-              g2d.setColor(Color.BLACK);
-              String hint = String.valueOf(flips);
-              FontMetrics fm = g2d.getFontMetrics();
-              int textX = x + (cellSize.width - fm.stringWidth(hint)) / 2;
-              int textY = y + (cellSize.height + fm.getAscent()) / 2;
-              g2d.drawString(hint, textX, textY);
-            }
-          }
-        }
-      }
-    }
+  @Override
+  public void paint(Graphics g) {
+    super.paint(g);
+    System.out.println("Paint called"); // Debug
+    paintHints(g);
   }
 
   @Override
@@ -88,17 +107,23 @@ public class HintDecorator extends JPanel implements GameBoardPanel {
 
   @Override
   public void refresh() {
+    System.out.println("Refresh called"); // Debug
     decoratedPanel.refresh();
-    repaint();
+    revalidate();
+    repaint(50L); // Force repaint with delay
   }
 
   public void setShowHints(boolean show) {
+    System.out.println("Setting showHints to: " + show); // Debug
     this.showHints = show;
-    repaint();
+    refresh();
   }
 
   public void setSelectedCard(Card card, Player player) {
+    System.out.println("Setting selectedCard to: " + (card != null ? card.getName() : "null")); // Debug
     this.selectedCard = card;
-    repaint();
+    if (showHints) {
+      refresh();
+    }
   }
 }

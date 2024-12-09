@@ -61,40 +61,44 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
    */
   public ThreeTriosSwingView(ReadOnlyThreeTriosModel model) {
     this.model = model;
-
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setLayout(new BorderLayout(0, 0));
 
-    Player currentPlayer = model.getCurrentPlayer();
-    if (currentPlayer != null) {
-      setTitle("Current player: " + currentPlayer.getColor());
-    }
+    // Initialize panels first
+    this.boardPanel = new GameBoardPanelImpl(model);
+    this.leftHandPanel = new PlayerHandPanelImpl(model, "RED");
+    this.rightHandPanel = new PlayerHandPanelImpl(model, "BLUE");
 
-    leftHandPanel = new PlayerHandPanelImpl(model, "RED");
-    rightHandPanel = new PlayerHandPanelImpl(model, "BLUE");
-    boardPanel = new GameBoardPanelImpl(model);
-
+    // Set panel sizes
     leftHandPanel.setPreferredSize(new Dimension(HAND_WIDTH, 400));
     rightHandPanel.setPreferredSize(new Dimension(HAND_WIDTH, 400));
     boardPanel.setPreferredSize(new Dimension(500, 400));
 
+    // Initialize hint-related components
     String currentColor = model.getCurrentPlayer() != null ?
             model.getCurrentPlayer().getColor() : "RED";
     this.boardDecorator = new HintDecorator(boardPanel, model, currentColor);
     this.hintsToggle = new JCheckBox("Show Hints");
-    hintsToggle.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        boardDecorator.setShowHints(hintsToggle.isSelected());
+
+    // Set up hint toggle after boardDecorator is initialized
+    hintsToggle.addActionListener(e -> {
+      System.out.println("Hint toggle clicked: " + hintsToggle.isSelected());
+      boardDecorator.setShowHints(hintsToggle.isSelected());
+      if (selectedCard != null) {
+        boardDecorator.setSelectedCard(selectedCard, selectedCardPlayer);
       }
+      boardDecorator.refresh();
     });
+
+    // Add components to frame
     JPanel controlPanel = new JPanel();
     controlPanel.add(hintsToggle);
     add(controlPanel, BorderLayout.NORTH);
     add(leftHandPanel, BorderLayout.WEST);
-    add(boardDecorator, BorderLayout.CENTER);
+    add(boardDecorator, BorderLayout.CENTER);  // Use boardDecorator instead of boardPanel
     add(rightHandPanel, BorderLayout.EAST);
 
+    // Set up board decorator mouse listener
     boardDecorator.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
@@ -108,6 +112,7 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
         }
       }
     });
+
     pack();
   }
 
@@ -154,6 +159,7 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
 
     @Override
     protected void paintComponent(Graphics g) {
+
       super.paintComponent(g);
       Graphics2D g2d = (Graphics2D) g;
       g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -493,6 +499,7 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
 
   @Override
   public void setSelectedCard(Card card, Player player) {
+    System.out.println("setSelectedCard called: " + (card != null));
     this.selectedCard = card;
     this.selectedCardPlayer = player;
 
@@ -505,13 +512,18 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
         } else if (player.getColor().equals("BLUE")) {
           rightHandPanel.selectedCardIndex = rightHandPanel.findCardIndex(card);
         }
+
+        if (hintsToggle.isSelected()) {
+          System.out.println("Updating hints for card: " + card.getName());
+          boardDecorator.setSelectedCard(card, player);
+          boardDecorator.refresh();
+        }
       }
-      leftHandPanel.refresh();
-      rightHandPanel.refresh();
+
       repaint();
     } catch (Exception e) {
       System.err.println("Error in setSelectedCard: " + e.getMessage());
+      e.printStackTrace();
     }
-    boardDecorator.setSelectedCard(card, player);
   }
 }
