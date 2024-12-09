@@ -13,29 +13,32 @@ public class PlusRuleDecorator extends ModelDecorator {
 
   @Override
   public void executeBattlePhase(Position newCardPosition) {
-    List<Card> plusFlips = checkPlusRule(newCardPosition);
-    base.executeBattlePhase(newCardPosition);  // Call base implementation
-    for (Card card : plusFlips) {
+    List<Card> sameFlips = checkSameRule(newCardPosition);
+    for (Card card : sameFlips) {
       card.setOwner(getCurrentPlayer());
     }
+    base.executeBattlePhase(newCardPosition);
   }
 
-  private List<Card> checkPlusRule(Position pos) {
+  private List<Card> checkSameRule(Position pos) {
     List<Card> toFlip = new ArrayList<>();
     Card placedCard = grid.getCard(pos.row, pos.col);
-    Map<Integer, List<Position>> sumPositions = new HashMap<>();
+    Map<Integer, List<Position>> matchingCards = new HashMap<>();
 
     for (Position adjPos : getAdjacentPositions(pos)) {
       Card adjCard = grid.getCard(adjPos.row, adjPos.col);
       if (adjCard != null) {
         Direction dir = getBattleDirection(pos, adjPos);
-        int sum = placedCard.getAttackPower(dir) +
-                adjCard.getAttackPower(dir.getOpposite());
-        sumPositions.computeIfAbsent(sum, k -> new ArrayList<>()).add(adjPos);
+        int placedValue = placedCard.getAttackPower(dir);
+        int adjValue = adjCard.getAttackPower(dir.getOpposite());
+
+        if (placedValue == adjValue) {
+          matchingCards.computeIfAbsent(placedValue, k -> new ArrayList<>()).add(adjPos);
+        }
       }
     }
 
-    for (List<Position> positions : sumPositions.values()) {
+    for (List<Position> positions : matchingCards.values()) {
       if (positions.size() >= 2) {
         for (Position matchPos : positions) {
           Card card = grid.getCard(matchPos.row, matchPos.col);
