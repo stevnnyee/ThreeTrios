@@ -11,38 +11,67 @@ public class ReverseRuleDecorator extends ModelDecorator {
   }
 
   @Override
-  public void executeBattlePhase(cs3500.threetrios.strategy.Position newCardPosition) {
-    System.out.println("=== Reverse Battle Phase Starting ===");
-    Card newCard = grid.getCard(newCardPosition.row, newCardPosition.col);
+  public void executeBattlePhase(Position newCardPosition) {
+    Card newCard = getCardAt(newCardPosition.row, newCardPosition.col);
     List<Position> adjacent = getAdjacentPositions(newCardPosition);
-    List<Card> toFlip = new ArrayList<>();
 
     for (Position pos : adjacent) {
-      Card adjCard = grid.getCard(pos.row, pos.col);
+      Card adjCard = getCardAt(pos.row, pos.col);
       if (adjCard != null && adjCard.getOwner() != getCurrentPlayer()) {
         Direction battleDir = getBattleDirection(newCardPosition, pos);
         int attackValue = newCard.getAttackPower(battleDir);
         int defenseValue = adjCard.getAttackPower(battleDir.getOpposite());
 
-        System.out.println(String.format(
-                "Battle at (%d,%d) -> (%d,%d): %d vs %d using direction %s",
-                newCardPosition.row, newCardPosition.col,
-                pos.row, pos.col,
-                attackValue, defenseValue,
-                battleDir));
-
-        if (attackValue < defenseValue) {
-          System.out.println("Flipping card - attack value is lower!");
-          System.out.println("Before flip - Owner: " + adjCard.getOwner().getColor());
-          adjCard.setOwner(getCurrentPlayer());  // Directly set the owner
-          System.out.println("After flip - Owner: " + adjCard.getOwner().getColor());
-          grid.placeCard(pos.row, pos.col, adjCard);  // Update the grid
-          toFlip.add(adjCard);
+        if (attackValue < defenseValue) {  // Reversed comparison
+          // Only update the ownership, don't place the card again
+          adjCard.setOwner(getCurrentPlayer());
         }
       }
     }
+  }
 
-    System.out.println(String.format("Battle complete - flipped %d cards", toFlip.size()));
+  @Override
+  public void placeCard(int row, int col, Card card) {
+    // First check if the move is valid
+    if (!canPlaceCard(row, col, card)) {
+      return;
+    }
+
+    // Set ownership BEFORE placing the card
+    card.setOwner(getCurrentPlayer());
+
+    // Place the card on the grid
+    grid.placeCard(row, col, card);
+
+    // Remove the card from player's hand
+    getPlayerHand(getCurrentPlayer()).remove(card);
+
+    // Execute battle phase - this handles the flipping
+    executeBattlePhase(new Position(row, col));
+
+    // IMPORTANT: Only change the player turn AFTER everything else is complete
+    // and don't check the current player again - just switch directly
+    setCurrentPlayer(getPlayers().get(getCurrentPlayer().equals(getPlayers().get(0).getColor()) ? 1 : 0).getColor());
+  }
+
+  @Override
+  public boolean canPlaceCard(int row, int col, Card card) {
+    // Check if position is within bounds
+    if (row < 0 || row >= grid.getRows() || col < 0 || col >= grid.getCols()) {
+      return false;
+    }
+
+    // Check if position is a hole
+    if (isHole(row, col)) {
+      return false;
+    }
+
+    // Check if position is already occupied
+    if (getCardAt(row, col) != null) {
+      return false;
+    }
+
+    return true;
   }
 
   @Override
@@ -50,14 +79,17 @@ public class ReverseRuleDecorator extends ModelDecorator {
     if (!canPlaceCard(row, col, card)) {
       return 0;
     }
+
     int flippableCount = 0;
     List<Position> adjacent = getAdjacentPositions(new Position(row, col));
+
     for (Position pos : adjacent) {
       Card adjacentCard = getCardAt(pos.row, pos.col);
       if (adjacentCard != null && adjacentCard.getOwner() != getCurrentPlayer()) {
         Direction battleDir = getBattleDirection(new Position(row, col), pos);
         int attackValue = card.getAttackPower(battleDir);
         int defenseValue = adjacentCard.getAttackPower(battleDir.getOpposite());
+
         if (attackValue < defenseValue) {  // Reversed comparison
           flippableCount++;
         }
