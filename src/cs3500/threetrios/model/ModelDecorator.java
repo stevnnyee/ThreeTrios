@@ -14,6 +14,33 @@ public abstract class ModelDecorator implements MainModelInterface {
   }
 
   @Override
+  public void placeCard(Player player, int row, int col, Card card) {
+    if (!canPlaceCard(row, col, card)) {
+      throw new IllegalArgumentException("Invalid card placement");
+    }
+
+    // Place card directly on grid
+    card.setOwner(player);
+    grid.placeCard(row, col, card);
+
+    // Remove from player's hand using base model (which modifies the actual hand)
+    base.getPlayerHand(player).remove(card);
+
+    // Execute only our battle phase
+    executeBattlePhase(new Position(row, col));
+
+    // Change turns
+    String nextPlayer = player.getColor().equals("RED") ? "BLUE" : "RED";
+    base.setCurrentPlayer(nextPlayer);
+  }
+
+  @Override
+  public void placeCard(int row, int col, Card card) {
+    placeCard(getCurrentPlayer(), row, col, card);
+  }
+
+  // All other methods remain unchanged, delegating to base
+  @Override
   public void startGame(Grid grid, List<Card> deck) {
     base.startGame(grid, deck);
     this.grid = grid;
@@ -22,18 +49,6 @@ public abstract class ModelDecorator implements MainModelInterface {
   @Override
   public void startGameFromConfig(String boardFile, String cardFile) throws IOException {
     base.startGameFromConfig(boardFile, cardFile);
-  }
-
-  @Override
-  public void placeCard(Player player, int row, int col, Card card) {
-    base.placeCard(player, row, col, card);  // Let base handle placement
-    executeBattlePhase(new Position(row, col));  // Then do our battle phase
-  }
-
-  @Override
-  public void placeCard(int row, int col, Card card) {
-    base.placeCard(row, col, card);  // Let base handle placement
-    executeBattlePhase(new Position(row, col));  // Then do our battle phase
   }
 
   @Override
@@ -69,11 +84,6 @@ public abstract class ModelDecorator implements MainModelInterface {
   @Override
   public Player getWinner() {
     return base.getWinner();
-  }
-
-  @Override
-  public int getFlippableCards(int row, int col, Card card) {
-    return base.getFlippableCards(row, col, card);
   }
 
   @Override

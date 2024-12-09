@@ -73,4 +73,9 @@ public class SameRuleDecorator extends ModelDecorator {
             && col >= 0 && col < grid.getCols()
             && !isHole(row, col);
   }
+
+  @Override
+  public int getFlippableCards(int row, int col, Card card) {
+    return 0;
+  }
 }
