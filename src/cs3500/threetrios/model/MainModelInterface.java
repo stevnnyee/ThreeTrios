@@ -76,4 +76,6 @@ public interface MainModelInterface extends ReadOnlyThreeTriosModel {
    * @throws IllegalArgumentException if the listener parameter is null
    */
   void addFeaturesListener(ModelFeatures listener);
+
+  void executeBattlePhase(cs3500.threetrios.strategy.Position newCardPosition);
 }

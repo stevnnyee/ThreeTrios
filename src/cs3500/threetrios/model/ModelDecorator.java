@@ -26,12 +26,14 @@ public abstract class ModelDecorator implements MainModelInterface {
 
   @Override
   public void placeCard(Player player, int row, int col, Card card) {
-    base.placeCard(player, row, col, card);
+    base.placeCard(player, row, col, card);  // Let base handle placement
+    executeBattlePhase(new Position(row, col));  // Then do our battle phase
   }
 
   @Override
   public void placeCard(int row, int col, Card card) {
-    base.placeCard(row, col, card);
+    base.placeCard(row, col, card);  // Let base handle placement
+    executeBattlePhase(new Position(row, col));  // Then do our battle phase
   }
 
   @Override

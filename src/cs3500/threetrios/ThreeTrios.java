@@ -91,7 +91,7 @@ public final class ThreeTrios {
     } else if (variantArgs.contains("plus")) {
       model = new PlusRuleDecorator(model);
     }
-    setupGame((ThreeTriosGameModel)model);
+    setupGame(model);
 
     String redType = playerArgs.size() > 0 ? playerArgs.get(0) : "human";
     String blueType = playerArgs.size() > 1 ? playerArgs.get(1) : "human";
@@ -156,7 +156,7 @@ public final class ThreeTrios {
     }
   }
 
-  private static void setupGame(ThreeTriosGameModel model) {
+  private static void setupGame(MainModelInterface model) {
     int rows = 5;
     int cols = 7;
     boolean[][] holes = new boolean[rows][cols];
