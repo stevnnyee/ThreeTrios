@@ -8,7 +8,7 @@ import cs3500.threetrios.provider.model.CardCell;
 import cs3500.threetrios.provider.model.Card;
 import cs3500.threetrios.model.Player;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -32,7 +32,9 @@ public class ReadOnlyTTAdapter implements ReadOnlyTT {
   @Override
   public PlayerColor getCurrentTurn() {
     Player current = model.getCurrentPlayer();
-    if (current == null) return null;
+    if (current == null) {
+      return null;
+    }
     return current.getColor().equals("RED") ? PlayerColor.RED : PlayerColor.BLUE;
   }
 
@@ -78,7 +80,9 @@ public class ReadOnlyTTAdapter implements ReadOnlyTT {
   @Override
   public PlayerColor getCardOwner(int row, int col) {
     Player owner = model.getCardOwnerAt(row, col);
-    if (owner == null) return null;
+    if (owner == null) {
+      return null;
+    }
     return owner.getColor().equals("RED") ? PlayerColor.RED : PlayerColor.BLUE;
   }
 
@@ -131,7 +135,6 @@ public class ReadOnlyTTAdapter implements ReadOnlyTT {
       if (p.getColor().equals(colorStr)) {
         List<Card> adaptedHand = new ArrayList<>();
         List<cs3500.threetrios.model.Card> playerHand = model.getPlayerHand(p);
-        System.out.println("Hand for " + colorStr + ": " + playerHand.size() + " cards");
         for (cs3500.threetrios.model.Card modelCard : playerHand) {
           adaptedHand.add(new CardAdapter(modelCard));
         }
@@ -163,7 +166,9 @@ public class ReadOnlyTTAdapter implements ReadOnlyTT {
       throw new IllegalStateException("Game is not over yet");
     }
     Player winner = model.getWinner();
-    if (winner == null) return null;
+    if (winner == null) {
+      return null;
+    }
     return winner.getColor().equals("RED") ? PlayerColor.RED : PlayerColor.BLUE;
   }
 

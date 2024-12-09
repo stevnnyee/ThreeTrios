@@ -462,16 +462,24 @@ public class ThreeTriosGameModel implements MainModelInterface {
     if (!canPlaceCard(row, col, card)) {
       return 0;
     }
+
     int flippableCount = 0;
     List<Position> adjacent = getAdjacentPositions(new Position(row, col));
+
     for (Position pos : adjacent) {
       Card adjacentCard = grid.getCard(pos.row, pos.col);
       if (adjacentCard != null && adjacentCard.getOwner() != currentPlayer) {
-        if (checkCardWinsBattle(new Position(row, col), pos)) {
+        // Simulate placing the card to check if it would win the battle
+        Direction battleDir = getBattleDirection(new Position(row, col), pos);
+        int attackValue = card.getAttackPower(battleDir);
+        int defenseValue = adjacentCard.getAttackPower(battleDir.getOpposite());
+
+        if (attackValue > defenseValue) {
           flippableCount++;
         }
       }
     }
+
     return flippableCount;
   }
 

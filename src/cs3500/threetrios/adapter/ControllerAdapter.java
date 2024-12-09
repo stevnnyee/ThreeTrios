@@ -18,7 +18,7 @@ import cs3500.threetrios.provider.model.Card;
 public class ControllerAdapter implements TriosController, ModelFeatures {
   private final MainModelInterface model;
   private final ReadOnlyTTAdapter modelAdapter;
-  private final ViewAdapter view;  // Changed from ThreeTriosView to ViewAdapter
+  private final ViewAdapter view;
   private final Player controlledPlayer;
   private Card selectedCard;
   private PlayerColor selectedColor;
@@ -31,7 +31,7 @@ public class ControllerAdapter implements TriosController, ModelFeatures {
    * @param player the player this controller is responsible for
    * @throws IllegalArgumentException if any parameter is null
    */
-  public ControllerAdapter(MainModelInterface model, ViewAdapter view, Player player) {  // Changed parameter type
+  public ControllerAdapter(MainModelInterface model, ViewAdapter view, Player player) {
     this.model = model;
     this.modelAdapter = new ReadOnlyTTAdapter(model);
     this.view = view;
@@ -58,11 +58,8 @@ public class ControllerAdapter implements TriosController, ModelFeatures {
   public void handleCellClick(int x, int y) {
     int cellWidth = view.getCellWidth();
     int cellHeight = view.getCellHeight();
-
     int row = y / cellHeight;
     int col = x / cellWidth;
-
-    System.out.println("Click at: x=" + x + ", y=" + y + " (row=" + row + ", col=" + col + ")");
 
     if (col == 0 || col == modelAdapter.numCols() + 1) {
       PlayerColor color = (col == 0) ? PlayerColor.RED : PlayerColor.BLUE;
@@ -77,7 +74,6 @@ public class ControllerAdapter implements TriosController, ModelFeatures {
     String clickedColor = (color == PlayerColor.RED) ? "RED" : "BLUE";
 
     if (!currentColor.equals(clickedColor)) {
-      System.out.println("Not " + clickedColor + "'s turn!");
       return;
     }
 
@@ -86,18 +82,15 @@ public class ControllerAdapter implements TriosController, ModelFeatures {
       selectedCard = hand.get(index);
       selectedColor = color;
       view.selectCard(index, col);
-      System.out.println("Selected card at index " + index + " for " + color);
     }
   }
 
   private void handleBoardClick(int row, int col) {
     if (selectedCard == null) {
-      System.out.println("No card selected!");
       return;
     }
 
     if (!modelAdapter.isValidMove(row, col)) {
-      System.out.println("Invalid move position: " + row + "," + col);
       return;
     }
 
@@ -114,11 +107,10 @@ public class ControllerAdapter implements TriosController, ModelFeatures {
         model.placeCard(row, col, ourCard);
         selectedCard = null;
         selectedColor = null;
-        System.out.println("Card placed at " + row + "," + col);
-        view.selectCard(-1, -1);  // Clear selection
+        view.selectCard(-1, -1);
         view.refresh();
       } catch (Exception e) {
-        System.out.println("Error placing card: " + e.getMessage());
+        throw new IllegalArgumentException(e.getMessage());
       }
     }
   }
@@ -144,7 +136,6 @@ public class ControllerAdapter implements TriosController, ModelFeatures {
       cs3500.threetrios.strategy.AIMove move = aiPlayer.getNextMove(model);
 
       if (move != null && move.getCard() != null) {
-        // First, find the matching provider card and select it
         PlayerColor aiColor = controlledPlayer.getColor().equals("RED") ?
                 PlayerColor.RED : PlayerColor.BLUE;
         List<Card> hand = modelAdapter.getHand(aiColor);
@@ -152,7 +143,6 @@ public class ControllerAdapter implements TriosController, ModelFeatures {
         for (int i = 0; i < hand.size(); i++) {
           Card providerCard = hand.get(i);
           if (providerCard.getName().equals(move.getCard().getName())) {
-            // Simulate card selection
             selectedCard = providerCard;
             selectedColor = aiColor;
             int col = aiColor == PlayerColor.RED ? 0 : modelAdapter.numCols() + 1;
@@ -160,19 +150,16 @@ public class ControllerAdapter implements TriosController, ModelFeatures {
             break;
           }
         }
-
-        // Now place the card
         if (selectedCard != null) {
           model.placeCard(move.getRow(), move.getCol(), move.getCard());
           selectedCard = null;
           selectedColor = null;
-          view.selectCard(-1, -1);  // Clear selection
+          view.selectCard(-1, -1);
           view.refresh();
         }
       }
     } catch (Exception e) {
-      System.err.println("Error making AI move: " + e.getMessage());
-      e.printStackTrace();  // Add stack trace for debugging
+      throw new IllegalArgumentException(e.getMessage());
     }
   }
 
