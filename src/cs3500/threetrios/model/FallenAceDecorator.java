@@ -29,10 +29,7 @@ public class FallenAceDecorator extends ModelDecorator {
       }
     }
 
-    if (base instanceof ThreeTriosGameModel) {
-      ((ThreeTriosGameModel) base).executeBattlePhase(
-              new ThreeTriosGameModel.Position(newCardPosition.row, newCardPosition.col));
-    }
+    base.executeBattlePhase(newCardPosition);  // Call base implementation
 
     for (Card card : toFlip) {
       card.setOwner(getCurrentPlayer());

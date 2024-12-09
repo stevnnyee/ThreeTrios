@@ -244,4 +244,11 @@ public class MockThreeTriosModel implements MainModelInterface {
       initializeDefaultHand();
     }
   }
+
+  @Override
+  public void executeBattlePhase(Position newCardPosition) {
+    log.append(String.format("Executing battle phase at position (%d,%d)\n",
+            newCardPosition.row, newCardPosition.col));
+    // Mock implementation - doesn't actually execute battles but logs that it was called
+  }
 }

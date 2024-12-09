@@ -11,7 +11,8 @@ public class ReverseRuleDecorator extends ModelDecorator {
   }
 
   @Override
-  public void executeBattlePhase(Position newCardPosition) {
+  public void executeBattlePhase(cs3500.threetrios.strategy.Position newCardPosition) {
+    System.out.println("=== Reverse Battle Phase Starting ===");
     Card newCard = grid.getCard(newCardPosition.row, newCardPosition.col);
     List<Position> adjacent = getAdjacentPositions(newCardPosition);
     List<Card> toFlip = new ArrayList<>();
@@ -22,20 +23,26 @@ public class ReverseRuleDecorator extends ModelDecorator {
         Direction battleDir = getBattleDirection(newCardPosition, pos);
         int attackValue = newCard.getAttackPower(battleDir);
         int defenseValue = adjCard.getAttackPower(battleDir.getOpposite());
-        if (attackValue < defenseValue) {  // Reversed comparison
+
+        System.out.println(String.format(
+                "Battle at (%d,%d) -> (%d,%d): %d vs %d using direction %s",
+                newCardPosition.row, newCardPosition.col,
+                pos.row, pos.col,
+                attackValue, defenseValue,
+                battleDir));
+
+        if (attackValue < defenseValue) {
+          System.out.println("Flipping card - attack value is lower!");
+          System.out.println("Before flip - Owner: " + adjCard.getOwner().getColor());
+          adjCard.setOwner(getCurrentPlayer());  // Directly set the owner
+          System.out.println("After flip - Owner: " + adjCard.getOwner().getColor());
+          grid.placeCard(pos.row, pos.col, adjCard);  // Update the grid
           toFlip.add(adjCard);
         }
       }
     }
 
-    if (base instanceof ThreeTriosGameModel) {
-      ((ThreeTriosGameModel) base).executeBattlePhase(
-              new ThreeTriosGameModel.Position(newCardPosition.row, newCardPosition.col));
-    }
-
-    for (Card card : toFlip) {
-      card.setOwner(getCurrentPlayer());
-    }
+    System.out.println(String.format("Battle complete - flipped %d cards", toFlip.size()));
   }
 
   @Override
@@ -74,10 +81,10 @@ public class ReverseRuleDecorator extends ModelDecorator {
   }
 
   private Direction getBattleDirection(Position from, Position to) {
-    if (from.row < to.row) return Direction.SOUTH;
-    if (from.row > to.row) return Direction.NORTH;
-    if (from.col < to.col) return Direction.EAST;
-    return Direction.WEST;
+    if (from.row < to.row) return Direction.SOUTH;  // Attacking downward
+    if (from.row > to.row) return Direction.NORTH;  // Attacking upward
+    if (from.col < to.col) return Direction.EAST;   // Attacking rightward
+    return Direction.WEST;                          // Attacking leftward
   }
 
   private boolean isValidPosition(int row, int col) {
