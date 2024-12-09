@@ -14,7 +14,6 @@ public class SameRuleDecorator extends ModelDecorator {
   @Override
   public void executeBattlePhase(Position newCardPosition) {
     List<Card> sameFlips = checkSameRule(newCardPosition);
-    // Call base executeBattlePhase without type checking/casting
     base.executeBattlePhase(newCardPosition);
     for (Card card : sameFlips) {
       card.setOwner(getCurrentPlayer());
