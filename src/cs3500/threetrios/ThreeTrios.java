@@ -80,11 +80,14 @@ public final class ThreeTrios {
     }
 
     MainModelInterface model = new ThreeTriosGameModel();
-    if (variantArgs.contains("reverse")) {
+    boolean reverseActive = variantArgs.contains("reverse");
+
+    // Apply decorators in order
+    if (reverseActive) {
       model = new ReverseRuleDecorator(model);
     }
     if (variantArgs.contains("fallenace")) {
-      model = new FallenAceDecorator(model);
+      model = new FallenAceDecorator(model, reverseActive);  // Pass whether reverse rule is active
     }
     if (variantArgs.contains("same")) {
       model = new SameRuleDecorator(model);

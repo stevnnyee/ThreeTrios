@@ -14,7 +14,6 @@ public class SameRuleDecorator extends ModelDecorator {
   @Override
   public void executeBattlePhase(Position newCardPosition) {
     List<Card> sameFlips = checkSameRule(newCardPosition);
-    // Call base executeBattlePhase without type checking/casting
     base.executeBattlePhase(newCardPosition);
     for (Card card : sameFlips) {
       card.setOwner(getCurrentPlayer());
@@ -73,5 +72,10 @@ public class SameRuleDecorator extends ModelDecorator {
     return row >= 0 && row < grid.getRows()
             && col >= 0 && col < grid.getCols()
             && !isHole(row, col);
+  }
+
+  @Override
+  public int getFlippableCards(int row, int col, Card card) {
+    return 0;
   }
 }

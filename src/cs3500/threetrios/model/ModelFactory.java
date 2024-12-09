@@ -17,7 +17,7 @@ public class ModelFactory {
       model = new ReverseRuleDecorator(model);
     }
     if (hasFallenAce) {
-      model = new FallenAceDecorator(model);
+      model = new FallenAceDecorator(model, hasReverse);  // Pass whether reverse rule is active
     }
 
     // Apply Set 2 rules (mutually exclusive)

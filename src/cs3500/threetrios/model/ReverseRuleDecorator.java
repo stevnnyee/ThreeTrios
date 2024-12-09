@@ -1,9 +1,12 @@
 package cs3500.threetrios.model;
 
-import java.util.List;
-
 import cs3500.threetrios.strategy.Position;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ReverseRuleDecorator extends ModelDecorator {
   public ReverseRuleDecorator(MainModelInterface base) {
@@ -12,66 +15,40 @@ public class ReverseRuleDecorator extends ModelDecorator {
 
   @Override
   public void executeBattlePhase(Position newCardPosition) {
-    Card newCard = getCardAt(newCardPosition.row, newCardPosition.col);
-    List<Position> adjacent = getAdjacentPositions(newCardPosition);
+    Set<Position> toProcess = new HashSet<>();
+    Set<Position> processed = new HashSet<>();
+    toProcess.add(newCardPosition);
 
-    for (Position pos : adjacent) {
-      Card adjCard = getCardAt(pos.row, pos.col);
-      if (adjCard != null && adjCard.getOwner() != getCurrentPlayer()) {
-        Direction battleDir = getBattleDirection(newCardPosition, pos);
-        int attackValue = newCard.getAttackPower(battleDir);
-        int defenseValue = adjCard.getAttackPower(battleDir.getOpposite());
+    while (!toProcess.isEmpty()) {
+      Position currentPos = toProcess.iterator().next();
+      toProcess.remove(currentPos);
+      processed.add(currentPos);
 
-        if (attackValue < defenseValue) {  // Reversed comparison
-          // Only update the ownership, don't place the card again
-          adjCard.setOwner(getCurrentPlayer());
+      Card currentCard = getCardAt(currentPos.row, currentPos.col);
+      if (currentCard == null) {
+        continue;
+      }
+
+      List<Position> adjacent = getAdjacentPositions(currentPos);
+      for (Position adjPos : adjacent) {
+        if (processed.contains(adjPos)) {
+          continue;
+        }
+
+        Card adjCard = getCardAt(adjPos.row, adjPos.col);
+        if (adjCard != null && adjCard.getOwner() != currentCard.getOwner()) {
+          Direction battleDir = getBattleDirection(currentPos, adjPos);
+          int attackValue = currentCard.getAttackPower(battleDir);
+          int defenseValue = adjCard.getAttackPower(battleDir.getOpposite());
+
+          // Only flip when attack is LESS than defense
+          if (attackValue < defenseValue) {
+            adjCard.setOwner(currentCard.getOwner());
+            toProcess.add(adjPos); // Add the flipped card to process its battles
+          }
         }
       }
     }
-  }
-
-  @Override
-  public void placeCard(int row, int col, Card card) {
-    // First check if the move is valid
-    if (!canPlaceCard(row, col, card)) {
-      return;
-    }
-
-    // Set ownership BEFORE placing the card
-    card.setOwner(getCurrentPlayer());
-
-    // Place the card on the grid
-    grid.placeCard(row, col, card);
-
-    // Remove the card from player's hand
-    getPlayerHand(getCurrentPlayer()).remove(card);
-
-    // Execute battle phase - this handles the flipping
-    executeBattlePhase(new Position(row, col));
-
-    // IMPORTANT: Only change the player turn AFTER everything else is complete
-    // and don't check the current player again - just switch directly
-    setCurrentPlayer(getPlayers().get(getCurrentPlayer().equals(getPlayers().get(0).getColor()) ? 1 : 0).getColor());
-  }
-
-  @Override
-  public boolean canPlaceCard(int row, int col, Card card) {
-    // Check if position is within bounds
-    if (row < 0 || row >= grid.getRows() || col < 0 || col >= grid.getCols()) {
-      return false;
-    }
-
-    // Check if position is a hole
-    if (isHole(row, col)) {
-      return false;
-    }
-
-    // Check if position is already occupied
-    if (getCardAt(row, col) != null) {
-      return false;
-    }
-
-    return true;
   }
 
   @Override
@@ -80,22 +57,43 @@ public class ReverseRuleDecorator extends ModelDecorator {
       return 0;
     }
 
-    int flippableCount = 0;
-    List<Position> adjacent = getAdjacentPositions(new Position(row, col));
+    Set<Position> flippedCards = new HashSet<>();
+    Set<Position> toProcess = new HashSet<>();
+    Set<Position> processed = new HashSet<>();
 
-    for (Position pos : adjacent) {
-      Card adjacentCard = getCardAt(pos.row, pos.col);
-      if (adjacentCard != null && adjacentCard.getOwner() != getCurrentPlayer()) {
-        Direction battleDir = getBattleDirection(new Position(row, col), pos);
-        int attackValue = card.getAttackPower(battleDir);
-        int defenseValue = adjacentCard.getAttackPower(battleDir.getOpposite());
+    Position initialPos = new Position(row, col);
+    toProcess.add(initialPos);
 
-        if (attackValue < defenseValue) {  // Reversed comparison
-          flippableCount++;
+    while (!toProcess.isEmpty()) {
+      Position currentPos = toProcess.iterator().next();
+      toProcess.remove(currentPos);
+      processed.add(currentPos);
+
+      List<Position> adjacent = getAdjacentPositions(currentPos);
+      Card attackingCard = (currentPos.equals(initialPos)) ? card :
+              getCardAt(currentPos.row, currentPos.col);
+
+      for (Position adjPos : adjacent) {
+        if (processed.contains(adjPos)) {
+          continue;
+        }
+
+        Card adjCard = getCardAt(adjPos.row, adjPos.col);
+        if (adjCard != null && adjCard.getOwner() != getCurrentPlayer()) {
+          Direction battleDir = getBattleDirection(currentPos, adjPos);
+          int attackValue = attackingCard.getAttackPower(battleDir);
+          int defenseValue = adjCard.getAttackPower(battleDir.getOpposite());
+
+          // Only count flip when attack is LESS than defense
+          if (attackValue < defenseValue) {
+            flippedCards.add(adjPos);
+            toProcess.add(adjPos); // Process battles for the card that would be flipped
+          }
         }
       }
     }
-    return flippableCount;
+
+    return flippedCards.size();
   }
 
   private List<Position> getAdjacentPositions(Position position) {
@@ -113,15 +111,32 @@ public class ReverseRuleDecorator extends ModelDecorator {
   }
 
   private Direction getBattleDirection(Position from, Position to) {
-    if (from.row < to.row) return Direction.SOUTH;  // Attacking downward
-    if (from.row > to.row) return Direction.NORTH;  // Attacking upward
-    if (from.col < to.col) return Direction.EAST;   // Attacking rightward
-    return Direction.WEST;                          // Attacking leftward
+    if (from.row < to.row) return Direction.SOUTH;
+    if (from.row > to.row) return Direction.NORTH;
+    if (from.col < to.col) return Direction.EAST;
+    return Direction.WEST;
   }
 
   private boolean isValidPosition(int row, int col) {
     return row >= 0 && row < grid.getRows()
             && col >= 0 && col < grid.getCols()
             && !isHole(row, col);
+  }
+
+  @Override
+  public void placeCard(int row, int col, Card card) {
+    super.placeCard(row, col, card);
+    executeBattlePhase(new Position(row, col));
+  }
+
+  @Override
+  public void startGameFromConfig(String boardFile, String cardFile) throws IOException {
+    // Implementation if needed
+  }
+
+  @Override
+  public void placeCard(Player player, int row, int col, Card card) {
+    super.placeCard(player, row, col, card);
+    executeBattlePhase(new Position(row, col));
   }
 }
