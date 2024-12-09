@@ -11,6 +11,34 @@ public class ReverseRuleDecorator extends ModelDecorator {
   }
 
   @Override
+  public void executeBattlePhase(Position newCardPosition) {
+    Card newCard = grid.getCard(newCardPosition.row, newCardPosition.col);
+    List<Position> adjacent = getAdjacentPositions(newCardPosition);
+    List<Card> toFlip = new ArrayList<>();
+
+    for (Position pos : adjacent) {
+      Card adjCard = grid.getCard(pos.row, pos.col);
+      if (adjCard != null && adjCard.getOwner() != getCurrentPlayer()) {
+        Direction battleDir = getBattleDirection(newCardPosition, pos);
+        int attackValue = newCard.getAttackPower(battleDir);
+        int defenseValue = adjCard.getAttackPower(battleDir.getOpposite());
+        if (attackValue < defenseValue) {  // Reversed comparison
+          toFlip.add(adjCard);
+        }
+      }
+    }
+
+    if (base instanceof ThreeTriosGameModel) {
+      ((ThreeTriosGameModel) base).executeBattlePhase(
+              new ThreeTriosGameModel.Position(newCardPosition.row, newCardPosition.col));
+    }
+
+    for (Card card : toFlip) {
+      card.setOwner(getCurrentPlayer());
+    }
+  }
+
+  @Override
   public int getFlippableCards(int row, int col, Card card) {
     if (!canPlaceCard(row, col, card)) {
       return 0;

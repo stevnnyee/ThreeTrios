@@ -2,7 +2,7 @@ package cs3500.threetrios.model;
 
 import java.io.IOException;
 import java.util.List;
-
+import cs3500.threetrios.strategy.Position;
 import cs3500.threetrios.features.ModelFeatures;
 
 public abstract class ModelDecorator implements MainModelInterface {
@@ -109,9 +109,5 @@ public abstract class ModelDecorator implements MainModelInterface {
     base.addFeaturesListener(listener);
   }
 
-  protected void executeBattlePhase(cs3500.threetrios.model.ThreeTriosGameModel.Position newCardPosition) {
-    if (base instanceof ThreeTriosGameModel) {
-      ((ThreeTriosGameModel) base).executeBattlePhase(newCardPosition);
-    }
-  }
+  public abstract void executeBattlePhase(Position newCardPosition);
 }

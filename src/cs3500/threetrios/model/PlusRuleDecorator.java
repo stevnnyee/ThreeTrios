@@ -14,7 +14,10 @@ public class PlusRuleDecorator extends ModelDecorator {
   @Override
   public void executeBattlePhase(Position newCardPosition) {
     List<Card> plusFlips = checkPlusRule(newCardPosition);
-    super.executeBattlePhase(newCardPosition);
+    if (base instanceof ThreeTriosGameModel) {
+      ((ThreeTriosGameModel) base).executeBattlePhase(
+              new ThreeTriosGameModel.Position(newCardPosition.row, newCardPosition.col));
+    }
     for (Card card : plusFlips) {
       card.setOwner(getCurrentPlayer());
     }

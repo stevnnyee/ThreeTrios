@@ -14,7 +14,10 @@ public class SameRuleDecorator extends ModelDecorator {
   @Override
   public void executeBattlePhase(Position newCardPosition) {
     List<Card> sameFlips = checkSameRule(newCardPosition);
-    super.executeBattlePhase(newCardPosition);
+    if (base instanceof ThreeTriosGameModel) {
+      ((ThreeTriosGameModel) base).executeBattlePhase(
+              new ThreeTriosGameModel.Position(newCardPosition.row, newCardPosition.col));
+    }
     for (Card card : sameFlips) {
       card.setOwner(getCurrentPlayer());
     }

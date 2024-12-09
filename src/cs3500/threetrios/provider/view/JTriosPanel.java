@@ -24,7 +24,6 @@ import cs3500.threetrios.provider.model.ReadOnlyTT;
  * Again, just for preparation and testing for the next part!
  */
 public class JTriosPanel extends JPanel {
-
   private final ReadOnlyTT model;
   private TriosController features;
   private int selectedCardIndex = -1;
@@ -48,6 +47,31 @@ public class JTriosPanel extends JPanel {
     this.addMouseListener(new TriosClickListener());
   }
 
+  private int[] getCellDimensions() {
+    int rows = model.numRows();
+    int cols = model.numCols() + 2; // add player hands on either side
+    int cellWidth = getWidth() / cols;
+    int cellHeight = getHeight() / rows;
+    return new int[]{cellWidth, cellHeight};
+  }
+
+  private int[] getGridCoordinates(int pixelX, int pixelY) {
+    int[] dims = getCellDimensions();
+    int cellWidth = dims[0];
+    int cellHeight = dims[1];
+
+    int col = pixelX / cellWidth;
+    int row = pixelY / cellHeight;
+
+    // Bound checking
+    if (row < 0) row = 0;
+    if (col < 0) col = 0;
+    if (row >= model.numRows()) row = model.numRows() - 1;
+    if (col >= model.numCols() + 2) col = model.numCols() + 1;
+
+    return new int[]{row, col};
+  }
+
   /**
    * This method tells Swing what the "natural" size should be
    * for this panel.  Here, we set it to 600x600 pixels.
@@ -57,6 +81,12 @@ public class JTriosPanel extends JPanel {
   @Override
   public Dimension getPreferredSize() {
     return new Dimension(600, 600);
+  }
+
+
+  @Override
+  public Dimension getMinimumSize() {
+    return new Dimension(400, 400);
   }
 
   /**
@@ -76,7 +106,6 @@ public class JTriosPanel extends JPanel {
    * @return true if the card was selected, false otherwise
    */
   public boolean selectCard(int row, int col) {
-
     PlayerColor colorChosen = (col == 0) ? PlayerColor.RED : PlayerColor.BLUE;
 
     if (this.selectedCardIndex == row && this.selectedCardColor == colorChosen) {
@@ -102,7 +131,7 @@ public class JTriosPanel extends JPanel {
     List<Card> playerRedHand = model.getHand(PlayerColor.RED);
     List<Card> playerBlueHand = model.getHand(PlayerColor.BLUE);
 
-    for (int row = 0; row < rows; row++) { // loop to iterate through and draw each cell
+    for (int row = 0; row < rows; row++) {
       for (int col = 0; col < cols; col++) {
         Cell currentCell;
         boolean isHighlighted = false;
@@ -111,7 +140,7 @@ public class JTriosPanel extends JPanel {
         PlayerColor currentColor = (col == 0) ? PlayerColor.RED : PlayerColor.BLUE;
         if (col == 0 || col == cols - 1) {  // player hands
           if (row > currentHand.size() - 1) {
-            currentCell = null; // then this spot in player's hand is empty
+            currentCell = null;
           } else {
             Card currentCard = currentHand.get(row);
             CardCell temp = new CardCell();
@@ -128,13 +157,14 @@ public class JTriosPanel extends JPanel {
             isHighlighted = true;
           }
         }
+
         Color cellColor = handleHighlight(currentCell, isHighlighted, col, cols);
         int x = col * cellWidth;
         int y = row * cellHeight;
         g2d.setColor(cellColor);
         g2d.fillRect(x, y, cellWidth, cellHeight);
 
-        g2d.setColor(Color.BLACK); // Draw the black outline around the cell
+        g2d.setColor(Color.BLACK);
         g2d.drawRect(x, y, cellWidth, cellHeight);
         if (currentCell == null || currentCell.isHole() || currentCell.isEmpty()) {
           continue;
@@ -143,11 +173,11 @@ public class JTriosPanel extends JPanel {
       }
     }
 
-    // draw black lines separating hands from the board
     g2d.setColor(Color.BLACK);
     g2d.setStroke(new BasicStroke(5));
     g2d.drawLine(cellWidth, 0, cellWidth, getHeight());
     g2d.drawLine(cellWidth * (cols - 1), 0, cellWidth * (cols - 1), getHeight());
+
     if (showHints && selectedCardIndex != -1) {
       paintHints(g2d);
     }
@@ -314,31 +344,30 @@ public class JTriosPanel extends JPanel {
   }
 
   private class TriosClickListener implements MouseListener {
-
     @Override
     public void mouseClicked(MouseEvent e) {
-      features.handleCellClick(e.getX(), e.getY());
+      if (features != null) {
+        features.handleCellClick(e.getX(), e.getY());
+      }
     }
-
     @Override
     public void mousePressed(MouseEvent e) {
-      //empty
+      // empty
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-      //empty
+      // empty
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-      //empty
+      // empty
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-      //empty
+      // empty
     }
-
   }
 }
