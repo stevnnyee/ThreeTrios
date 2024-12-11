@@ -1,6 +1,6 @@
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
 
 import cs3500.threetrios.model.Card;
 import cs3500.threetrios.model.Grid;
@@ -14,23 +14,25 @@ import cs3500.threetrios.model.ThreeTriosGrid;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Tests functionality of the ReverseRuleDecorator class with focus on reverse battle mechanics.
  */
 public class ReverseRuleDecoratorTest {
-  private MainModelInterface baseModel;
   private ReverseRuleDecorator decorator;
-  private List<Card> deck;
-  private Grid grid;
 
   /**
    * Sets up the test environment with a 3x3 grid, two holes, and 15 test cards.
    */
   @Before
   public void setup() {
-    baseModel = new ThreeTriosGameModel();
+    MainModelInterface baseModel = new ThreeTriosGameModel();
     decorator = new ReverseRuleDecorator(baseModel);
-    deck = new ArrayList<>();
+    List<Card> deck = new ArrayList<>();
     deck.add(new ThreeTriosCard("BlackKnight", 8, 6, 9, 7));
     deck.add(new ThreeTriosCard("BabyDragon", 7, 8, 6, 5));
     deck.add(new ThreeTriosCard("IceWizard", 6, 5, 8, 7));
@@ -52,7 +54,7 @@ public class ReverseRuleDecoratorTest {
             {true, true, false},
             {false, false, false}
     };
-    grid = new ThreeTriosGrid(3, 3, holes);
+    Grid grid = new ThreeTriosGrid(3, 3, holes);
     decorator.startGame(grid, deck);
   }
 
@@ -139,6 +141,7 @@ public class ReverseRuleDecoratorTest {
     decorator.placeCard(0, 0, firstCard);
 
     Player secondPlayer = decorator.getCurrentPlayer();
+
     assertNotEquals(firstPlayer, secondPlayer);
   }
 

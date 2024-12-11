@@ -55,50 +55,39 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
   private final JCheckBox hintsToggle;
 
   /**
-   * Constructs a new ThreeTrios game window.
-   *
-   * @param model the game model
+   * Constructor initializing game.
+   * @param model our model.
    */
   public ThreeTriosSwingView(ReadOnlyThreeTriosModel model) {
     this.model = model;
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setLayout(new BorderLayout(0, 0));
-
-    // Initialize panels first
     this.boardPanel = new GameBoardPanelImpl(model);
     this.leftHandPanel = new PlayerHandPanelImpl(model, "RED");
     this.rightHandPanel = new PlayerHandPanelImpl(model, "BLUE");
-
-    // Set panel sizes
     leftHandPanel.setPreferredSize(new Dimension(HAND_WIDTH, 400));
     rightHandPanel.setPreferredSize(new Dimension(HAND_WIDTH, 400));
     boardPanel.setPreferredSize(new Dimension(500, 400));
-
-    // Initialize hint-related components
     String currentColor = model.getCurrentPlayer() != null ?
             model.getCurrentPlayer().getColor() : "RED";
     this.boardDecorator = new HintDecorator(boardPanel, model, currentColor);
     this.hintsToggle = new JCheckBox("Show Hints");
-
-    // Set up hint toggle after boardDecorator is initialized
-    hintsToggle.addActionListener(e -> {
-      System.out.println("Hint toggle clicked: " + hintsToggle.isSelected());
-      boardDecorator.setShowHints(hintsToggle.isSelected());
-      if (selectedCard != null) {
-        boardDecorator.setSelectedCard(selectedCard, selectedCardPlayer);
+    hintsToggle.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        boardDecorator.setShowHints(hintsToggle.isSelected());
+        if (selectedCard != null) {
+          boardDecorator.setSelectedCard(selectedCard, selectedCardPlayer);
+        }
+        boardDecorator.refresh();
       }
-      boardDecorator.refresh();
     });
-
-    // Add components to frame
     JPanel controlPanel = new JPanel();
     controlPanel.add(hintsToggle);
     add(controlPanel, BorderLayout.NORTH);
     add(leftHandPanel, BorderLayout.WEST);
-    add(boardDecorator, BorderLayout.CENTER);  // Use boardDecorator instead of boardPanel
+    add(boardDecorator, BorderLayout.CENTER);
     add(rightHandPanel, BorderLayout.EAST);
-
-    // Set up board decorator mouse listener
     boardDecorator.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
@@ -112,7 +101,6 @@ public class ThreeTriosSwingView extends JFrame implements ThreeTriosFrame {
         }
       }
     });
-
     pack();
   }
 

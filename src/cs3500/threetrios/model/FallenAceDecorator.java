@@ -2,7 +2,6 @@ package cs3500.threetrios.model;
 
 import cs3500.threetrios.strategy.Position;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -10,11 +9,6 @@ import java.util.Set;
 
 /**
  * Fallen ace decorator class.
- * Special rules:
- * 1. A 1 beats an A (Ace)
- * 2. An A beats 2-9
- * 3. 2-9 can beat 1
- * 4. An A can never beat 1
  */
 public class FallenAceDecorator extends ModelDecorator {
   private final boolean reverseRuleActive;
@@ -155,9 +149,15 @@ public class FallenAceDecorator extends ModelDecorator {
   }
 
   private Direction getBattleDirection(Position from, Position to) {
-    if (from.row < to.row) return Direction.SOUTH;
-    if (from.row > to.row) return Direction.NORTH;
-    if (from.col < to.col) return Direction.EAST;
+    if (from.row < to.row) {
+      return Direction.SOUTH;
+    }
+    if (from.row > to.row) {
+      return Direction.NORTH;
+    }
+    if (from.col < to.col) {
+      return Direction.EAST;
+    }
     return Direction.WEST;
   }
 
@@ -177,9 +177,5 @@ public class FallenAceDecorator extends ModelDecorator {
   public void placeCard(Player player, int row, int col, Card card) {
     super.placeCard(player, row, col, card);
     executeBattlePhase(new Position(row, col));
-  }
-
-  @Override
-  public void startGameFromConfig(String boardFile, String cardFile) throws IOException {
   }
 }

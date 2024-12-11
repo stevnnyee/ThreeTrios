@@ -271,6 +271,12 @@ public class ThreeTriosGameModel implements MainModelInterface {
     }
   }
 
+  @Override
+  public void executeBattlePhase(cs3500.threetrios.strategy.Position newCardPosition) {
+    Position internalPos = new Position(newCardPosition.row, newCardPosition.col);
+    executeBattlePhase(internalPos);
+  }
+
 
   /**
    * Checks if a card wins the battle in comparison to another card.
@@ -586,13 +592,5 @@ public class ThreeTriosGameModel implements MainModelInterface {
       this.row = row;
       this.col = col;
     }
-  }
-
-  @Override
-  public void executeBattlePhase(cs3500.threetrios.strategy.Position newCardPosition) {
-    // Convert the strategy.Position to our internal Position class
-    Position internalPos = new Position(newCardPosition.row, newCardPosition.col);
-    // Call our existing implementation
-    executeBattlePhase(internalPos);
   }
 }

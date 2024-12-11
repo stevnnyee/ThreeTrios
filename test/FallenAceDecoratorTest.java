@@ -1,6 +1,6 @@
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
 
 import cs3500.threetrios.model.Card;
 import cs3500.threetrios.model.Grid;
@@ -13,6 +13,11 @@ import cs3500.threetrios.model.ThreeTriosGrid;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests functionality of the FallenAceDecorator class with focus on Ace-specific battle rules.
@@ -77,6 +82,7 @@ public class FallenAceDecoratorTest {
     decorator.placeCard(0, 0, firstCard);
 
     Player secondPlayer = decorator.getCurrentPlayer();
+    
     assertNotEquals(firstPlayer, secondPlayer);
   }
 

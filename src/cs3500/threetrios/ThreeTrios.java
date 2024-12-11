@@ -6,9 +6,7 @@ import cs3500.threetrios.controller.AIPlayer;
 import cs3500.threetrios.controller.ThreeTriosController;
 import cs3500.threetrios.model.FallenAceDecorator;
 import cs3500.threetrios.model.MainModelInterface;
-import cs3500.threetrios.model.PlusRuleDecorator;
 import cs3500.threetrios.model.ReverseRuleDecorator;
-import cs3500.threetrios.model.SameRuleDecorator;
 import cs3500.threetrios.model.ThreeTriosGameModel;
 import cs3500.threetrios.model.Grid;
 import cs3500.threetrios.model.Card;
@@ -27,16 +25,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * java -jar threetrios.jar [player1] [player2] [variant rules...] [provider]
- *
- * java -jar threetrios.jar human human
- * java -jar threetrios.jar human human reverse fallenace
- * java -jar threetrios.jar human cornerstrat same
- * java -jar threetrios.jar human human reverse provider
- *
- */
+ * java -jar threetrios.jar human human.
+ * java -jar threetrios.jar human human reverse fallenace.
+ * java -jar threetrios.jar human cornerstrat same.
+ * java -jar threetrios.jar human human reverse provider.
 
-/**
  * Main class for the ThreeTrios game. This class initializes and starts the game with
  * a predefined board layout and randomly generated cards.
  * The board is a 5x7 grid with specific holes pattern, and the deck contains 35 cards
@@ -89,11 +82,6 @@ public final class ThreeTrios {
     if (variantArgs.contains("fallenace")) {
       model = new FallenAceDecorator(model, reverseActive);  // Pass whether reverse rule is active
     }
-    if (variantArgs.contains("same")) {
-      model = new SameRuleDecorator(model);
-    } else if (variantArgs.contains("plus")) {
-      model = new PlusRuleDecorator(model);
-    }
     setupGame(model);
 
     String redType = playerArgs.size() > 0 ? playerArgs.get(0) : "human";
@@ -121,8 +109,8 @@ public final class ThreeTrios {
       redController.startGame();
       blueView.makeVisible();
 
-      if (model.getCurrentPlayer().getColor().equals("BLUE") &&
-              bluePlayer instanceof AIPlayer) {
+      if (model.getCurrentPlayer().getColor().equals("BLUE")
+              && bluePlayer instanceof AIPlayer) {
         blueController.notifyTurnChange(model.getCurrentPlayer());
       }
     } else {

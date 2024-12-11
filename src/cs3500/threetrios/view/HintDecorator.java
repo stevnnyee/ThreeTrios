@@ -7,11 +7,15 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.RenderingHints;
+import java.util.HashSet;
+import java.util.Set;
 
 import cs3500.threetrios.model.Card;
+import cs3500.threetrios.model.FallenAceDecorator;
 import cs3500.threetrios.model.Player;
 import cs3500.threetrios.model.ReadOnlyThreeTriosModel;
 import cs3500.threetrios.model.Direction;
+import cs3500.threetrios.model.ReverseRuleDecorator;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -78,37 +82,151 @@ public class HintDecorator extends JPanel implements GameBoardPanel {
     g2d.dispose();
   }
 
+
   private int calculateTotalFlips(int row, int col) {
-    int flips = model.getFlippableCards(row, col, selectedCard);
+    if (model instanceof ReverseRuleDecorator && model instanceof FallenAceDecorator) {
+      return countFlipsReverseFallenAce(row, col, selectedCard,
+              new HashSet<>(), selectedCard.getOwner());
+    } else if (model instanceof ReverseRuleDecorator) {
+      return countFlipsReverse(row, col, selectedCard, new HashSet<>(), selectedCard.getOwner());
+    } else if (model instanceof FallenAceDecorator) {
+      return countFlipsFallenAce(row, col, selectedCard, new HashSet<>(), selectedCard.getOwner());
+    } else {
+      return countFlipsNormal(row, col, selectedCard, new HashSet<>(), selectedCard.getOwner());
+    }
+  }
+
+  private int countFlipsReverseFallenAce(int row, int col,
+                                         Card attackingCard,
+                                         Set<String> processed, Player originalAttacker) {
+    int flips = 0;
     int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
     for (int[] dir : directions) {
       int adjRow = row + dir[0];
       int adjCol = col + dir[1];
+      String coord = adjRow + "," + adjCol;
 
-      if (isValidPosition(adjRow, adjCol)) {
+      if (!processed.contains(coord) && isValidPosition(adjRow, adjCol)) {
         Card adjCard = model.getCardAt(adjRow, adjCol);
-        if (adjCard != null && adjCard.getOwner() != selectedCard.getOwner()) {
+        if (adjCard != null && adjCard.getOwner() != originalAttacker) {
           Direction battleDir = getBattleDirection(row, col, adjRow, adjCol);
-          int attackValue = selectedCard.getAttackPower(battleDir);
+          int attackValue = attackingCard.getAttackPower(battleDir);
           int defenseValue = adjCard.getAttackPower(battleDir.getOpposite());
-          if (attackValue > defenseValue) {
-            for (int[] secDir : directions) {
-              int secRow = adjRow + secDir[0];
-              int secCol = adjCol + secDir[1];
+          int attackNum = attackValue == 10 ? 10 : attackValue;
+          int defenseNum = defenseValue == 10 ? 10 : defenseValue;
+          boolean shouldFlip;
+          if ((attackNum == 10 && defenseNum == 1) || (attackNum == 1 && defenseNum == 10)) {
+            shouldFlip = false;
+          }
+          else {
+            shouldFlip = attackNum < defenseNum;
+          }
+          if (shouldFlip) {
+            flips++;
+            processed.add(coord);
+            flips += countFlipsReverseFallenAce(adjRow,
+                    adjCol, adjCard, processed, originalAttacker);
+          }
+        }
+      }
+    }
+    return flips;
+  }
 
-              if (isValidPosition(secRow, secCol)) {
-                Card secCard = model.getCardAt(secRow, secCol);
-                if (secCard != null && secCard.getOwner() != selectedCard.getOwner()) {
-                  Direction secBattleDir = getBattleDirection(adjRow, adjCol, secRow, secCol);
-                  int secAttackValue = adjCard.getAttackPower(secBattleDir);
-                  int secDefenseValue = secCard.getAttackPower(secBattleDir.getOpposite());
-                  if (secAttackValue > secDefenseValue) {
-                    flips++;
-                  }
-                }
-              }
-            }
+  private int countFlipsNormal(int row, int col,
+                               Card attackingCard, Set<String> processed,
+                               Player originalAttacker) {
+    int flips = 0;
+    int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+    for (int[] dir : directions) {
+      int adjRow = row + dir[0];
+      int adjCol = col + dir[1];
+      String coord = adjRow + "," + adjCol;
+
+      if (!processed.contains(coord) && isValidPosition(adjRow, adjCol)) {
+        Card adjCard = model.getCardAt(adjRow, adjCol);
+        if (adjCard != null && adjCard.getOwner() != originalAttacker) {
+          Direction battleDir = getBattleDirection(row, col, adjRow, adjCol);
+          int attackValue = attackingCard.getAttackPower(battleDir);
+          int defenseValue = adjCard.getAttackPower(battleDir.getOpposite());
+
+          if (attackValue > defenseValue) {
+            flips++;
+            processed.add(coord);
+            flips += countFlipsNormal(adjRow, adjCol, adjCard, processed, originalAttacker);
+          }
+        }
+      }
+    }
+    return flips;
+  }
+
+  private int countFlipsReverse(int row, int col,
+                                Card attackingCard, Set<String> processed,
+                                Player originalAttacker) {
+    int flips = 0;
+    int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+    for (int[] dir : directions) {
+      int adjRow = row + dir[0];
+      int adjCol = col + dir[1];
+      String coord = adjRow + "," + adjCol;
+
+      if (!processed.contains(coord) && isValidPosition(adjRow, adjCol)) {
+        Card adjCard = model.getCardAt(adjRow, adjCol);
+        if (adjCard != null && adjCard.getOwner() != originalAttacker) {
+          Direction battleDir = getBattleDirection(row, col, adjRow, adjCol);
+          int attackValue = attackingCard.getAttackPower(battleDir);
+          int defenseValue = adjCard.getAttackPower(battleDir.getOpposite());
+
+          if (attackValue < defenseValue) {
+            flips++;
+            processed.add(coord);
+            flips += countFlipsReverse(adjRow, adjCol, adjCard, processed, originalAttacker);
+          }
+        }
+      }
+    }
+    return flips;
+  }
+
+  private int countFlipsFallenAce(int row, int col,
+                                  Card attackingCard,
+                                  Set<String> processed, Player originalAttacker) {
+    int flips = 0;
+    int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+    for (int[] dir : directions) {
+      int adjRow = row + dir[0];
+      int adjCol = col + dir[1];
+      String coord = adjRow + "," + adjCol;
+
+      if (!processed.contains(coord) && isValidPosition(adjRow, adjCol)) {
+        Card adjCard = model.getCardAt(adjRow, adjCol);
+        if (adjCard != null && adjCard.getOwner() != originalAttacker) {
+          Direction battleDir = getBattleDirection(row, col, adjRow, adjCol);
+          int attackValue = attackingCard.getAttackPower(battleDir);
+          int defenseValue = adjCard.getAttackPower(battleDir.getOpposite());
+
+          boolean shouldFlip = false;
+          if (attackValue == 1 && defenseValue == 10) {
+            shouldFlip = true;
+          } else if (attackValue == 10 && defenseValue == 1) {
+            shouldFlip = false;
+          } else if (attackValue == 10 && defenseValue >= 2 && defenseValue <= 9) {
+            shouldFlip = true;
+          } else if (defenseValue == 1) {
+            shouldFlip = attackValue > defenseValue;
+          } else {
+            shouldFlip = attackValue > defenseValue;
+          }
+
+          if (shouldFlip) {
+            flips++;
+            processed.add(coord);
+            flips += countFlipsFallenAce(adjRow, adjCol, adjCard, processed, originalAttacker);
           }
         }
       }
@@ -123,9 +241,15 @@ public class HintDecorator extends JPanel implements GameBoardPanel {
   }
 
   private Direction getBattleDirection(int fromRow, int fromCol, int toRow, int toCol) {
-    if (fromRow < toRow) return Direction.SOUTH;
-    if (fromRow > toRow) return Direction.NORTH;
-    if (fromCol < toCol) return Direction.EAST;
+    if (fromRow < toRow) {
+      return Direction.SOUTH;
+    }
+    if (fromRow > toRow) {
+      return Direction.NORTH;
+    }
+    if (fromCol < toCol) {
+      return Direction.EAST;
+    }
     return Direction.WEST;
   }
 
@@ -161,6 +285,11 @@ public class HintDecorator extends JPanel implements GameBoardPanel {
     refresh();
   }
 
+  /**
+   * helps refresh.
+   * @param card selected card.
+   * @param player team person who played the card.
+   */
   public void setSelectedCard(Card card, Player player) {
     this.selectedCard = card;
     if (showHints) {

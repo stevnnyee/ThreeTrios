@@ -2,12 +2,15 @@ package cs3500.threetrios.model;
 
 import cs3500.threetrios.strategy.Position;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Reverse rule decorator class.
+ * Cards with lower attack power beat cards with higher values.
+ */
 public class ReverseRuleDecorator extends ModelDecorator {
   public ReverseRuleDecorator(MainModelInterface base) {
     super(base);
@@ -40,11 +43,9 @@ public class ReverseRuleDecorator extends ModelDecorator {
           Direction battleDir = getBattleDirection(currentPos, adjPos);
           int attackValue = currentCard.getAttackPower(battleDir);
           int defenseValue = adjCard.getAttackPower(battleDir.getOpposite());
-
-          // Only flip when attack is LESS than defense
           if (attackValue < defenseValue) {
             adjCard.setOwner(currentCard.getOwner());
-            toProcess.add(adjPos); // Add the flipped card to process its battles
+            toProcess.add(adjPos);
           }
         }
       }
@@ -84,10 +85,9 @@ public class ReverseRuleDecorator extends ModelDecorator {
           int attackValue = attackingCard.getAttackPower(battleDir);
           int defenseValue = adjCard.getAttackPower(battleDir.getOpposite());
 
-          // Only count flip when attack is LESS than defense
           if (attackValue < defenseValue) {
             flippedCards.add(adjPos);
-            toProcess.add(adjPos); // Process battles for the card that would be flipped
+            toProcess.add(adjPos);
           }
         }
       }
@@ -111,9 +111,15 @@ public class ReverseRuleDecorator extends ModelDecorator {
   }
 
   private Direction getBattleDirection(Position from, Position to) {
-    if (from.row < to.row) return Direction.SOUTH;
-    if (from.row > to.row) return Direction.NORTH;
-    if (from.col < to.col) return Direction.EAST;
+    if (from.row < to.row) {
+      return Direction.SOUTH;
+    }
+    if (from.row > to.row) {
+      return Direction.NORTH;
+    }
+    if (from.col < to.col) {
+      return Direction.EAST;
+    }
     return Direction.WEST;
   }
 
@@ -130,13 +136,9 @@ public class ReverseRuleDecorator extends ModelDecorator {
   }
 
   @Override
-  public void startGameFromConfig(String boardFile, String cardFile) throws IOException {
-    // Implementation if needed
-  }
-
-  @Override
   public void placeCard(Player player, int row, int col, Card card) {
     super.placeCard(player, row, col, card);
     executeBattlePhase(new Position(row, col));
   }
+
 }

@@ -5,6 +5,9 @@ import java.util.List;
 import cs3500.threetrios.strategy.Position;
 import cs3500.threetrios.features.ModelFeatures;
 
+/**
+ * Abstract class containing the methods required by the decorators.
+ */
 public abstract class ModelDecorator implements MainModelInterface {
   protected final MainModelInterface base;
   protected Grid grid;
@@ -18,18 +21,10 @@ public abstract class ModelDecorator implements MainModelInterface {
     if (!canPlaceCard(row, col, card)) {
       throw new IllegalArgumentException("Invalid card placement");
     }
-
-    // Place card directly on grid
     card.setOwner(player);
     grid.placeCard(row, col, card);
-
-    // Remove from player's hand using base model (which modifies the actual hand)
     base.getPlayerHand(player).remove(card);
-
-    // Execute only our battle phase
     executeBattlePhase(new Position(row, col));
-
-    // Change turns
     String nextPlayer = player.getColor().equals("RED") ? "BLUE" : "RED";
     base.setCurrentPlayer(nextPlayer);
   }
@@ -39,7 +34,6 @@ public abstract class ModelDecorator implements MainModelInterface {
     placeCard(getCurrentPlayer(), row, col, card);
   }
 
-  // All other methods remain unchanged, delegating to base
   @Override
   public void startGame(Grid grid, List<Card> deck) {
     base.startGame(grid, deck);
